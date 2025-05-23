@@ -14,10 +14,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "de.crafty.eiv.fabric.ExtendedItemView"
+      "de.crafty.eiv.fabric.FabricEIV"
     ],
     "client": [
-      "de.crafty.eiv.fabric.ExtendedItemViewClient"
+      "de.crafty.eiv.fabric.FabricEIVClient"
     ],
     "eiv": [
       "de.crafty.eiv.common.BuiltInEivIntegration"

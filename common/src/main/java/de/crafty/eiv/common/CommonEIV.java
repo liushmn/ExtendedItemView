@@ -45,7 +45,7 @@ public class CommonEIV {
             Class.forName("net.minecraft.client.main.Main");
             NETWORK_MANAGER.registerClientHandlers();
 
-        }catch (ClassNotFoundException ignored){
+        } catch (ClassNotFoundException ignored) {
         }
 
     }
@@ -56,7 +56,6 @@ public class CommonEIV {
 
         throw new IllegalStateException("Network manager not set");
     }
-
 
 
     public static void buildFluidItems() {
@@ -85,24 +84,4 @@ public class CommonEIV {
         ItemViewRecipes.INSTANCE.setFluidItemMap(fluidItemMap);
     }
 
-
-    public static void onExit() {
-
-        JsonObject encoded = new JsonObject();
-        ItemBookmarkOverlay.INSTANCE.saveBookmarkedItems(encoded);
-
-        File bookmarkFile = new File("config/eiv/bookmarks.json");
-
-        try {
-            if (!bookmarkFile.exists())
-                bookmarkFile.createNewFile();
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileUtils.writeStringToFile(bookmarkFile, gson.toJson(encoded));
-        } catch (Exception e) {
-            LOGGER.error("Failed to save bookmarks to file", e);
-        }
-
-
-    }
 }
