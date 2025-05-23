@@ -1,0 +1,54 @@
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    compileOnly project(":Common")
+}
+
+loom {
+    accessWidenerPath = project(":Common").file("src/main/resources/${mod_id}.accesswidener")
+
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Minecraft Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Minecraft Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+base.archivesName.set("${project.mod_id}-fabric")
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+}
+
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${base.archivesName.get()}"}
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    source(project(":Common").sourceSets.main.allSource)
+}

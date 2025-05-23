@@ -1,0 +1,62 @@
+package de.crafty.eiv.common;
+
+import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
+import de.crafty.eiv.common.resolver.IEivClientResolver;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.inventory.MenuType;
+
+import java.util.List;
+
+import static de.crafty.eiv.common.CommonEIV.LOGGER;
+import static de.crafty.eiv.common.CommonEIV.MODID;
+
+public class CommonEIVClient {
+
+    public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MODID, "fluiditem"), "inventory");
+
+    public static final MenuType<RecipeViewMenu> RECIPE_VIEW_MENU = Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(MODID, "recipe_view"), new MenuType<>(RecipeViewMenu::new, FeatureFlagSet.of()));
+
+
+    public static final KeyMapping USAGE_KEYBIND = new KeyMapping("key.eiv.usage", 85, "key.categories.eiv");
+
+    public static final KeyMapping RECIPE_KEYBIND = new KeyMapping("key.eiv.recipe", 82, "key.categories.eiv");
+
+    public static final KeyMapping TOGGLE_OVERLAY_KEYBIND = new KeyMapping("key.eiv.toggle_overlay", 79, "key.categories.eiv");
+
+    public static final KeyMapping ADD_BOOKMARK_KEYBIND = new KeyMapping("key.eiv.bookmark", 65, "key.categories.eiv");
+
+    public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND);
+
+    private static IEivClientResolver HELPER = null;
+
+
+    public static void setResolver(final IEivClientResolver helper) {
+        HELPER = helper;
+        LOGGER.info("Helper has been set");
+    }
+
+    public static IEivClientResolver resolver() {
+        if (HELPER != null)
+            return HELPER;
+
+        throw new IllegalStateException("Helper not set");
+    }
+
+
+    public static void excludeEivMappings() {
+        KeyMapping.MAP.clear();
+
+        for (KeyMapping keyMapping : KeyMapping.ALL.values()) {
+            if (KeyMapping.MAP.containsKey(keyMapping.key) && EIV_KEY_MAPPINGS.contains(keyMapping)) {
+                continue;
+            }
+
+            KeyMapping.MAP.put(keyMapping.key, keyMapping);
+        }
+    }
+}

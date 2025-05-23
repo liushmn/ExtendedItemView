@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "de.crafty.eiv.common.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "eiv.refmap.json",
+  "mixins": [
+    "advancements.critereon.MixinInventoryChangeTrigger",
+    "server.MixinMinecraftServer",
+    "world.item.crafting.MixinRecipeManager"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "client.MixinKeyMapping",
+    "client.MixinMinecraft",
+    "client.gui.MixinGui",
+    "client.gui.screens.MixinScreen",
+    "client.gui.screens.inventory.MixinAbstractContainerScreen",
+    "client.gui.screens.inventory.MixinCreativeModeInventoryScreen",
+    "client.multiplayer.MixinClientPacketListener",
+    "client.renderer.special.MixinSpecialModelRenderers",
+    "core.registries.MixinBuiltInRegistries"
+  ]
+}

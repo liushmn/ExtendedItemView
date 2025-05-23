@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "eiv",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contact": {
+  },
+  "license": "${mod_license}",
+  "icon": "assets/eiv/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.crafty.eiv.fabric.ExtendedItemView"
+    ],
+    "client": [
+      "de.crafty.eiv.fabric.ExtendedItemViewClient"
+    ],
+    "eiv": [
+      "de.crafty.eiv.common.BuiltInEivIntegration"
+    ]
+  },
+  "mixins": [
+    "eiv.mixins.json"
+  ],
+  "accessWidener": "eiv.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.5",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+  }
+}
