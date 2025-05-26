@@ -1,9 +1,7 @@
 package de.crafty.eiv.fabric;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
-import de.crafty.eiv.fabric.network.FabricNetworkManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -16,8 +14,6 @@ public class FabricEIV implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Hello Minecraft!");
-
-        CommonEIV.setNetworkManager(new FabricNetworkManager());
 
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> EivCommand.register(commandDispatcher));
 

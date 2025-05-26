@@ -1,14 +1,15 @@
 package de.crafty.eiv.fabric.resolver;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
-import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.material.Fluid;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class FabricEivResolver implements IEivClientResolver {
@@ -21,7 +22,12 @@ public class FabricEivResolver implements IEivClientResolver {
     }
 
     @Override
-    public TextureAtlasSprite resolveFluidSprite(Fluid fluid) {
-        return FluidRenderHandlerRegistryImpl.INSTANCE.get(fluid).getFluidSprites(null, null, fluid.defaultFluidState())[0];
+    public UVInfo getUVInfo(TextureAtlasSprite sprite) {
+        return new UVInfo(sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
+    }
+
+    @Override
+    public Map<InputConstants.Key, KeyMapping> getKeyMap() {
+        return KeyMapping.MAP;
     }
 }

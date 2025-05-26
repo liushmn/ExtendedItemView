@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.extra.FluidStack;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -165,7 +166,7 @@ public class SlotContent {
 
     public static SlotContent of(Ingredient ingredient) {
 
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ingredient.values.unwrap();
+        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = HolderSet.direct(ingredient.items().toList()).unwrap();
 
         if (ingredientContent.right().isPresent()) {
             List<ItemStack> stacks = new ArrayList<>();

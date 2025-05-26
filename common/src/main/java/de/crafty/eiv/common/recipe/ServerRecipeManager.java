@@ -1,5 +1,8 @@
 package de.crafty.eiv.common.recipe;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivServerModRecipe;
 import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
@@ -14,7 +17,10 @@ import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTy
 import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTypeUpdatePayload;
 import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTypeUpdateStartPayload;
 import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeRecipeUpdatePayload;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,10 +30,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 
 import java.util.*;
 
@@ -145,6 +148,7 @@ public class ServerRecipeManager {
 
 
     public void informAboutAllRecipes(ServerPlayer serverPlayer) {
+        System.out.println("I've got something! Wooow");
         if (VANILLA_LIKE_RECIPES.isEmpty() && MOD_RECIPES.isEmpty())
             return;
 
@@ -175,6 +179,8 @@ public class ServerRecipeManager {
         if (MOD_RECIPES.isEmpty())
             return;
 
+        System.out.println(this.getServer() == null);
+
         CommonEIV.LOGGER.info("Informing {} about {} mod recipe types", serverPlayer.getName(), MOD_RECIPES.size());
         CommonEIV.networkManager().sendPacket(serverPlayer, new ClientboundModRecipeUpdatePayload(MOD_RECIPES.size()));
         MOD_RECIPES.forEach((type, entries) -> {
@@ -196,11 +202,12 @@ public class ServerRecipeManager {
                 VanillaRecipeEntry::recipe,
                 (s, r) -> new VanillaRecipeEntry(ResourceLocation.tryParse(s), r)
         );
+
     }
 
     public record ModRecipeEntry(ResourceLocation modRecipeId, IEivServerModRecipe recipe) {
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, ModRecipeEntry> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<FriendlyByteBuf, ModRecipeEntry> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8,
                 entry -> entry.modRecipeId().toString(),
                 ByteBufCodecs.COMPOUND_TAG,
@@ -246,7 +253,7 @@ public class ServerRecipeManager {
             usedSlots.forEach((playerSlot, stack) -> {
                 ItemStack currentInDest = player.containerMenu.getSlot(destSlot).getItem();
 
-                if(currentInDest.isEmpty())
+                if (currentInDest.isEmpty())
                     player.containerMenu.getSlot(destSlot).set(player.getInventory().removeItem(playerSlot, stack.getCount()));
                 else
                     player.containerMenu.getSlot(destSlot).set(currentInDest.copyWithCount(currentInDest.getCount() + player.getInventory().removeItem(playerSlot, stack.getCount()).getCount()));

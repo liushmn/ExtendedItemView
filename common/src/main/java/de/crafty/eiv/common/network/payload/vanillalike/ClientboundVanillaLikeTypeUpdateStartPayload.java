@@ -2,6 +2,7 @@ package de.crafty.eiv.common.network.payload.vanillalike;
 
 import de.crafty.eiv.common.CommonEIV;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

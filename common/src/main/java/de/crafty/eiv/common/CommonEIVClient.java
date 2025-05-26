@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
@@ -19,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static de.crafty.eiv.common.CommonEIV.LOGGER;
 import static de.crafty.eiv.common.CommonEIV.MODID;
@@ -27,7 +29,7 @@ public class CommonEIVClient {
 
     public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MODID, "fluiditem"), "inventory");
 
-    public static final MenuType<RecipeViewMenu> RECIPE_VIEW_MENU = Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(MODID, "recipe_view"), new MenuType<>(RecipeViewMenu::new, FeatureFlagSet.of()));
+    public static final MenuType<RecipeViewMenu> RECIPE_VIEW_MENU = new MenuType<>(RecipeViewMenu::new, FeatureFlagSet.of());
 
 
     public static final KeyMapping USAGE_KEYBIND = new KeyMapping("key.eiv.usage", 85, "key.categories.eiv");
@@ -57,14 +59,15 @@ public class CommonEIVClient {
 
 
     public static void excludeEivMappings() {
-        KeyMapping.MAP.clear();
+        Map<InputConstants.Key, KeyMapping> map = CommonEIVClient.resolver().getKeyMap();
+        map.clear();
 
         for (KeyMapping keyMapping : KeyMapping.ALL.values()) {
-            if (KeyMapping.MAP.containsKey(keyMapping.key) && EIV_KEY_MAPPINGS.contains(keyMapping)) {
+            if (map.containsKey(keyMapping.key) && EIV_KEY_MAPPINGS.contains(keyMapping)) {
                 continue;
             }
 
-            KeyMapping.MAP.put(keyMapping.key, keyMapping);
+            map.put(keyMapping.key, keyMapping);
         }
     }
 

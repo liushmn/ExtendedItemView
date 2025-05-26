@@ -2,6 +2,7 @@ package de.crafty.eiv.common.network.payload.vanillalike;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

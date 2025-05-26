@@ -4,6 +4,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

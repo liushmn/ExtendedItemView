@@ -19,10 +19,10 @@ public abstract class MixinSpecialModelRenderers {
 
     @Shadow
     @Final
-    public static ExtraCodecs.LateBoundIdMapper<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> ID_MAPPER;
+    private static ExtraCodecs.LateBoundIdMapper<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> ID_MAPPER;
 
     @Inject(method = "bootstrap", at = @At("HEAD"))
-    private static void injectFluidItemRenderer(CallbackInfo ci){
+    private static void injectFluidItemRenderer(CallbackInfo ci) {
         ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "fluiditem"), FluidItemSpecialRenderer.Unbaked.MAP_CODEC);
     }
 }

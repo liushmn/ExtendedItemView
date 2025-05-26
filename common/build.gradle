@@ -13,4 +13,6 @@ minecraft {
 
 dependencies {
     compileOnly group: "org.spongepowered", name: "mixin", version: "0.8.5"
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
 }
