@@ -2,6 +2,7 @@ package de.crafty.eiv.common.recipe.vanilla.stonecutting;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.stonecutting.StonecutterServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -15,9 +16,9 @@ public class StonecutterViewRecipe implements IEivViewRecipe {
 
     private final SlotContent input, result;
 
-    public StonecutterViewRecipe(StonecutterRecipe stonecutterRecipe) {
-        this.input = SlotContent.of(stonecutterRecipe.input());
-        this.result = SlotContent.of(stonecutterRecipe.result);
+    public StonecutterViewRecipe(StonecutterServerRecipe stonecutterRecipe) {
+        this.input = SlotContent.of(stonecutterRecipe.getInput());
+        this.result = SlotContent.of(stonecutterRecipe.getResult());
     }
 
     @Override

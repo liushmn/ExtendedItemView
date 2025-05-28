@@ -11,7 +11,7 @@ public class EivCommand {
 
 
     private static int reloadRecipes(CommandContext<CommandSourceStack> context) {
-        ServerRecipeManager.INSTANCE.reload(context.getSource().getServer().getRecipeManager());
+        ServerRecipeManager.INSTANCE.reload();
         context.getSource().sendSuccess(() -> Component.translatable("commands.eiv.reloaded"), true);
         return 1;
     }

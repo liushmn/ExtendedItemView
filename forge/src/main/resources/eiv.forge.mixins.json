@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "de.crafty.eiv.forge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "eiv.refmap.json",
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+  ]
+}

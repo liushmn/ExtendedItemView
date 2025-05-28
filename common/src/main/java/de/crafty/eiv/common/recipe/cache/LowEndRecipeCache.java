@@ -1,6 +1,6 @@
 package de.crafty.eiv.common.recipe.cache;
 
-import de.crafty.eiv.common.api.recipe.ModRecipeType;
+import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
@@ -10,24 +10,24 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModRecipeCache {
+public class LowEndRecipeCache {
 
-    public static final ModRecipeCache INSTANCE = new ModRecipeCache();
+    public static final LowEndRecipeCache INSTANCE = new LowEndRecipeCache();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("ClientRecipeManager - ModRecipeCache");
+    private static final Logger LOGGER = LoggerFactory.getLogger("ClientRecipeManager - LowEndRecipeCache");
 
 
-    private ModCacheData cachingData;
-    private final List<ModCacheData> receivedData;
+    private CacheData cachingData;
+    private final List<CacheData> receivedData;
     private int expectedTypes;
 
-    private ModRecipeCache() {
-        this.cachingData = ModCacheData.EMPTY;
+    private LowEndRecipeCache() {
+        this.cachingData = CacheData.EMPTY;
         this.receivedData = new ArrayList<>();
     }
 
     public void clear() {
-        this.cachingData = ModCacheData.EMPTY;
+        this.cachingData = CacheData.EMPTY;
         this.receivedData.clear();
         this.expectedTypes = 0;
     }
@@ -36,7 +36,7 @@ public class ModRecipeCache {
         boolean success = this.receivedData.size() == this.expectedTypes;
 
         for (int i = 0; i < this.receivedData.size(); i++) {
-            ModCacheData data = this.receivedData.get(i);
+            CacheData data = this.receivedData.get(i);
             ClientRecipeManager.INSTANCE.status().setStatusStep("Processing Recipes (" + data.type().getId() + ")");
             ClientRecipeCache.INSTANCE.sortModType(data.type());
             ClientRecipeManager.INSTANCE.status().setStatusProgress(Math.round(((i + 1.0F) / this.receivedData.size()) * 100.0F) + "%");
@@ -46,30 +46,30 @@ public class ModRecipeCache {
     }
 
 
-    public void modCacheStartReceived(int expectedTypes) {
+    public void cacheStartReceived(int expectedTypes) {
         this.expectedTypes = expectedTypes;
     }
 
-    public void startModCaching(ModRecipeType<?> type, int amount) {
-        if (this.cachingData != ModCacheData.EMPTY) {
+    public void startCaching(EivRecipeType<?> type, int amount) {
+        if (this.cachingData != CacheData.EMPTY) {
             LOGGER.error("Received new update while caching, skipping request...");
             return;
         }
 
-        if (ModRecipeType.idFromType(type) == null) {
+        if (EivRecipeType.idFromType(type) == null) {
             LOGGER.error("Received unknown recipe type: {}", type);
         }
 
         LOGGER.info("Received recipe update for type: {}, caching {} Recipes...", type.getId(), amount);
 
-        this.cachingData = new ModCacheData(type, amount, new ArrayList<>());
+        this.cachingData = new CacheData(type, amount, new ArrayList<>());
 
         ClientRecipeManager.INSTANCE.status().setStatusStep("Caching Recipes (" + type.getId() + ")");
         ClientRecipeManager.INSTANCE.status().setStatusProgress(0 + "/" + amount);
     }
 
-    public void cacheModRecipe(ServerRecipeManager.ModRecipeEntry entry) {
-        if (this.cachingData == ModCacheData.EMPTY) {
+    public void cacheModRecipe(ServerRecipeManager.ServerRecipeEntry entry) {
+        if (this.cachingData == CacheData.EMPTY) {
             LOGGER.error("Received recipe while idling, skipping request...");
             return;
         }
@@ -83,8 +83,8 @@ public class ModRecipeCache {
         ClientRecipeManager.INSTANCE.status().setStatusProgress(this.cachingData.received().size() + "/" + this.cachingData.expectedAmount());
     }
 
-    public void endModCaching(ModRecipeType<?> type) {
-        if (this.cachingData == ModCacheData.EMPTY) {
+    public void endCaching(EivRecipeType<?> type) {
+        if (this.cachingData == CacheData.EMPTY) {
             LOGGER.error("Received end-packet while idling => bad request");
             return;
         }
@@ -95,23 +95,23 @@ public class ModRecipeCache {
         }
 
         if (this.cachingData.finishedSuccessfully()) {
-            ModCacheData cachedCache = this.cachingData;
+            CacheData cachedCache = this.cachingData;
             this.receivedData.add(cachedCache);
 
-            this.cachingData = ModCacheData.EMPTY;
+            this.cachingData = CacheData.EMPTY;
             LOGGER.info("Successfully updated recipes for type: {}", cachedCache.type().getId());
-            ClientRecipeCache.INSTANCE.updateModType(cachedCache.type(), cachedCache.received());
+            ClientRecipeCache.INSTANCE.updateType(cachedCache.type(), cachedCache.received());
         } else {
-            this.cachingData = ModCacheData.EMPTY;
+            this.cachingData = CacheData.EMPTY;
             LOGGER.error("Expected amount of recipes does not match the amount of recipes received => Update failed");
         }
 
     }
 
 
-    record ModCacheData(ModRecipeType<?> type, int expectedAmount, List<ServerRecipeManager.ModRecipeEntry> received) {
+    record CacheData(EivRecipeType<?> type, int expectedAmount, List<ServerRecipeManager.ServerRecipeEntry> received) {
 
-        static final ModCacheData EMPTY = null;
+        static final CacheData EMPTY = null;
 
         boolean finishedSuccessfully() {
             return this.received.size() == this.expectedAmount;

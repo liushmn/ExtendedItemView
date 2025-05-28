@@ -1,8 +1,9 @@
 package de.crafty.eiv.common.recipe.vanilla.blasting;
 
-import de.crafty.eiv.common.BuiltInEivIntegration;
+import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -21,10 +22,10 @@ public class BlastingViewRecipe implements IEivViewRecipe {
     private final SlotContent input, result;
     private final AnimationTicker blastingTicker;
 
-    public BlastingViewRecipe(BlastingRecipe blastingRecipe) {
+    public BlastingViewRecipe(BlastingServerRecipe blastingRecipe) {
 
-        this.input = SlotContent.of(blastingRecipe.input());
-        this.result = SlotContent.of(blastingRecipe.result);
+        this.input = SlotContent.of(blastingRecipe.getInput());
+        this.result = SlotContent.of(blastingRecipe.getResult());
 
         this.blastingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("blasting_ticker"), 100);
     }

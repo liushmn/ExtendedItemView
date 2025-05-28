@@ -2,8 +2,7 @@ package de.crafty.eiv.common.recipe;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.network.payload.ServerboundRequestRecipesPayload;
-import de.crafty.eiv.common.recipe.cache.ModRecipeCache;
-import de.crafty.eiv.common.recipe.cache.VanillaRecipeCache;
+import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,7 @@ public class ClientRecipeManager {
                 //Cleanup on timeout
                 if (this.status().networkTimeout()) {
                     this.status().setIdle(true);
-                    VanillaRecipeCache.INSTANCE.clear();
-                    ModRecipeCache.INSTANCE.clear();
+                    LowEndRecipeCache.INSTANCE.clear();
                     return;
                 }
             }
@@ -54,13 +52,11 @@ public class ClientRecipeManager {
             this.status.setStatusStep("Processing Recipes");
             this.status.setStatusProgress("0%");
 
-            boolean vanillaSuccess = VanillaRecipeCache.INSTANCE.processRecipes();
-            boolean modSuccess = ModRecipeCache.INSTANCE.processRecipes();
+            boolean success = LowEndRecipeCache.INSTANCE.processRecipes();
 
-            VanillaRecipeCache.INSTANCE.clear();
-            ModRecipeCache.INSTANCE.clear();
+            LowEndRecipeCache.INSTANCE.clear();
 
-            if (!(vanillaSuccess && modSuccess))
+            if (!success)
                 LOGGER.error("Something went wrong while processing recipes, there might be some strange appearances");
 
             this.status.setIdle(true);

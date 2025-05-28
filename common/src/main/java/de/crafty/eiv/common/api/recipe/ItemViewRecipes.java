@@ -2,8 +2,6 @@ package de.crafty.eiv.common.api.recipe;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
@@ -15,48 +13,35 @@ public class ItemViewRecipes {
     public static final ItemViewRecipes INSTANCE = new ItemViewRecipes();
 
 
-    private final HashMap<RecipeType<?>, ClientVanillaRecipeWrapper> clientWrapperMap;
-    private final HashMap<ModRecipeType<?>, ClientModRecipeWrapper> modRecipeWrapperMap;
-
-    private final List<ServerModRecipeProvider> modRecipeProviders;
+    private final HashMap<EivRecipeType<?>, ClientRecipeWrapper<?>> recipeWrappers;
+    private final List<ServerRecipeProvider> recipeProviders;
 
     private final HashMap<Fluid, Item> fluidItemMap;
 
 
     private ItemViewRecipes() {
-        this.clientWrapperMap = new HashMap<>();
-        this.modRecipeWrapperMap = new HashMap<>();
-
-        this.modRecipeProviders = new ArrayList<>();
-
+        this.recipeWrappers = new HashMap<>();
+        this.recipeProviders = new ArrayList<>();
         this.fluidItemMap = new HashMap<>();
     }
 
 
-    public void registerVanillaLikeWrapper(RecipeType<?> recipeType, ClientVanillaRecipeWrapper wrapper) {
-        this.clientWrapperMap.put(recipeType, wrapper);
+
+    public <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ClientRecipeWrapper<T> wrapper) {
+        this.recipeWrappers.put(recipeType, wrapper);
     }
 
-    public void registerModRecipeWrapper(ModRecipeType<?> recipeType, ClientModRecipeWrapper wrapper) {
-        this.modRecipeWrapperMap.put(recipeType, wrapper);
-    }
-
-    public void addModRecipeProvider(ServerModRecipeProvider provider) {
-        this.modRecipeProviders.add(provider);
+    public void addRecipeProvider(ServerRecipeProvider provider) {
+        this.recipeProviders.add(provider);
     }
 
 
-
-    public HashMap<RecipeType<?>, ClientVanillaRecipeWrapper> getVanillaWrapperMap() {
-        return this.clientWrapperMap;
+    public HashMap<EivRecipeType<?>, ClientRecipeWrapper<?>> wrapperMap() {
+        return this.recipeWrappers;
     }
 
-    public HashMap<ModRecipeType<?>, ClientModRecipeWrapper> getModRecipeWrapperMap() {
-        return this.modRecipeWrapperMap;
-    }
-
-    public List<ServerModRecipeProvider> getModRecipeProviders() {
-        return this.modRecipeProviders;
+    public List<ServerRecipeProvider> getRecipeProviders() {
+        return this.recipeProviders;
     }
 
     public void setFluidItemMap(HashMap<Fluid, Item> fluidItemMap) {
@@ -70,21 +55,17 @@ public class ItemViewRecipes {
 
 
 
-    public interface ClientVanillaRecipeWrapper {
+    public interface ClientRecipeWrapper<T extends IEivServerRecipe> {
 
-        List<? extends IEivViewRecipe> wrap(Recipe<?> vanillaLike);
-
-    }
-
-    public interface ClientModRecipeWrapper {
-
-        List<? extends IEivViewRecipe> wrap(IEivServerModRecipe modRecipe);
+        List<? extends IEivViewRecipe> wrap(T unwrapped);
 
     }
 
-    public interface ServerModRecipeProvider {
 
-        void provide(List<IEivServerModRecipe> recipeList);
+    public interface ServerRecipeProvider {
+
+        void provide(List<IEivServerRecipe> recipeList);
 
     }
+
 }

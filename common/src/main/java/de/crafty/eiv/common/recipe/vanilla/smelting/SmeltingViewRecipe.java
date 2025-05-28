@@ -1,7 +1,8 @@
 package de.crafty.eiv.common.recipe.vanilla.smelting;
 
-import de.crafty.eiv.common.BuiltInEivIntegration;
+import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -20,10 +21,10 @@ public class SmeltingViewRecipe implements IEivViewRecipe {
     private final SlotContent input, result;
     private final AnimationTicker smeltingTicker;
 
-    public SmeltingViewRecipe(SmeltingRecipe recipe) {
+    public SmeltingViewRecipe(SmeltingServerRecipe recipe) {
 
-        this.input = SlotContent.of(recipe.input());
-        this.result = SlotContent.of(recipe.result);
+        this.input = SlotContent.of(recipe.getInput());
+        this.result = SlotContent.of(recipe.getResult());
 
         this.smeltingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("smelting_tick"), 200);
     }

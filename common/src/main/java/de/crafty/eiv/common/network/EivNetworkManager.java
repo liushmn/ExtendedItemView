@@ -1,26 +1,15 @@
 package de.crafty.eiv.common.network;
 
-import de.crafty.eiv.common.network.payload.ClientboundAllUpdatesFinishedPayload;
-import de.crafty.eiv.common.network.payload.ClientboundGeneralUpdateStartedPayload;
 import de.crafty.eiv.common.network.payload.ServerboundRequestRecipesPayload;
-import de.crafty.eiv.common.network.payload.mod.ClientboundModRecipeUpdatePayload;
-import de.crafty.eiv.common.network.payload.mod.ClientboundModTypeUpdateEndPayload;
-import de.crafty.eiv.common.network.payload.mod.ClientboundModTypeUpdatePayload;
-import de.crafty.eiv.common.network.payload.mod.ClientboundModTypeUpdateStartPayload;
+import de.crafty.eiv.common.network.payload.recipe.*;
 import de.crafty.eiv.common.network.payload.transfer.ClientboundUpdateTransferCachePayload;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
-import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeRecipeUpdatePayload;
-import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTypeUpdateEndPayload;
-import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTypeUpdatePayload;
-import de.crafty.eiv.common.network.payload.vanillalike.ClientboundVanillaLikeTypeUpdateStartPayload;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
-import de.crafty.eiv.common.recipe.cache.ModRecipeCache;
-import de.crafty.eiv.common.recipe.cache.VanillaRecipeCache;
+import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
@@ -29,9 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class EivNetworkManager {
 
@@ -97,46 +84,33 @@ public class EivNetworkManager {
     public EivNetworkManager registerPayloads() {
 
         this.registerServerbound(ServerboundRequestRecipesPayload.TYPE, ServerboundRequestRecipesPayload.STREAM_CODEC, (context, payload) -> {
-            ServerRecipeManager.INSTANCE.informAboutAllRecipes(context.sender());
+            ServerRecipeManager.INSTANCE.informAboutRecipes(context.sender());
         });
 
 
-        //Vanilla-like
-        this.registerClientbound(ClientboundVanillaLikeRecipeUpdatePayload.TYPE, ClientboundVanillaLikeRecipeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            VanillaRecipeCache.INSTANCE.vanillaCacheStartReceived(payload.types());
-        });
-
-        this.registerClientbound(ClientboundVanillaLikeTypeUpdateStartPayload.TYPE, ClientboundVanillaLikeTypeUpdateStartPayload.STREAM_CODEC, (context, payload) -> {
-            VanillaRecipeCache.INSTANCE.startVanillaCaching(payload.recipeType(), payload.recipeAmount());
-        });
-        this.registerClientbound(ClientboundVanillaLikeTypeUpdatePayload.TYPE, ClientboundVanillaLikeTypeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            VanillaRecipeCache.INSTANCE.cacheVanillaLikeRecipe(payload.recipe());
-        });
-        this.registerClientbound(ClientboundVanillaLikeTypeUpdateEndPayload.TYPE, ClientboundVanillaLikeTypeUpdateEndPayload.STREAM_CODEC, (context, payload) -> {
-            VanillaRecipeCache.INSTANCE.endVanillaCaching(payload.recipeType());
-        });
-
-
-        //Mod
-        this.registerClientbound(ClientboundModRecipeUpdatePayload.TYPE, ClientboundModRecipeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            ModRecipeCache.INSTANCE.modCacheStartReceived(payload.types());
-        });
-        this.registerClientbound(ClientboundModTypeUpdateStartPayload.TYPE, ClientboundModTypeUpdateStartPayload.STREAM_CODEC, (context, payload) -> {
-            ModRecipeCache.INSTANCE.startModCaching(payload.recipeType(), payload.amount());
-        });
-        this.registerClientbound(ClientboundModTypeUpdatePayload.TYPE, ClientboundModTypeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            ModRecipeCache.INSTANCE.cacheModRecipe(payload.entry());
-        });
-        this.registerClientbound(ClientboundModTypeUpdateEndPayload.TYPE, ClientboundModTypeUpdateEndPayload.STREAM_CODEC, (context, payload) -> {
-            ModRecipeCache.INSTANCE.endModCaching(payload.recipeType());
-        });
-
-        this.registerClientbound(ClientboundGeneralUpdateStartedPayload.TYPE, ClientboundGeneralUpdateStartedPayload.STREAM_CODEC, (context, payload) -> {
+        //Enclosing payloads
+        this.registerClientbound(ClientboundStartUpdatesPayload.TYPE, ClientboundStartUpdatesPayload.STREAM_CODEC, (context, payload) -> {
             ClientRecipeManager.INSTANCE.startUpdate();
         });
-        this.registerClientbound(ClientboundAllUpdatesFinishedPayload.TYPE, ClientboundAllUpdatesFinishedPayload.STREAM_CODEC, (context, payload) -> {
+
+        this.registerClientbound(ClientboundFinishUpdatesPayload.TYPE, ClientboundFinishUpdatesPayload.STREAM_CODEC, (context, payload) -> {
             ClientRecipeManager.INSTANCE.processRecipes();
         });
+
+        //Recipes
+        this.registerClientbound(ClientboundCacheStartPayload.TYPE, ClientboundCacheStartPayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.cacheStartReceived(payload.types());
+        });
+        this.registerClientbound(ClientboundTypeUpdateStartPayload.TYPE, ClientboundTypeUpdateStartPayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.startCaching(payload.recipeType(), payload.amount());
+        });
+        this.registerClientbound(ClientboundTypeUpdatePayload.TYPE, ClientboundTypeUpdatePayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.cacheModRecipe(payload.entry());
+        });
+        this.registerClientbound(ClientboundTypeUpdateEndPayload.TYPE, ClientboundTypeUpdateEndPayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.endCaching(payload.recipeType());
+        });
+
 
         //Transfer
         this.registerServerbound(ServerboundTransferPayload.TYPE, ServerboundTransferPayload.STREAM_CODEC, (context, payload) -> {

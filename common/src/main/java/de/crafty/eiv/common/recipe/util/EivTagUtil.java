@@ -1,16 +1,26 @@
 package de.crafty.eiv.common.recipe.util;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import de.crafty.eiv.common.mixin.MixinTest;
 import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EivTagUtil {
 
@@ -22,16 +32,40 @@ public class EivTagUtil {
     }
 
     private static <T> List<T> reconstructRegistryList(CompoundTag srcTag, String key, DefaultedRegistry<T> registry) {
-        return srcTag.getList(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).toList();
+        return srcTag.getListOrEmpty(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).toList();
     }
 
 
-    public static CompoundTag encodeItemStack(ItemStack stack){
+    public static CompoundTag encodeItemStack(ItemStack stack) {
         return ItemStack.CODEC.encode(stack, NbtOps.INSTANCE, new CompoundTag()).mapOrElse(tag -> (CompoundTag) tag, tagError -> new CompoundTag());
     }
 
-    public static ItemStack decodeItemStack(CompoundTag tag){
+    public static ItemStack decodeItemStack(CompoundTag tag) {
         return ItemStack.CODEC.decode(NbtOps.INSTANCE, tag).mapOrElse(Pair::getFirst, pairError -> ItemStack.EMPTY);
+    }
+
+    public static CompoundTag writeIngredient(Ingredient ingredient) {
+        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((MixinTest) (Object) ingredient).getValues().unwrap();
+
+        CompoundTag tag = new CompoundTag();
+
+        if (ingredientContent.left().isPresent()) {
+            tag.putString("tag", ingredientContent.left().get().location().toString());
+            return tag;
+        }
+
+        tag.put("items", EivTagUtil.createItemList(ingredientContent.right().get().stream().map(Holder::value).toList()));
+        return tag;
+    }
+
+    public static Ingredient readIngredient(CompoundTag tag) {
+        if (tag.contains("tag")) {
+            TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getStringOr("tag", "")));
+            return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).orElse(null)));
+        }
+
+        List<Holder<Item>> itemList = EivTagUtil.reconstructItemList(tag, "items").stream().map(Holder::direct).toList();
+        return Ingredient.of(HolderSet.direct(itemList));
     }
 
     //----------------- Item, Block, Fluid -----------------
@@ -72,7 +106,7 @@ public class EivTagUtil {
     }
 
     public static <T> List<T> readList(CompoundTag srcTag, String key, CompoundReconstructor<T> builder) {
-        return srcTag.getList(key).stream().map(Tag::asCompound).map(compoundTag -> builder.reconstructSingle(compoundTag.orElseGet(CompoundTag::new))).toList();
+        return srcTag.getListOrEmpty(key).stream().map(Tag::asCompound).map(compoundTag -> builder.reconstructSingle(compoundTag.orElseGet(CompoundTag::new))).toList();
     }
 
 

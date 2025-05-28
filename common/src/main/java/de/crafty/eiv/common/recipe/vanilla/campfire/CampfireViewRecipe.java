@@ -1,8 +1,9 @@
 package de.crafty.eiv.common.recipe.vanilla.campfire;
 
-import de.crafty.eiv.common.BuiltInEivIntegration;
+import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.campfire.CampfireServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -21,9 +22,9 @@ public class CampfireViewRecipe implements IEivViewRecipe {
     private final SlotContent input, result;
     private final AnimationTicker cookingTicker;
 
-    public CampfireViewRecipe(CampfireCookingRecipe campfireCookingRecipe) {
-        this.input = SlotContent.of(campfireCookingRecipe.input());
-        this.result = SlotContent.of(campfireCookingRecipe.result);
+    public CampfireViewRecipe(CampfireServerRecipe campfireCookingRecipe) {
+        this.input = SlotContent.of(campfireCookingRecipe.getInput());
+        this.result = SlotContent.of(campfireCookingRecipe.getResult());
 
         this.cookingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("campfire_cooking_ticker"), 300);
     }

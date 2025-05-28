@@ -2,6 +2,7 @@ package de.crafty.eiv.common.recipe.vanilla.shapeless;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -16,14 +17,14 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     private final SlotContent result;
     private final List<SlotContent> ingredients;
 
-    public ShapelessViewRecipe(ShapelessRecipe shapelessRecipe) {
+    public ShapelessViewRecipe(ShapelessServerRecipe shapelessRecipe) {
         this.ingredients = new ArrayList<>();
 
-        shapelessRecipe.ingredients.forEach(ingredient -> {
+        shapelessRecipe.getIngredients().forEach(ingredient -> {
             this.ingredients.add(SlotContent.of(ingredient));
         });
 
-        this.result = SlotContent.of(shapelessRecipe.result);
+        this.result = SlotContent.of(shapelessRecipe.getResult());
     }
 
     @Override

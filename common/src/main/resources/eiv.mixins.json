@@ -6,6 +6,7 @@
   "mixins": [
     "MixinTest",
     "advancements.critereon.MixinInventoryChangeTrigger",
+    "network.protocol.common.custom.MixinCustomPacketPayload",
     "server.MixinMinecraftServer",
     "server.network.MixinServerGamePacketListenerImpl",
     "world.item.crafting.MixinRecipeManager"

@@ -20,7 +20,7 @@
       "de.crafty.eiv.fabric.FabricEIVClient"
     ],
     "eiv": [
-      "de.crafty.eiv.common.BuiltInEivIntegration"
+      "de.crafty.eiv.common.builtin.BuiltInEivIntegration"
     ]
   },
   "mixins": [

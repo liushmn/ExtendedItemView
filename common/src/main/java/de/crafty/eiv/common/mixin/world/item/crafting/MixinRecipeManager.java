@@ -18,6 +18,10 @@ public abstract class MixinRecipeManager extends SimplePreparableReloadListener<
 
     @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
     private void afterReload(RecipeMap recipeMap, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
-        ServerRecipeManager.INSTANCE.reload((RecipeManager) (Object) this);
+        if(!((RecipeManager) (Object) this).equals(ServerRecipeManager.INSTANCE.getVanillaRecipeManager()))
+            ServerRecipeManager.INSTANCE.setRecipeManager((RecipeManager) (Object) this);
+
+
+        ServerRecipeManager.INSTANCE.reload();
     }
 }

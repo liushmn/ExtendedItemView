@@ -2,7 +2,7 @@ package de.crafty.eiv.common.api.recipe;
 
 import net.minecraft.nbt.CompoundTag;
 
-public interface IEivServerModRecipe {
+public interface IEivServerRecipe {
 
 
     void writeToTag(CompoundTag tag);
@@ -10,5 +10,5 @@ public interface IEivServerModRecipe {
     void loadFromTag(CompoundTag tag);
 
 
-    ModRecipeType<? extends IEivServerModRecipe> getRecipeType();
+    EivRecipeType<? extends IEivServerRecipe> getRecipeType();
 }

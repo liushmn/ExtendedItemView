@@ -2,6 +2,7 @@ package de.crafty.eiv.common.recipe.vanilla.crafting;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.shaped.ShapedServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -16,25 +17,10 @@ public class CraftingViewRecipe implements IEivViewRecipe {
     private final HashMap<Integer, SlotContent> ingredientSlotContents = new HashMap<>();
     private final SlotContent result;
 
-    public CraftingViewRecipe(ShapedRecipe recipe) {
+    public CraftingViewRecipe(ShapedServerRecipe recipe) {
 
-
-        int i = 0;
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-
-                if (x >= recipe.getWidth() || y >= recipe.getHeight()) {
-                    continue;
-                }
-
-                if (recipe.getIngredients().get(i).isPresent())
-                    this.ingredientSlotContents.put(x + y * 3, SlotContent.of(recipe.getIngredients().get(i).get()));
-
-                i++;
-            }
-        }
-
-        this.result = SlotContent.of(recipe.result);
+        recipe.getIngredients().forEach((slotId, ingredient) -> this.ingredientSlotContents.put(slotId, SlotContent.of(ingredient)));
+        this.result = SlotContent.of(recipe.getResult());
 
 
     }

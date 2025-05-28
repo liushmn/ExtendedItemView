@@ -247,7 +247,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         if (tagTag.contains(CommonEIV.MODID + "_recipeTag")) {
             tooltip.add(
                     Component.translatable("view.eiv.tags").append(": ").withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal("#" + tagTag.getString(CommonEIV.MODID + "_recipeTag")).withStyle(ChatFormatting.GRAY))
+                            .append(Component.literal("#" + tagTag.getStringOr(CommonEIV.MODID + "_recipeTag", "Error")).withStyle(ChatFormatting.GRAY))
 
             );
         }

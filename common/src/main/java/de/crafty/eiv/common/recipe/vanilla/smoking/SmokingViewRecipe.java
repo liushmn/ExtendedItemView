@@ -1,8 +1,9 @@
 package de.crafty.eiv.common.recipe.vanilla.smoking;
 
-import de.crafty.eiv.common.BuiltInEivIntegration;
+import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -21,10 +22,10 @@ public class SmokingViewRecipe implements IEivViewRecipe {
     private final SlotContent input, result;
     private final AnimationTicker smokingTicker;
 
-    public SmokingViewRecipe(SmokingRecipe blastingRecipe) {
+    public SmokingViewRecipe(SmokingServerRecipe smokingRecipe) {
 
-        this.input = SlotContent.of(blastingRecipe.input());
-        this.result = SlotContent.of(blastingRecipe.result);
+        this.input = SlotContent.of(smokingRecipe.getInput());
+        this.result = SlotContent.of(smokingRecipe.getResult());
 
         this.smokingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("smoking_ticker"), 100);
     }

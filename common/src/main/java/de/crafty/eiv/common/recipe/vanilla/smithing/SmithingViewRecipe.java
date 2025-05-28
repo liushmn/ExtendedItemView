@@ -1,24 +1,28 @@
 package de.crafty.eiv.common.recipe.vanilla.smithing;
 
+import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.SmithingRecipe;
-import net.minecraft.world.item.crafting.SmithingTransformRecipe;
-import net.minecraft.world.item.crafting.SmithingTrimRecipe;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SmithingViewRecipe implements IEivViewRecipe {
-
 
     private final SlotContent additionIngredient;
     private final ItemStack base, template;
@@ -26,12 +30,12 @@ public class SmithingViewRecipe implements IEivViewRecipe {
 
     private final boolean isTrimType;
 
-    public SmithingViewRecipe(SmithingRecipe smithingRecipe, ItemStack base, ItemStack template) {
-        this.isTrimType = smithingRecipe instanceof SmithingTrimRecipe;
+    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, TrimPattern trimPattern) {
+        this.isTrimType = isTrimType;
 
         this.template = template;
         this.base = base;
-        this.additionIngredient = smithingRecipe.additionIngredient().isPresent() ? SlotContent.of(smithingRecipe.additionIngredient().get()) : SlotContent.of(Items.AIR);
+        this.additionIngredient = additionIngredient != null ? SlotContent.of(additionIngredient) : SlotContent.of(Items.AIR);
 
 
         if (Minecraft.getInstance().player == null) {
@@ -41,11 +45,11 @@ public class SmithingViewRecipe implements IEivViewRecipe {
 
         HolderLookup.Provider provider = Minecraft.getInstance().player.clientLevel.registryAccess();
 
-        if (smithingRecipe instanceof SmithingTrimRecipe trimRecipe) {
+        if (this.isTrimType) {
             List<ItemStack> possibleResults = new ArrayList<>();
 
             this.additionIngredient.getValidContents().forEach(addition -> {
-                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base, addition, trimRecipe.pattern));
+                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base, addition, Holder.direct(trimPattern)));
             });
 
             this.result = SlotContent.of(possibleResults);
@@ -53,12 +57,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe) {
-            this.result = SlotContent.of(transformRecipe.result.apply(this.base));
-            return;
-        }
-
-        this.result = SlotContent.of(Items.AIR);
+        this.result = SlotContent.of(new TransmuteResult(this.template.getItem()).apply(this.base));
     }
 
     @Override
