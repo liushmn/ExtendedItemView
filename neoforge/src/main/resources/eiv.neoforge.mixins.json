@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "de.crafty.eiv.neoforge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "eiv.refmap.json",
+  "mixins": [
+    "neoforge.network.registration.MixinNetworkRegistry"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+  ]
+}

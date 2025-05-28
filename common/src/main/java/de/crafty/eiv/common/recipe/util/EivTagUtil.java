@@ -2,7 +2,7 @@ package de.crafty.eiv.common.recipe.util;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import de.crafty.eiv.common.mixin.MixinTest;
+import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -10,11 +10,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -45,7 +43,7 @@ public class EivTagUtil {
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((MixinTest) (Object) ingredient).getValues().unwrap();
+        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
 
         CompoundTag tag = new CompoundTag();
 
@@ -54,7 +52,7 @@ public class EivTagUtil {
             return tag;
         }
 
-        tag.put("items", EivTagUtil.createItemList(ingredientContent.right().get().stream().map(Holder::value).toList()));
+        tag.put("items", EivTagUtil.createItemList(ingredient.items().map(Holder::value).toList()));
         return tag;
     }
 

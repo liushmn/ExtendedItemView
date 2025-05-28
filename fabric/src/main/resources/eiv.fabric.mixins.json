@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "de.crafty.eiv.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "eiv.refmap.json",
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "KeyMappingAccessor",
+    "client.MixinKeyMapping"
+  ]
+}

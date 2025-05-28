@@ -3,9 +3,8 @@ package de.crafty.eiv.common.recipe.inventory;
 import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.extra.FluidStack;
-import de.crafty.eiv.common.mixin.MixinTest;
+import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -167,7 +166,7 @@ public class SlotContent {
 
     public static SlotContent of(Ingredient ingredient) {
 
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((MixinTest) (Object) ingredient).getValues().unwrap();
+        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
 
         if (ingredientContent.right().isPresent()) {
             List<ItemStack> stacks = new ArrayList<>();

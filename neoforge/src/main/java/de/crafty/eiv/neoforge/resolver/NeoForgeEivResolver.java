@@ -1,12 +1,17 @@
-package de.crafty.eiv.forge.resolver;
+package de.crafty.eiv.neoforge.resolver;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLLoader;
 
-public class ForgeEivResolver implements IEivClientResolver {
+import java.util.Map;
+
+public class NeoForgeEivResolver implements IEivClientResolver {
+
 
     @Override
     public String getModNameForItem(Item item) {
@@ -17,5 +22,4 @@ public class ForgeEivResolver implements IEivClientResolver {
     public UVInfo getUVInfo(TextureAtlasSprite sprite) {
         return new UVInfo(0, 1, 0, 1);
     }
-
 }

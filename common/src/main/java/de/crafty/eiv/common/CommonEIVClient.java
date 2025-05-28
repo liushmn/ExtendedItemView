@@ -10,8 +10,6 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.MenuType;
@@ -57,19 +55,6 @@ public class CommonEIVClient {
         throw new IllegalStateException("Helper not set");
     }
 
-
-    public static void excludeEivMappings() {
-        Map<InputConstants.Key, KeyMapping> map = CommonEIVClient.resolver().getKeyMap();
-        map.clear();
-
-        for (KeyMapping keyMapping : KeyMapping.ALL.values()) {
-            if (map.containsKey(keyMapping.key) && EIV_KEY_MAPPINGS.contains(keyMapping)) {
-                continue;
-            }
-
-            map.put(keyMapping.key, keyMapping);
-        }
-    }
 
     public static void loadBookmarks() {
         //Save bookmarks

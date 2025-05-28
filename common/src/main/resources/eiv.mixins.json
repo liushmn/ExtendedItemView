@@ -4,23 +4,23 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "eiv.refmap.json",
   "mixins": [
-    "MixinTest",
     "advancements.critereon.MixinInventoryChangeTrigger",
     "network.protocol.common.custom.MixinCustomPacketPayload",
     "server.MixinMinecraftServer",
     "server.network.MixinServerGamePacketListenerImpl",
+    "world.item.crafting.IngredientAccessor",
     "world.item.crafting.MixinRecipeManager"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "client.MixinKeyMapping",
     "client.MixinMinecraft",
     "client.gui.MixinGui",
     "client.gui.screens.MixinScreen",
     "client.gui.screens.inventory.MixinAbstractContainerScreen",
     "client.gui.screens.inventory.MixinCreativeModeInventoryScreen",
+    "client.multiplayer.MixinClientCommonPacketListenerImpl",
     "client.multiplayer.MixinClientPacketListener",
     "client.renderer.special.MixinSpecialModelRenderers",
     "core.registries.MixinBuiltInRegistries"

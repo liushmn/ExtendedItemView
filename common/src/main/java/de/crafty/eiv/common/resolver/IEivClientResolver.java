@@ -15,8 +15,6 @@ public interface IEivClientResolver {
 
     String getModNameForItem(Item item);
 
-    Map<InputConstants.Key, KeyMapping> getKeyMap();
-
     UVInfo getUVInfo(TextureAtlasSprite sprite);
 
 

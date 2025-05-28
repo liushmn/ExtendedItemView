@@ -24,7 +24,8 @@
     ]
   },
   "mixins": [
-    "eiv.mixins.json"
+    "eiv.mixins.json",
+    "eiv.fabric.mixins.json"
   ],
   "accessWidener": "eiv.accesswidener",
   "depends": {
