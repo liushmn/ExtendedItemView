@@ -273,7 +273,6 @@ public class ItemViewOverlay {
 
 
     public void openRecipeView(ItemStack stack, ItemViewOpenType openType) {
-        System.out.println("Trying to open view");
         if (stack.isEmpty())
             return;
 

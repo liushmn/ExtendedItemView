@@ -70,7 +70,6 @@ public class ServerRecipeManager {
         ItemViewRecipes.INSTANCE.getRecipeProviders().forEach(serverModRecipeProvider -> {
             List<IEivServerRecipe> recipes = new ArrayList<>();
             serverModRecipeProvider.provide(recipes);
-            System.out.println(recipes.getFirst().getRecipeType());
             serverRecipes.addAll(recipes);
         });
 
