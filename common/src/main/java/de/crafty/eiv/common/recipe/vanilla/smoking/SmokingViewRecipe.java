@@ -79,7 +79,7 @@ public class SmokingViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void mapRecipeItems(RecipeTransferMap transferMap) {
+    public void mapRecipeItems(RecipeTransferMap transferMap, AbstractContainerScreen<?> screen) {
 
         transferMap.linkSlots(0, 0);
 

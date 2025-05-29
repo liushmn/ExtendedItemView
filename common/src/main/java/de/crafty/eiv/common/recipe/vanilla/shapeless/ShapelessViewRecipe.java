@@ -7,6 +7,8 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
 import java.util.ArrayList;
@@ -59,7 +61,7 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void mapRecipeItems(RecipeTransferMap transferMap) {
+    public void mapRecipeItems(RecipeTransferMap transferMap, AbstractContainerScreen<?> screen) {
 
         transferMap.linkSlots(0, 1);
         transferMap.linkSlots(1, 2);
@@ -74,7 +76,12 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public Class<? extends AbstractContainerScreen<?>> getTransferClass() {
-        return CraftingScreen.class;
+    public List<Class<? extends AbstractContainerScreen<?>>> getTransferClasses() {
+        return List.of(CraftingScreen.class, InventoryScreen.class);
+    }
+
+    @Override
+    public boolean canTransferToScreen(AbstractContainerScreen<?> screen) {
+        return this.ingredients.size() <= 4;
     }
 }

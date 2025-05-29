@@ -154,9 +154,6 @@ public class ServerRecipeManager {
     //Transfer
     public void performRecipeTransfer(ServerPlayer player, HashMap<Integer, Integer> transferMap, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) {
 
-        if (!player.hasContainerOpen())
-            return;
-
         transferMap.forEach((recipeSlot, destSlot) -> {
 
             HashMap<Integer, ItemStack> usedSlots = usedPlayerSlots.getOrDefault(recipeSlot, new HashMap<>());

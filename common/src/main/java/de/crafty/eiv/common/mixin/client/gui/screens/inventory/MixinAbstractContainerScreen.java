@@ -81,9 +81,10 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         this.addRenderableWidget(ItemViewOverlay.SEARCHBAR);
     }
 
-    @Inject(method = "mouseScrolled", at = @At("RETURN"))
+    @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$2(double mouseX, double mouseY, double scrolledX, double scrolledY, CallbackInfoReturnable<Boolean> cir) {
-        ItemViewOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY);
+        if(ItemViewOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
+            cir.setReturnValue(true);
     }
 
 

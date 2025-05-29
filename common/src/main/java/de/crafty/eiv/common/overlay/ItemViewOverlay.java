@@ -172,15 +172,15 @@ public class ItemViewOverlay {
         this.updateSlots();
     }
 
-    public void scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
+    public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
 
         if (!this.isEnabled())
-            return;
+            return false;
 
         ItemBookmarkOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY);
 
         if (mouseX < this.itemStartX)
-            return;
+            return false;
 
         int fittingPerPage = this.fittingItemsPerRow * this.fittingItemsPerColumn;
 
@@ -192,6 +192,9 @@ public class ItemViewOverlay {
 
         if (scrolledY != 0)
             this.updateSlots();
+
+
+        return true;
     }
 
     public void clickMouse(int mouseX, int mouseY, int mouseButton) {

@@ -65,11 +65,21 @@ public interface IEivViewRecipe {
         return false;
     }
 
+    @Deprecated
     default Class<? extends AbstractContainerScreen<?>> getTransferClass() {
         return null;
     }
 
-    default void mapRecipeItems(RecipeTransferMap transferMap) {
+    default List<Class<? extends AbstractContainerScreen<?>>> getTransferClasses() {
+        return this.getTransferClass() == null ? List.of() : List.of(this.getTransferClass());
+    }
+
+    //Just in case only specific recipes can be transferred
+    default boolean canTransferToScreen(AbstractContainerScreen<?> screen) {
+        return true;
+    }
+
+    default void mapRecipeItems(RecipeTransferMap transferMap, AbstractContainerScreen<?> screen) {
     }
 
 

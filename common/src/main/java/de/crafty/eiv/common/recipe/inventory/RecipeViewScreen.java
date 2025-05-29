@@ -7,6 +7,7 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
 import de.crafty.eiv.common.overlay.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
+import de.crafty.eiv.common.recipe.util.EivUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -174,20 +175,21 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
                         Minecraft.getInstance().setScreen(this.getMenu().getParentScreen());
                         LocalPlayer player = Minecraft.getInstance().player;
 
-                        if (Minecraft.getInstance().screen != null && player != null) {
+                        if (player != null && EivUtil.matchesAnyTransferClass(currentView, Minecraft.getInstance().screen)) {
+
+                            if(!currentView.canTransferToScreen((AbstractContainerScreen<?>) Minecraft.getInstance().screen))
+                                return;
+
                             IEivViewRecipe.RecipeTransferMap map = new IEivViewRecipe.RecipeTransferMap();
-                            currentView.mapRecipeItems(map);
+                            currentView.mapRecipeItems(map, (AbstractContainerScreen<?>) Minecraft.getInstance().screen);
 
 
-                            if (currentView.getTransferClass() != null && currentView.getTransferClass().isInstance(Minecraft.getInstance().screen)) {
+                            RecipeTransferData transferData = this.getMenu().getTransferData().get(finalI);
 
-                                RecipeTransferData transferData = this.getMenu().getTransferData().get(finalI);
+                            HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = RecipeViewScreen.hasShiftDown() ? transferData.getStackedData().getUsedPlayerSlots() : transferData.getUsedPlayerSlots();
+                            //TODO make component required in recipes
+                            CommonEIV.networkManager().sendPacketToServer(new ServerboundTransferPayload(map.getTransferMap(), usedPlayerSlots));
 
-                                HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = RecipeViewScreen.hasShiftDown() ? transferData.getStackedData().getUsedPlayerSlots() : transferData.getUsedPlayerSlots();
-                                //TODO make component required in recipes
-                                CommonEIV.networkManager().sendPacketToServer(new ServerboundTransferPayload(map.getTransferMap(), usedPlayerSlots));
-
-                            }
                         }
 
                     })
@@ -196,7 +198,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
                     .build();
 
             RecipeTransferData data = this.getMenu().getTransferData().get(i);
-            button.active = data.isSuccess() && currentView.supportsItemTransfer() && currentView.getTransferClass().isInstance(this.getMenu().getParentScreen());
+            button.active = data.isSuccess() && currentView.supportsItemTransfer() && EivUtil.matchesAnyTransferClass(currentView, this.getMenu().getParentScreen()) && currentView.canTransferToScreen((AbstractContainerScreen<?>) this.getMenu().getParentScreen());
             button.visible = currentView.supportsItemTransfer();
 
             this.addRenderableWidget(button);

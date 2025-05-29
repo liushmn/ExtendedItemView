@@ -80,7 +80,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                         }
                     }
 
-                    recipeList.add(new ShapedServerRecipe(ingredients, shapedRecipe.result));
+                    recipeList.add(new ShapedServerRecipe(shapedRecipe.getWidth(), shapedRecipe.getHeight(), ingredients, shapedRecipe.result));
                 }
             });
         });
