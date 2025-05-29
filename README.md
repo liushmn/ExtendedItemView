@@ -17,7 +17,7 @@ Currently supported functions are:
 **NOTE: _Must be installed on both the client and server_**
 
 
-# Developer Guide (fabric)
+# Developer Guide
 
 ## Creating your mod's integration
 
@@ -35,8 +35,9 @@ public class EivIntegration implements IExtendedItemViewIntegration {
 }
 ```
 
-Don't forget to add it as an entrypoint to your `fabric.mod.json`:
+Don't forget to add it as an entrypoint to your mod
 
+### Fabric (fabric.mod.json)
 ```json
 {
 ...,
@@ -48,6 +49,13 @@ Don't forget to add it as an entrypoint to your `fabric.mod.json`:
 	},
 ...
 }
+```
+
+### Forge (mods.toml) & NeoForge (neoforge.mods.toml)
+```toml
+# ...
+eiv="de.you.modid.eiv.EivIntegration"
+# ...
 ```
 
 ## Adding a new recipe type
@@ -199,7 +207,7 @@ To keep a consistent concept EIV requires a server side representation of all re
 Creating a server side representation for your mod recipes is quite easy, simply create a class that implements `IEivServerModRecipe` and override the methods:
 
 ```java
-public class YourServerRecipe implements IEivServerModRecipe {
+public class YourServerRecipe implements IEivServerRecipe {
 
 
     //Create a server recipe type (the id does not have to match your client side viewtype id)
@@ -229,8 +237,8 @@ public class YourServerRecipe implements IEivServerModRecipe {
 
 Registering your recipes requires you to call 2 methods in your `onIntegrationInitialize();` method:
 
-- `ItemViewRecipes.INSTANCE.addModRecipeProvider();`
-- `ItemViewRecipes.INSTANCE.registerModRecipeWrapper();`
+- `ItemViewRecipes.INSTANCE.addRecipeProvider();`
+- `ItemViewRecipes.INSTANCE.registerRecipeWrapper();`
 
 ```java
 public class EivIntegration implements IExtendedItemViewIntegration {
@@ -239,12 +247,12 @@ public class EivIntegration implements IExtendedItemViewIntegration {
     public void onIntegrationInitialize() {
 
         //For the server 
-        ItemViewRecipes.INSTANCE.addModRecipeProvider(list -> {
+        ItemViewRecipes.INSTANCE.addRecipeProvider(list -> {
             //Here you can add all your server recipes
         });
 
         //For the client
-        ItemViewRecipes.INSTANCE.registerModRecipeWrapper(YourServerRecipe.TYPE, modRecipe -> {
+        ItemViewRecipes.INSTANCE.registerRecipeWrapper(YourServerRecipe.TYPE, modRecipe -> {
             
             //Here you tell EIV how to process incoming server recipes
             //Requires you to return a list of client-side view-recipes (IEivViewRecipe)
@@ -257,12 +265,13 @@ public class EivIntegration implements IExtendedItemViewIntegration {
 }
 ```
 
-Mod recipe providers registered by `ItemViewRecipes.INSTANCE.addModRecipeProvider();` are used by the server recipe manager to maintain and update the recipe cache.
-Whenever there is an update the client is informed about the update and the mod recipe wrappers registered by `ItemViewRecipes.INSTANCE.registerModRecipeWrapper();` are used to convert incoming server recipes into displayable view-recipes.
+Recipe providers registered by `ItemViewRecipes.INSTANCE.addRecipeProvider();` are used by the server recipe manager to maintain and update the recipe cache.
+Whenever there is an update the client is informed about the update and the mod recipe wrappers registered by `ItemViewRecipes.INSTANCE.registerRecipeWrapper();` are used to convert incoming server recipes into displayable view-recipes.
 
 ## Conclusion
 
 And there you go! Just reproduce these steps for each of your recipe types and you'll be fine.
+Note: You can always look at EIV's builtin code, to see how everything works in practice.
 If you now want to create item-transfer functionality, read the section below.
 
 ## Adding recipe-transfer functionality
