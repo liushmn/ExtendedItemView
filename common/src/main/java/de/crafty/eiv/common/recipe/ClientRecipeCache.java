@@ -1,9 +1,7 @@
 package de.crafty.eiv.common.recipe;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
-import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
-import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +29,11 @@ public class ClientRecipeCache {
         this.byItemResult = new HashMap<>();
 
     }
+
+    public IEivViewRecipe getRecipe(final ResourceLocation recipeId) {
+        return recipeMap.getOrDefault(recipeId, null);
+    }
+
 
     public void updateType(EivRecipeType<?> type, List<ServerRecipeManager.ServerRecipeEntry> recipes) {
         this.serverEntryMap.getOrDefault(type, new ArrayList<>()).forEach(entry -> {

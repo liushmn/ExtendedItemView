@@ -1,8 +1,7 @@
 package de.crafty.eiv.common;
 
-import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
+import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.network.EivNetworkManager;
-import de.crafty.eiv.common.network.IEivNetworkManager;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;

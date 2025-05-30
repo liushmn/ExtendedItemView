@@ -1,7 +1,8 @@
 package de.crafty.eiv.common.builtin;
 
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
-import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
+import de.crafty.eiv.common.api.recipe.ItemView;
+import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
 import de.crafty.eiv.common.builtin.campfire.CampfireServerRecipe;
 import de.crafty.eiv.common.builtin.shaped.ShapedServerRecipe;
@@ -21,6 +22,7 @@ import de.crafty.eiv.common.recipe.vanilla.smithing.SmithingViewRecipe;
 import de.crafty.eiv.common.recipe.vanilla.smoking.SmokingViewRecipe;
 import de.crafty.eiv.common.recipe.vanilla.stonecutting.StonecutterViewRecipe;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
@@ -37,26 +39,28 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
     @Override
     public void onIntegrationInitialize() {
 
+        ItemView.excludeItem(Items.AIR);
+
         //providers
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMELTING).forEach(recipe -> {
                 recipeList.add(new SmeltingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.BLASTING).forEach(recipe -> {
                 recipeList.add(new BlastingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMOKING).forEach(recipe -> {
                 recipeList.add(new SmokingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.CRAFTING).forEach(recipe -> {
                 if (recipe instanceof ShapelessRecipe shapelessRecipe)
                     recipeList.add(new ShapelessServerRecipe(shapelessRecipe.ingredients, shapelessRecipe.result));
@@ -85,19 +89,19 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.CAMPFIRE_COOKING).forEach(campfireCookingRecipe -> {
                 recipeList.add(new CampfireServerRecipe(campfireCookingRecipe.input(), campfireCookingRecipe.result));
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.STONECUTTING).forEach(stonecutterRecipe -> {
                 recipeList.add(new StonecutterServerRecipe(stonecutterRecipe.input(), stonecutterRecipe.result));
             });
         });
 
-        ItemViewRecipes.INSTANCE.addRecipeProvider(recipeList -> {
+        ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMITHING).forEach(smithingRecipe -> {
 
                 if(smithingRecipe instanceof SmithingTrimRecipe trimRecipe)
@@ -110,16 +114,16 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         });
 
         //Wrapper
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(SmeltingServerRecipe.TYPE, unwrapped -> List.of(new SmeltingViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(BlastingServerRecipe.TYPE, unwrapped -> List.of(new BlastingViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(SmokingServerRecipe.TYPE, unwrapped -> List.of(new SmokingViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(ShapelessServerRecipe.TYPE, unwrapped -> List.of(new ShapelessViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(ShapedServerRecipe.TYPE, unwrapped -> List.of(new CraftingViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(CampfireServerRecipe.TYPE, unwrapped -> List.of(new CampfireViewRecipe(unwrapped)));
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(StonecutterServerRecipe.TYPE, unwrapped -> List.of(new StonecutterViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(SmeltingServerRecipe.TYPE, unwrapped -> List.of(new SmeltingViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(BlastingServerRecipe.TYPE, unwrapped -> List.of(new BlastingViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(SmokingServerRecipe.TYPE, unwrapped -> List.of(new SmokingViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(ShapelessServerRecipe.TYPE, unwrapped -> List.of(new ShapelessViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(ShapedServerRecipe.TYPE, unwrapped -> List.of(new CraftingViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(CampfireServerRecipe.TYPE, unwrapped -> List.of(new CampfireViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(StonecutterServerRecipe.TYPE, unwrapped -> List.of(new StonecutterViewRecipe(unwrapped)));
 
 
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(SmithingServerRecipe.TYPE, unwrapped -> {
+        ItemView.registerRecipeWrapper(SmithingServerRecipe.TYPE, unwrapped -> {
             List<SmithingViewRecipe> recipes = new ArrayList<>();
 
             SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {

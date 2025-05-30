@@ -1,6 +1,6 @@
 package de.crafty.eiv.common.extra;
 
-import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
+import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;

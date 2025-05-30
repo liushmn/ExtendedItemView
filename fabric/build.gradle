@@ -2,6 +2,11 @@ plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()

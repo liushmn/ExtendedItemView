@@ -1,7 +1,10 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -16,8 +19,6 @@ public class ItemFilters {
         List<Item> secondPrio = new ArrayList<>();
 
         for (Item item : BuiltInRegistries.ITEM) {
-            if (item == Items.AIR)
-                continue;
 
             String itemName = item.getName().getString().toLowerCase();
 
@@ -63,7 +64,13 @@ public class ItemFilters {
         List<Item> firstPrio = new ArrayList<>();
         List<Item> secondPrio = new ArrayList<>();
 
-        for (Item item : BuiltInRegistries.ITEM) {
+        for (TagKey<Item> tag : BuiltInRegistries.ITEM.getTags().map(HolderSet.Named::key).toList()) {
+
+            String tagName = tag.location().getPath().toLowerCase();
+            if(tagName.startsWith(query.toLowerCase()))
+                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(Holder::value).filter(item -> !firstPrio.contains(item)).forEach(firstPrio::add));
+            else if(tagName.contains(query.toLowerCase()))
+                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(Holder::value).filter(item -> !firstPrio.contains(item) && !secondPrio.contains(item)).forEach(secondPrio::add));
 
         }
 

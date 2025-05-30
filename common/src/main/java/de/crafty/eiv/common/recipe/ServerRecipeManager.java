@@ -2,7 +2,6 @@ package de.crafty.eiv.common.recipe;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.api.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.network.payload.recipe.*;
 import net.minecraft.nbt.CompoundTag;

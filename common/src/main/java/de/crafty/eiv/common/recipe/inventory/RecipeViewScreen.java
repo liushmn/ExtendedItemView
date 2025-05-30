@@ -376,6 +376,8 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         List<ItemStack> craftReferences = this.getMenu().getViewType().getCraftReferences();
 
         for (int i = 0; i < craftReferences.size(); i++) {
+            if(this.topPos + 4 + i * 24 + i + 24 > this.topPos + this.imageHeight)
+                break;
 
             guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 25, this.topPos + 4 + i * 24 + i, 231, 48, 25, 24, 256, 256);
 

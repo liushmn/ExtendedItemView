@@ -2,6 +2,7 @@ package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -31,11 +33,13 @@ public class ItemViewOverlay {
     private final LinkedList<ItemSlot> slots = new LinkedList<>();
 
     public static EditBox SEARCHBAR = null;
+    private long lastSearchbarClick = -1;
 
     private int width, height, xStart;
     private int fittingItemsPerRow, fittingItemsPerColumn;
     private int itemStartX, itemStartY;
     private String currentQuery;
+    private boolean itemFilterMode;
     private List<Item> availableItems;
 
     private int startIndex;
@@ -45,6 +49,7 @@ public class ItemViewOverlay {
 
     private ItemViewOverlay() {
         this.currentQuery = "";
+        this.itemFilterMode = false;
         this.availableItems = new ArrayList<>();
         this.startIndex = 0;
         this.enabled = true;
@@ -55,6 +60,10 @@ public class ItemViewOverlay {
 
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    public boolean isItemFilterMode() {
+        return this.itemFilterMode;
     }
 
     public void setEnabled(boolean enabled) {
@@ -166,8 +175,12 @@ public class ItemViewOverlay {
 
         if (newQuery.startsWith("@"))
             this.availableItems = ItemFilters.modId(newQuery.substring(1));
+        else if (newQuery.startsWith("#"))
+            this.availableItems = ItemFilters.tag(newQuery.substring(1));
         else
             this.availableItems = ItemFilters.defaultFilter(newQuery);
+
+        this.availableItems.removeAll(ItemView.getExcluded());
 
         this.updateSlots();
     }
@@ -206,6 +219,16 @@ public class ItemViewOverlay {
         if (mouseX < this.xStart)
             return;
 
+        if (SEARCHBAR.isHovered()) {
+
+            if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
+                this.itemFilterMode = !this.itemFilterMode;
+                this.lastSearchbarClick = -1;
+            } else
+                this.lastSearchbarClick = System.currentTimeMillis();
+
+        }
+
         for (ItemSlot itemSlot : this.slots) {
             if (itemSlot.isHovered()) {
                 itemSlot.onClicked(mouseX, mouseY, mouseButton);
@@ -234,7 +257,7 @@ public class ItemViewOverlay {
             if (CommonEIVClient.RECIPE_KEYBIND.matches(i, j))
                 ItemViewOverlay.INSTANCE.openRecipeView(slot.getStack(), ItemViewOverlay.ItemViewOpenType.RESULT);
 
-            if(CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j))
+            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j))
                 ItemBookmarkOverlay.INSTANCE.bookmarkItem(slot.getStack());
 
             break;
@@ -272,6 +295,23 @@ public class ItemViewOverlay {
             slot.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
 
+    }
+
+    public void renderItemHighlighting(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        if (!this.itemFilterMode || !this.isEnabled())
+            return;
+
+
+        screen.getMenu().slots.forEach(slot -> {
+
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(this.currentInfo.leftPos - 1, this.currentInfo.topPos - 1, 0);
+            if (!slot.hasItem() || !ItemViewOverlay.INSTANCE.getAvailableItems().contains(slot.getItem().getItem())) {
+                guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
+            }
+            guiGraphics.pose().popPose();
+
+        });
     }
 
 

@@ -1,5 +1,8 @@
-package de.crafty.eiv.common.api.recipe;
+package de.crafty.eiv.common.recipe;
 
+import de.crafty.eiv.common.api.recipe.EivRecipeType;
+import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
+import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluid;
@@ -27,10 +30,12 @@ public class ItemViewRecipes {
 
 
 
+    @Deprecated
     public <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ClientRecipeWrapper<T> wrapper) {
         this.recipeWrappers.put(recipeType, wrapper);
     }
 
+    @Deprecated
     public void addRecipeProvider(ServerRecipeProvider provider) {
         this.recipeProviders.add(provider);
     }

@@ -41,6 +41,9 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Nullable
     protected Slot hoveredSlot;
 
+    @Shadow
+    public abstract T getMenu();
+
     protected MixinAbstractContainerScreen(Component component) {
         super(component);
     }
@@ -59,14 +62,24 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
         ItemViewOverlay.InventoryPositionInfo info = new ItemViewOverlay.InventoryPositionInfo(this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
         if (ItemViewOverlay.INSTANCE.checkForScreenChange((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info)) {
-            if(ItemViewOverlay.SEARCHBAR != null)
+            if (ItemViewOverlay.SEARCHBAR != null)
                 this.removeWidget(ItemViewOverlay.SEARCHBAR);
 
             this.addSearchbar(info);
         }
+
         ItemViewOverlay.INSTANCE.render((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info, this.minecraft, guiGraphics, mouseX, mouseY, partialTicks);
 
     }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void injectItemHighlighting(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
+
+        //Render item highlighting
+        ItemViewOverlay.INSTANCE.renderItemHighlighting((AbstractContainerScreen<?>) (Object) this, guiGraphics, mouseX, mouseY, partialTicks);
+
+    }
+
 
     @Unique
     private void addSearchbar(ItemViewOverlay.InventoryPositionInfo info) {
@@ -83,7 +96,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$2(double mouseX, double mouseY, double scrolledX, double scrolledY, CallbackInfoReturnable<Boolean> cir) {
-        if(ItemViewOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
+        if (ItemViewOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
             cir.setReturnValue(true);
     }
 
@@ -104,7 +117,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         if (CommonEIVClient.RECIPE_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem())
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.RESULT);
 
-        if(CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem()){
+        if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem()) {
             ItemBookmarkOverlay.INSTANCE.bookmarkItem(this.hoveredSlot.getItem());
 
         }
