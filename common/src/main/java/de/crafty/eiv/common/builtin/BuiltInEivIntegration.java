@@ -2,8 +2,11 @@ package de.crafty.eiv.common.builtin;
 
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.api.recipe.ItemView;
-import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
+import de.crafty.eiv.common.builtin.brewing.BrewingServerRecipe;
+import de.crafty.eiv.common.builtin.brewing.BrewingViewRecipe;
+import de.crafty.eiv.common.builtin.burning.BurningServerRecipe;
+import de.crafty.eiv.common.builtin.burning.BurningViewRecipe;
 import de.crafty.eiv.common.builtin.campfire.CampfireServerRecipe;
 import de.crafty.eiv.common.builtin.shaped.ShapedServerRecipe;
 import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
@@ -11,19 +14,29 @@ import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
 import de.crafty.eiv.common.builtin.smithing.SmithingServerRecipe;
 import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.builtin.stonecutting.StonecutterServerRecipe;
+import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
-import de.crafty.eiv.common.recipe.vanilla.blasting.BlastingViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.campfire.CampfireViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.crafting.CraftingViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.shapeless.ShapelessViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.smelting.SmeltingViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.smithing.SmithingViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.smoking.SmokingViewRecipe;
-import de.crafty.eiv.common.recipe.vanilla.stonecutting.StonecutterViewRecipe;
+import de.crafty.eiv.common.builtin.blasting.BlastingViewRecipe;
+import de.crafty.eiv.common.builtin.campfire.CampfireViewRecipe;
+import de.crafty.eiv.common.builtin.shaped.CraftingViewRecipe;
+import de.crafty.eiv.common.builtin.shapeless.ShapelessViewRecipe;
+import de.crafty.eiv.common.builtin.smelting.SmeltingViewRecipe;
+import de.crafty.eiv.common.builtin.smithing.SmithingViewRecipe;
+import de.crafty.eiv.common.builtin.smoking.SmokingViewRecipe;
+import de.crafty.eiv.common.builtin.stonecutting.StonecutterViewRecipe;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.block.entity.FuelValues;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +54,22 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
         ItemView.excludeItem(Items.AIR);
 
+        BuiltInRegistries.POTION.forEach(potion -> {
+            ItemView.addStackSensitive(PotionContents.createItemStack(Items.POTION, Holder.direct(potion)));
+            ItemView.addStackSensitive(PotionContents.createItemStack(Items.SPLASH_POTION, Holder.direct(potion)));
+            ItemView.addStackSensitive(PotionContents.createItemStack(Items.LINGERING_POTION, Holder.direct(potion)));
+        });
+
         //providers
+        ItemView.addRecipeProvider(recipeList -> {
+            FuelValues fuelValues = ServerRecipeManager.INSTANCE.getServer().fuelValues();
+            fuelValues.fuelItems().forEach(item -> {
+                recipeList.add(new BurningServerRecipe(item, fuelValues.burnDuration(new ItemStack(item))));
+            });
+
+        });
+
+
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMELTING).forEach(recipe -> {
                 recipeList.add(new SmeltingServerRecipe(recipe.input(), recipe.result));
@@ -113,7 +141,27 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             });
         });
 
+        ItemView.addRecipeProvider(recipeList -> {
+
+            PotionBrewing potionBrewing = ServerRecipeManager.INSTANCE.getServer().potionBrewing();
+            List<PotionBrewing.Mix<Potion>> potionMixes = ((PotionBrewingAccessor) potionBrewing).getPotionMixes();
+            List<PotionBrewing.Mix<Item>> containerMixes = ((PotionBrewingAccessor) potionBrewing).getContainerMixes();
+
+            containerMixes.forEach(itemMix -> {
+                recipeList.add(new BrewingServerRecipe(new ItemStack(itemMix.to().value()), itemMix.ingredient(), new ItemStack(itemMix.from().value())));
+            });
+
+            potionMixes.forEach(potionMix -> {
+                recipeList.add(new BrewingServerRecipe(PotionContents.createItemStack(Items.POTION, potionMix.to()), potionMix.ingredient(), PotionContents.createItemStack(Items.POTION, potionMix.from())));
+                recipeList.add(new BrewingServerRecipe(PotionContents.createItemStack(Items.SPLASH_POTION, potionMix.to()), potionMix.ingredient(), PotionContents.createItemStack(Items.SPLASH_POTION, potionMix.from())));
+                recipeList.add(new BrewingServerRecipe(PotionContents.createItemStack(Items.LINGERING_POTION, potionMix.to()), potionMix.ingredient(), PotionContents.createItemStack(Items.LINGERING_POTION, potionMix.from())));
+
+            });
+
+        });
+
         //Wrapper
+        ItemView.registerRecipeWrapper(BurningServerRecipe.TYPE, unwrapped -> List.of(new BurningViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(SmeltingServerRecipe.TYPE, unwrapped -> List.of(new SmeltingViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(BlastingServerRecipe.TYPE, unwrapped -> List.of(new BlastingViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(SmokingServerRecipe.TYPE, unwrapped -> List.of(new SmokingViewRecipe(unwrapped)));
@@ -121,8 +169,6 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         ItemView.registerRecipeWrapper(ShapedServerRecipe.TYPE, unwrapped -> List.of(new CraftingViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(CampfireServerRecipe.TYPE, unwrapped -> List.of(new CampfireViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(StonecutterServerRecipe.TYPE, unwrapped -> List.of(new StonecutterViewRecipe(unwrapped)));
-
-
         ItemView.registerRecipeWrapper(SmithingServerRecipe.TYPE, unwrapped -> {
             List<SmithingViewRecipe> recipes = new ArrayList<>();
 
@@ -136,7 +182,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
             return recipes;
         });
-
+        ItemView.registerRecipeWrapper(BrewingServerRecipe.TYPE, unwrapped -> List.of(new BrewingViewRecipe(unwrapped)));
 
     }
 }

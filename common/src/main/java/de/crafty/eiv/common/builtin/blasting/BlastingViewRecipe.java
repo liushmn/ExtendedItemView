@@ -1,39 +1,36 @@
-package de.crafty.eiv.common.recipe.vanilla.smoking;
+package de.crafty.eiv.common.builtin.blasting;
 
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
-import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.SmokerScreen;
+import net.minecraft.client.gui.screens.inventory.BlastFurnaceScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.SmokingRecipe;
 
 import java.util.List;
 
-public class SmokingViewRecipe implements IEivViewRecipe {
+public class BlastingViewRecipe implements IEivViewRecipe {
 
     private final SlotContent input, result;
-    private final AnimationTicker smokingTicker;
+    private final AnimationTicker blastingTicker;
 
-    public SmokingViewRecipe(SmokingServerRecipe smokingRecipe) {
+    public BlastingViewRecipe(BlastingServerRecipe blastingRecipe) {
 
-        this.input = SlotContent.of(smokingRecipe.getInput());
-        this.result = SlotContent.of(smokingRecipe.getResult());
+        this.input = SlotContent.of(blastingRecipe.getInput());
+        this.result = SlotContent.of(blastingRecipe.getResult());
 
-        this.smokingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("smoking_ticker"), 100);
+        this.blastingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("blasting_ticker"), 100);
     }
-
 
     @Override
     public IEivRecipeViewType getViewType() {
-        return SmokingViewType.INSTANCE;
+        return BlastingViewType.INSTANCE;
     }
 
     @Override
@@ -54,13 +51,13 @@ public class SmokingViewRecipe implements IEivViewRecipe {
 
     @Override
     public List<AnimationTicker> getAnimationTickers() {
-        return List.of(this.smokingTicker);
+        return List.of(this.blastingTicker);
     }
 
     @Override
     public void renderRecipe(RecipeViewScreen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        int litProgress = Math.round(this.smokingTicker.getProgress() * 14);
-        int smeltProgress = Math.round(this.smokingTicker.getProgress() * 24);
+        int litProgress = Math.round(this.blastingTicker.getProgress() * 14);
+        int smeltProgress = Math.round(this.blastingTicker.getProgress() * 24);
 
         guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 1, 20 + (14 - litProgress), 0, 14 - litProgress, 14, litProgress, 128, 128);
 
@@ -75,7 +72,7 @@ public class SmokingViewRecipe implements IEivViewRecipe {
 
     @Override
     public Class<? extends AbstractContainerScreen<?>> getTransferClass() {
-        return SmokerScreen.class;
+        return BlastFurnaceScreen.class;
     }
 
     @Override

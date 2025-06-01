@@ -1,4 +1,4 @@
-package de.crafty.eiv.common.recipe.vanilla.crafting;
+package de.crafty.eiv.common.builtin.shaped;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;

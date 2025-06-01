@@ -1,7 +1,7 @@
-package de.crafty.eiv.common.recipe.vanilla.blasting;
+package de.crafty.eiv.common.builtin.blasting;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.recipe.vanilla.smelting.SmeltingViewType;
+import de.crafty.eiv.common.builtin.smelting.SmeltingViewType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;

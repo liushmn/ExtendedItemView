@@ -3,6 +3,7 @@ package de.crafty.eiv.neoforge;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
+import de.crafty.eiv.common.command.EivCommand;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.neoforge.resolver.NeoForgeEivResolver;
@@ -17,6 +18,8 @@ import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -35,6 +38,7 @@ public class NeoForgeEIV {
         eventBus.addListener(this::onMenuScreenRegistry);
         eventBus.addListener(this::onModelLayerRegistry);
         eventBus.addListener(this::onKeyMappingRegistry);
+        NeoForge.EVENT_BUS.addListener(this::onCommandRegistry);
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");
@@ -79,5 +83,8 @@ public class NeoForgeEIV {
 
     private void onKeyMappingRegistry(RegisterKeyMappingsEvent event) {
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
+    }
+    private void onCommandRegistry(RegisterCommandsEvent event) {
+        EivCommand.register(event.getDispatcher());
     }
 }

@@ -1,4 +1,4 @@
-package de.crafty.eiv.common.recipe.vanilla.stonecutting;
+package de.crafty.eiv.common.builtin.smithing;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
@@ -10,30 +10,30 @@ import net.minecraft.world.item.Items;
 
 import java.util.List;
 
-public class StonecutterViewType implements IEivRecipeViewType {
+public class SmithingViewType implements IEivRecipeViewType {
 
-    protected static final StonecutterViewType INSTANCE = new StonecutterViewType();
+    protected static final SmithingViewType INSTANCE = new SmithingViewType();
 
-    private static final ResourceLocation STONECUTTER_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
+    private static final ResourceLocation SMITHING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smithing.png");
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("view.eiv.type.stonecutter");
+        return Component.translatable("view.eiv.type.smithing");
     }
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("stonecutting");
+        return ResourceLocation.withDefaultNamespace("smithing");
     }
 
     @Override
     public ItemStack getIcon() {
-        return new ItemStack(Items.STONECUTTER);
+        return new ItemStack(Items.SMITHING_TABLE);
     }
 
     @Override
     public int getDisplayWidth() {
-        return 74;
+        return 108;
     }
 
     @Override
@@ -43,26 +43,33 @@ public class StonecutterViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getGuiTexture() {
-        return STONECUTTER_LOCATION;
+        return SMITHING_LOCATION;
     }
 
     @Override
     public int getSlotCount() {
-        return 2;
+        return 4;
     }
 
     @Override
     public void placeSlots(RecipeViewMenu.SlotDefinition slotDefinition) {
-        //Input
+
+        //Base
         slotDefinition.addItemSlot(0, 1, 1);
 
+        //Addition
+        slotDefinition.addItemSlot(1, 19, 1);
+
+        //Template
+        slotDefinition.addItemSlot(2, 37, 1);
+
         //Result
-        slotDefinition.addItemSlot(1, 57, 1);
+        slotDefinition.addItemSlot(3, 91, 1);
     }
 
 
     @Override
     public List<ItemStack> getCraftReferences() {
-        return List.of(new ItemStack(Items.STONECUTTER));
+        return List.of(new ItemStack(Items.SMITHING_TABLE));
     }
 }

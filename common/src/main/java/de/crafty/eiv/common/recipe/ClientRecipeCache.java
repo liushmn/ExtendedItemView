@@ -59,6 +59,8 @@ public class ClientRecipeCache {
         this.byItemIngredient.getOrDefault(inputStack.getItem(), List.of()).forEach(resourceLocation -> {
             recipes.add(this.recipeMap.get(resourceLocation));
         });
+
+        recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsIngredient(inputStack) && !viewRecipe.getViewType().getCraftReferences().contains(inputStack));
         return recipes;
     }
 
@@ -68,6 +70,8 @@ public class ClientRecipeCache {
         this.byItemResult.getOrDefault(outputStack.getItem(), List.of()).forEach(resourceLocation -> {
             recipes.add(this.recipeMap.get(resourceLocation));
         });
+
+        recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsResult(outputStack));
         return recipes;
     }
 

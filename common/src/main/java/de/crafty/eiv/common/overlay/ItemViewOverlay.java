@@ -40,7 +40,7 @@ public class ItemViewOverlay {
     private int itemStartX, itemStartY;
     private String currentQuery;
     private boolean itemFilterMode;
-    private List<Item> availableItems;
+    private List<ItemStack> availableItems;
 
     private int startIndex;
 
@@ -105,7 +105,7 @@ public class ItemViewOverlay {
         return this.height;
     }
 
-    public List<Item> getAvailableItems() {
+    public List<ItemStack> getAvailableItems() {
         return this.availableItems;
     }
 
@@ -155,14 +155,14 @@ public class ItemViewOverlay {
 
         //Slot registration
         for (int i = this.startIndex; i < endIndex && i < this.availableItems.size(); i++) {
-            Item item = this.availableItems.get(i);
+            ItemStack stack = this.availableItems.get(i);
 
             int j = i - this.startIndex;
 
             int xOff = (j - (j / this.fittingItemsPerRow) * this.fittingItemsPerRow) * 20;
             int yOff = j / this.fittingItemsPerRow * 20;
 
-            this.slots.add(new ItemSlot(new ItemStack(item), this.itemStartX + xOff, this.itemStartY + yOff));
+            this.slots.add(new ItemSlot(stack, this.itemStartX + xOff, this.itemStartY + yOff));
         }
 
     }
@@ -180,7 +180,7 @@ public class ItemViewOverlay {
         else
             this.availableItems = ItemFilters.defaultFilter(newQuery);
 
-        this.availableItems.removeAll(ItemView.getExcluded());
+        this.availableItems.removeIf(stack -> ItemView.getExcluded().contains(stack.getItem()));
 
         this.updateSlots();
     }
@@ -306,7 +306,7 @@ public class ItemViewOverlay {
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(this.currentInfo.leftPos - 1, this.currentInfo.topPos - 1, 0);
-            if (!slot.hasItem() || !ItemViewOverlay.INSTANCE.getAvailableItems().contains(slot.getItem().getItem())) {
+            if (!slot.hasItem() || ItemViewOverlay.INSTANCE.getAvailableItems().stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
                 guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
             guiGraphics.pose().popPose();

@@ -315,7 +315,9 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
             List<ItemStack> availableItems = new ArrayList<>();
             content.getValidContents().forEach(stack -> {
-                if (playerInvCache.stream().anyMatch(stack1 -> stack1.is(stack.getItem())))
+                StackValidator stackValidator = context.getStackValidators().getOrDefault(slot, null);
+
+                if (playerInvCache.stream().anyMatch(stack1 -> stack1.is(stack.getItem())) && (stackValidator == null || stackValidator.validate(stack)))
                     availableItems.add(stack);
             });
 
@@ -678,12 +680,14 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         private final HashMap<Integer, SlotContent> contents;
         private final HashMap<Integer, Supplier<Integer>> contentDependencies;
         private final HashMap<Integer, AdditionalStackModifier> additionalTooltips;
+        private final HashMap<Integer, StackValidator> stackValidators;
 
         protected SlotFillContext() {
             this.contents = new HashMap<>();
             this.contentDependencies = new HashMap<>();
 
             this.additionalTooltips = new HashMap<>();
+            this.stackValidators = new HashMap<>();
         }
 
         public void bindSlot(int slotId, SlotContent slotContent) {
@@ -703,6 +707,10 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             this.additionalTooltips.put(slotId, tooltipProvider);
         }
 
+        public void addStackValidator(int slotId, StackValidator stackValidator) {
+            this.stackValidators.put(slotId, stackValidator);
+        }
+
         protected HashMap<Integer, SlotContent> getContents() {
             return this.contents;
         }
@@ -714,21 +722,12 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         private HashMap<Integer, AdditionalStackModifier> getAdditionalTooltips() {
             return this.additionalTooltips;
         }
+
+        private HashMap<Integer, StackValidator> getStackValidators() {
+            return this.stackValidators;
+        }
     }
 
-    public static class SlotContentMap {
-
-        private HashMap<Integer, SlotContent> mappedContents;
-
-        private SlotContentMap() {
-            this.mappedContents = new HashMap<>();
-        }
-
-        private void mapIngredient(int containerSlot, SlotContent ingredient) {
-            this.mappedContents.put(containerSlot, ingredient);
-        }
-
-    }
 
     public interface AdditionalStackModifier {
 
@@ -736,6 +735,12 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         };
 
         void addTooltip(ItemStack stack, List<Component> tooltip);
+
+    }
+
+    public interface StackValidator {
+
+        boolean validate(ItemStack stack);
 
     }
 }

@@ -2,11 +2,12 @@ package de.crafty.eiv.common.api.recipe;
 
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
-import de.crafty.eiv.common.recipe.vanilla.crafting.CraftingViewType;
+import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,15 @@ public interface IEivViewRecipe {
     List<SlotContent> getIngredients();
 
     List<SlotContent> getResults();
+
+    //Just for correct recipe display
+    default boolean redirectsAsIngredient(ItemStack stack) {
+        return true;
+    }
+
+    default boolean redirectsAsResult(ItemStack stack) {
+        return true;
+    }
 
     default int getPriority() {
         return 0;

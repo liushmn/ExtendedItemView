@@ -1,6 +1,6 @@
-package de.crafty.eiv.common.recipe.vanilla.shapeless;
+package de.crafty.eiv.common.builtin.shapeless;
 
-import de.crafty.eiv.common.recipe.vanilla.crafting.CraftingViewType;
+import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 

@@ -1,4 +1,4 @@
-package de.crafty.eiv.common.recipe.vanilla.campfire;
+package de.crafty.eiv.common.builtin.campfire;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;

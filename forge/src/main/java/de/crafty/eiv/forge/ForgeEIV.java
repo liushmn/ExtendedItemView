@@ -3,6 +3,7 @@ package de.crafty.eiv.forge;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
+import de.crafty.eiv.common.command.EivCommand;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.forge.resolver.ForgeEivResolver;
@@ -10,6 +11,8 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -36,6 +39,7 @@ public class ForgeEIV {
         context.getModEventBus().addListener(this::onMenuRegistry);
         context.getModEventBus().addListener(this::onModelLayerRegistry);
         context.getModEventBus().addListener(this::onKeyMappingRegistry);
+        MinecraftForge.EVENT_BUS.addListener(this::onCommandRegistry);
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");
@@ -79,6 +83,10 @@ public class ForgeEIV {
 
     private void onKeyMappingRegistry(RegisterKeyMappingsEvent event) {
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
+    }
+
+    private void onCommandRegistry(RegisterCommandsEvent event) {
+        EivCommand.register(event.getDispatcher());
     }
 
 }

@@ -32,6 +32,7 @@ public class ServerRecipeManager {
 
     public void setServer(MinecraftServer server) {
         this.server = server;
+        this.reload();
         this.broadcastAllRecipes();
     }
 
@@ -54,6 +55,9 @@ public class ServerRecipeManager {
 
 
     public void reload() {
+        if(this.server == null || this.recipeManager == null)
+            return;
+
         CommonEIV.LOGGER.info("Reloading all Recipes...");
 
         this.reloadRecipes();

@@ -1,13 +1,11 @@
-package de.crafty.eiv.common.recipe.vanilla.stonecutting;
+package de.crafty.eiv.common.builtin.stonecutting;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
-import de.crafty.eiv.common.builtin.stonecutting.StonecutterServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
-import net.minecraft.world.item.crafting.StonecutterRecipe;
 
 import java.util.List;
 

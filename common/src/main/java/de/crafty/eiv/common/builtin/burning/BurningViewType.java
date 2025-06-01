@@ -1,4 +1,4 @@
-package de.crafty.eiv.common.recipe.vanilla.smelting;
+package de.crafty.eiv.common.builtin.burning;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
@@ -10,58 +10,49 @@ import net.minecraft.world.item.Items;
 
 import java.util.List;
 
-public class SmeltingViewType implements IEivRecipeViewType {
+public class BurningViewType implements IEivRecipeViewType {
 
-    public static final SmeltingViewType INSTANCE = new SmeltingViewType();
+    public static final BurningViewType INSTANCE = new BurningViewType();
 
-    private static final ResourceLocation SMELTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smelting.png");
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("view.eiv.type.smelting");
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("furnace_smelting");
-    }
-
-    @Override
-    public ItemStack getIcon() {
-        return new ItemStack(Items.FURNACE);
+        return Component.translatable("view.eiv.type.burning");
     }
 
     @Override
     public int getDisplayWidth() {
-        return 82;
+        return 72;
     }
 
     @Override
     public int getDisplayHeight() {
-        return 54;
+        return 18;
     }
 
     @Override
     public ResourceLocation getGuiTexture() {
-        return SMELTING_LOCATION;
+        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
     }
 
     @Override
     public int getSlotCount() {
-        return 3;
+        return 1;
     }
 
     @Override
     public void placeSlots(RecipeViewMenu.SlotDefinition slotDefinition) {
-
-        //Input Slot
         slotDefinition.addItemSlot(0, 1, 1);
+    }
 
-        //Fuel Slot
-        slotDefinition.addItemSlot(1, 1, 37);
+    @Override
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("furnace_burning");
+    }
 
-        //Result Slot
-        slotDefinition.addItemSlot(2, 61, 19);
+    @Override
+    public ItemStack getIcon() {
+        return new ItemStack(Items.COAL);
     }
 
     @Override
