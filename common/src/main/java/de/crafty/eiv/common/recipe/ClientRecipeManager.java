@@ -1,7 +1,7 @@
 package de.crafty.eiv.common.recipe;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.network.payload.ServerboundRequestRecipesPayload;
+import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
 import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class ClientRecipeManager {
 
 
     public void startUpdate() {
-        if(!this.status().isIdle())
+        if (!this.status().isIdle())
             return;
 
         this.status().setIdle(false);
@@ -60,15 +60,14 @@ public class ClientRecipeManager {
                 LOGGER.error("Something went wrong while processing recipes, there might be some strange appearances");
 
             this.status.setIdle(true);
-
         }, "EIV-Process-Recipe-Cache Thread").start();
 
     }
 
-    public void requestRecipesFromServer() {
+    public void requestServerEivData() {
         //TODO only send when not caching
-        if(this.status.isIdle())
-            CommonEIV.networkManager().sendPacketToServer(new ServerboundRequestRecipesPayload());
+        if (this.status.isIdle())
+            CommonEIV.networkManager().sendPacketToServer(new ServerboundRequestEivUpdate());
 
     }
 
@@ -92,8 +91,9 @@ public class ClientRecipeManager {
 
         public void setIdle(boolean idle) {
             this.idle = idle;
-            if(idle)
+            if (idle)
                 this.updateStartTimestamp = -1;
+
         }
 
         public boolean isIdle() {

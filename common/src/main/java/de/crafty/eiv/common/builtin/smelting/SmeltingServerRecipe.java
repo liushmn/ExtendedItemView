@@ -50,7 +50,6 @@ public class SmeltingServerRecipe implements IEivServerRecipe {
 
         tag.put("input", EivTagUtil.writeIngredient(this.input));
         tag.put("result", EivTagUtil.encodeItemStack(this.result));
-
     }
 
     @Override

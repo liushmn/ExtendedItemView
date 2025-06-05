@@ -3,6 +3,8 @@ package de.crafty.eiv.common.recipe.util;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.recipe.ServerRecipeManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -35,11 +37,11 @@ public class EivTagUtil {
 
 
     public static CompoundTag encodeItemStack(ItemStack stack) {
-        return ItemStack.CODEC.encode(stack, NbtOps.INSTANCE, new CompoundTag()).mapOrElse(tag -> (CompoundTag) tag, tagError -> new CompoundTag());
+        return stack.save(ServerRecipeManager.INSTANCE.getServer().registryAccess()).asCompound().orElseGet(CompoundTag::new);
     }
 
     public static ItemStack decodeItemStack(CompoundTag tag) {
-        return ItemStack.CODEC.decode(NbtOps.INSTANCE, tag).mapOrElse(Pair::getFirst, pairError -> ItemStack.EMPTY);
+        return ItemStack.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {

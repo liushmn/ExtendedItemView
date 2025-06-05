@@ -1,7 +1,10 @@
 package de.crafty.eiv.common.network;
 
-import de.crafty.eiv.common.network.payload.ServerboundRequestRecipesPayload;
+import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
 import de.crafty.eiv.common.network.payload.recipe.*;
+import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
+import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
+import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.transfer.ClientboundUpdateTransferCachePayload;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
@@ -83,10 +86,25 @@ public class EivNetworkManager {
 
     public EivNetworkManager registerPayloads() {
 
-        this.registerServerbound(ServerboundRequestRecipesPayload.TYPE, ServerboundRequestRecipesPayload.STREAM_CODEC, (context, payload) -> {
+        this.registerServerbound(ServerboundRequestEivUpdate.TYPE, ServerboundRequestEivUpdate.STREAM_CODEC, (context, payload) -> {
+            ServerRecipeManager.INSTANCE.informAboutStackSensitives();
             ServerRecipeManager.INSTANCE.informAboutRecipes(context.sender());
         });
 
+
+        //Stack-Sensitives
+        this.registerClientbound(ClientboundStartStackSensitivesPayload.TYPE, ClientboundStartStackSensitivesPayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.stackSensitiveStartReceived(payload.amount());
+        });
+
+        this.registerClientbound(ClientboundStackSensitivePayload.TYPE, ClientboundStackSensitivePayload.STREAM_CODEC, (context, payload) -> {
+            System.out.println("Received stack sensitive: " + payload.stackSensitive());
+            LowEndRecipeCache.INSTANCE.stackSensitiveReceived(payload.stackSensitive());
+        });
+
+        this.registerClientbound(ClientboundFinishStackSensitivesPayload.TYPE, ClientboundFinishStackSensitivesPayload.STREAM_CODEC, (context, payload) -> {
+            LowEndRecipeCache.INSTANCE.stackSensitiveEndReceived();
+        });
 
         //Enclosing payloads
         this.registerClientbound(ClientboundStartUpdatesPayload.TYPE, ClientboundStartUpdatesPayload.STREAM_CODEC, (context, payload) -> {

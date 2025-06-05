@@ -218,9 +218,12 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         this.additionalStackModifiers.clear();
 
         this.slots.clear();
+
+        this.currentDisplay.forEach(IEivViewRecipe::fadeRecipe);
         this.currentDisplay.clear();
 
         this.currentDisplay.addAll(this.getRecipeDisplay());
+        this.currentDisplay.forEach(IEivViewRecipe::initRecipe);
 
         for (int i = 0; i < this.currentDisplay.size(); i++) {
 
@@ -610,7 +613,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             for (int j = 0; j < this.getViewType().getSlotCount(); j++) {
 
                 if (slotFillContext.contentDependencies.containsKey(j))
-                    this.viewContainer.setItem(j + (i * this.getViewType().getSlotCount()), slotFillContext.contentBySlot(j).getByIndex(slotFillContext.contentDependencies.get(j).get()));
+                    this.viewContainer.setItem(j + (i * this.getViewType().getSlotCount()), slotFillContext.contentBySlot(j).getByIndex(Math.min(slotFillContext.contentDependencies.get(j).get(), slotFillContext.contentBySlot(j).size() - 1)));
             }
         }
     }

@@ -2,8 +2,11 @@ package de.crafty.eiv.common.recipe.inventory;
 
 import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.extra.FluidStack;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.recipe.ClientRecipeCache;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,8 +17,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +38,11 @@ public class SlotContent {
     private Type type;
 
     private SlotContent(List<ItemStack> content) {
-        this.content = content;
+
+        List<ItemStack> copied = new ArrayList<>();
+        content.stream().map(ItemStack::copy).forEach(copied::add);
+
+        this.content = copied;
         this.current = 0;
 
         this.itemOrigin = ItemStack.EMPTY;
@@ -55,7 +66,7 @@ public class SlotContent {
 
 
     public void bindOrigin(ItemStack stack) {
-        this.itemOrigin = stack;
+        this.itemOrigin = stack.copy();
     }
 
     public int size() {
@@ -68,19 +79,14 @@ public class SlotContent {
 
     public int index() {
 
-        if (this.hasItem(this.itemOrigin.getItem())) {
-            for (int i = 0; i < this.size(); i++) {
-                if (this.getByIndex(i).getItem() == this.itemOrigin.getItem())
-                    return i;
-
-            }
-        }
+        if (this.hasItem(this.itemOrigin.getItem()))
+            return this.getNextMatching(this.itemOrigin);
 
         return this.current;
     }
 
     public ItemStack getByIndex(int index) {
-        return this.content.isEmpty() ? ItemStack.EMPTY : this.content.get(index);
+        return this.content.isEmpty() ? ItemStack.EMPTY : this.content.get(index).copy();
     }
 
     public ItemStack next() {
@@ -113,8 +119,34 @@ public class SlotContent {
 
     }
 
-    public boolean hasItem(Item item) {
-        return this.content.stream().anyMatch(stack -> stack.getItem() == item);
+    public boolean hasItem(Item check) {
+        return this.content.stream().anyMatch(stack -> stack.getItem() == check);
+    }
+
+    public int getNextMatching(ItemStack origin) {
+
+        for (int i = this.current; i < this.content.size() + this.current; i++) {
+            int index = i < this.content.size() ? i : i - this.content.size();
+
+            ItemStack stack = this.content.get(index);
+
+            if (stack.getItem() != origin.getItem())
+                continue;
+
+            if (ClientRecipeCache.INSTANCE.getStackSensitives(origin.getItem()).isEmpty())
+                return index;
+
+
+            for (ItemView.StackSensitive sensitive : ClientRecipeCache.INSTANCE.getStackSensitives(origin.getItem())) {
+                ItemStack sensitiveStack = sensitive.stack();
+
+                if (sensitive.validator().isSame(sensitiveStack, origin) && sensitive.validator().isSame(origin, stack))
+                    return index;
+
+            }
+        }
+
+        return this.current;
     }
 
 

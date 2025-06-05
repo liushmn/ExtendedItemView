@@ -32,8 +32,11 @@ public abstract class MixinServerGamePacketListenerImpl {
             if (!payloadId.equals(resourceLocation))
                 return;
 
-            if (EivNetworkManager.INSTANCE.serverPayloadHandlers().containsKey(payloadId))
-                EivNetworkManager.INSTANCE.serverPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ServerContext(this.player.server, this.player), EivNetworkManager.INSTANCE.castPayload(payload));
+            if (EivNetworkManager.INSTANCE.serverPayloadHandlers().containsKey(payloadId)){
+                this.player.server.execute(() -> {
+                    EivNetworkManager.INSTANCE.serverPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ServerContext(this.player.server, this.player), EivNetworkManager.INSTANCE.castPayload(payload));
+                });
+            }
             else
                 CommonEIV.LOGGER.error("Cannot resolve payload handler for id: {}", payloadId);
 

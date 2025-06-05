@@ -3,7 +3,11 @@ package de.crafty.eiv.common.recipe;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.network.payload.recipe.*;
+import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
+import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
+import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -33,7 +37,6 @@ public class ServerRecipeManager {
     public void setServer(MinecraftServer server) {
         this.server = server;
         this.reload();
-        this.broadcastAllRecipes();
     }
 
     public MinecraftServer getServer() {
@@ -55,10 +58,16 @@ public class ServerRecipeManager {
 
 
     public void reload() {
-        if(this.server == null || this.recipeManager == null)
+        if (this.server == null || this.recipeManager == null)
             return;
 
+
         CommonEIV.LOGGER.info("Reloading all Recipes...");
+
+        ItemView.getStackSensitive().clear();
+        ItemView.getReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
+
+        this.informAboutStackSensitives();
 
         this.reloadRecipes();
         this.broadcastAllRecipes();
@@ -66,7 +75,30 @@ public class ServerRecipeManager {
     }
 
 
-    private void reloadRecipes() {
+    public void informAboutStackSensitives() {
+
+        if (this.server == null)
+            return;
+
+        List<ItemView.StackSensitive> collected = new ArrayList<>();
+        ItemView.getStackSensitive().forEach((item, stackSensitives) -> {
+            collected.addAll(stackSensitives);
+        });
+
+        CommonEIV.LOGGER.info("Broadcasting Stack-Sensitives...");
+        CommonEIV.LOGGER.info("Updating {} players...", this.server.getPlayerList().getPlayers().size());
+        this.server.getPlayerList().getPlayers().forEach(player -> {
+            CommonEIV.networkManager().sendPacket(player, new ClientboundStartStackSensitivesPayload(collected.size()));
+            collected.forEach(stackSensitive -> {
+                CommonEIV.networkManager().sendPacket(player, new ClientboundStackSensitivePayload(stackSensitive));
+            });
+            CommonEIV.networkManager().sendPacket(player, new ClientboundFinishStackSensitivesPayload());
+        });
+
+
+    }
+
+    public void reloadRecipes() {
         PRESENT_RECIPES.clear();
 
         List<IEivServerRecipe> serverRecipes = new ArrayList<>();
@@ -86,7 +118,7 @@ public class ServerRecipeManager {
     }
 
     //TODO make broadcast by type
-    private void broadcastAllRecipes() {
+    public void broadcastAllRecipes() {
         if (this.server == null) {
             return;
         }

@@ -5,6 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -65,6 +66,6 @@ public class BrewingViewType implements IEivRecipeViewType {
 
     @Override
     public List<ItemStack> getCraftReferences() {
-        return List.of(new ItemStack(Items.POTION));
+        return List.of(new ItemStack(Items.BREWING_STAND), new ItemStack(Items.POTION));
     }
 }

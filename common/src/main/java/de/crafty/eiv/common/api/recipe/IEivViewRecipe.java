@@ -70,6 +70,17 @@ public interface IEivViewRecipe {
 
     }
 
+    default void tick() {
+
+    }
+
+    default void initRecipe() {
+
+    }
+
+   default void fadeRecipe() {
+
+   }
 
     default boolean supportsItemTransfer() {
         return false;

@@ -329,6 +329,8 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
         if (timeOpen % 25 == 0 && timeOpen >= 25)
             this.getMenu().tickContents();
+
+        this.getMenu().getCurrentDisplay().forEach(IEivViewRecipe::tick);
     }
 
     public int getLeftPos() {
@@ -395,7 +397,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
             guiGraphics.blit(RenderType::guiTextured, viewType.getGuiTexture(), 0, 0, 0, 0, viewType.getDisplayWidth(), viewType.getDisplayHeight(), viewType.getDisplayWidth(), viewType.getDisplayHeight());
             this.renderInvalidSlots(guiGraphics, i);
-            this.getMenu().getCurrentDisplay().get(i).renderRecipe(this, guiGraphics, mouseX, mouseY, partialTicks);
+            this.getMenu().getCurrentDisplay().get(i).renderRecipe(this, guiGraphics, mouseX - guiLeft, mouseY - guiTop, partialTicks);
             guiGraphics.pose().popPose();
         }
 

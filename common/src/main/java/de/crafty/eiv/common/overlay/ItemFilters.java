@@ -2,13 +2,24 @@ package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.ItemView;
+import de.crafty.eiv.common.recipe.ClientRecipeCache;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemLore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +30,7 @@ public class ItemFilters {
     protected static List<ItemStack> defaultFilter(String query) {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
+        List<ItemStack> thirdPrio = new ArrayList<>();
 
         for (ItemStack stack : fullStackList()) {
 
@@ -28,11 +40,21 @@ public class ItemFilters {
                 firstPrio.add(stack);
             else if (itemName.contains(query.toLowerCase()))
                 secondPrio.add(stack);
+            else if(stack.is(Items.ENCHANTED_BOOK)) {
+
+                int compCheck = ItemFilters.getTooltipMatch(stack, query);
+                if (compCheck == 1)
+                    secondPrio.add(stack);
+                if (compCheck == 2)
+                    thirdPrio.add(stack);
+            }
+
         }
 
         List<ItemStack> results = new ArrayList<>();
         results.addAll(firstPrio);
         results.addAll(secondPrio);
+        results.addAll(thirdPrio);
         return results;
     }
 
@@ -69,17 +91,17 @@ public class ItemFilters {
         for (TagKey<Item> tag : BuiltInRegistries.ITEM.getTags().map(HolderSet.Named::key).toList()) {
             String tagName = tag.location().getPath().toLowerCase();
 
-            if(tagName.startsWith(query.toLowerCase())){
-                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item)).forEach(firstPrio::add));
-                firstPrio.forEach(stack -> {
-                    firstPrio.addAll(ItemView.getStackSensitive().getOrDefault(stack.getItem(), new ArrayList<>()));
-                });
-            }
-            else if(tagName.contains(query.toLowerCase())){
-                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item) && !secondPrio.contains(item)).forEach(secondPrio::add));
-                secondPrio.forEach(stack -> {
-                    secondPrio.addAll(ItemView.getStackSensitive().getOrDefault(stack.getItem(), new ArrayList<>()));
-                });
+            if (tagName.startsWith(query.toLowerCase())) {
+                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item)).forEach(stack -> {
+                    firstPrio.add(stack);
+                    firstPrio.addAll(ClientRecipeCache.INSTANCE.getStackSensitives(stack.getItem()).stream().map(ItemView.StackSensitive::stack).toList());
+                }));
+
+            } else if (tagName.contains(query.toLowerCase())) {
+                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item) && !secondPrio.contains(item)).forEach(stack -> {
+                    secondPrio.add(stack);
+                    secondPrio.addAll(ClientRecipeCache.INSTANCE.getStackSensitives(stack.getItem()).stream().map(ItemView.StackSensitive::stack).toList());
+                }));
             }
 
         }
@@ -91,12 +113,29 @@ public class ItemFilters {
         return results;
     }
 
-    private static List<ItemStack> fullStackList(){
+
+    private static int getTooltipMatch(ItemStack stack, String query) {
+
+        List<Component> lore = Screen.getTooltipFromItem(Minecraft.getInstance(), stack);
+
+        for (Component line : lore) {
+
+            if (line.getContents() instanceof TranslatableContents translatableContents && I18n.get(translatableContents.getKey()).toLowerCase().startsWith(query.toLowerCase()))
+                return 1;
+
+            if (line.getContents() instanceof TranslatableContents translatableContents && I18n.get(translatableContents.getKey()).toLowerCase().contains(query.toLowerCase()))
+                return 2;
+        }
+
+        return 0;
+    }
+
+    private static List<ItemStack> fullStackList() {
         List<ItemStack> results = new ArrayList<>();
 
         BuiltInRegistries.ITEM.forEach(item -> {
             results.add(new ItemStack(item));
-            results.addAll(ItemView.getStackSensitive().getOrDefault(item, new ArrayList<>()));
+            results.addAll(ClientRecipeCache.INSTANCE.getStackSensitives(item).stream().map(ItemView.StackSensitive::stack).toList());
         });
 
         return results;

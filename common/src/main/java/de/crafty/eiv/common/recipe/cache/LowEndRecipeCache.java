@@ -1,6 +1,7 @@
 package de.crafty.eiv.common.recipe.cache;
 
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
@@ -21,6 +22,9 @@ public class LowEndRecipeCache {
     private final List<CacheData> receivedData;
     private int expectedTypes;
 
+    private int expectedStackSensitives;
+    private int receivedStackSensitives;
+
     private LowEndRecipeCache() {
         this.cachingData = CacheData.EMPTY;
         this.receivedData = new ArrayList<>();
@@ -30,7 +34,33 @@ public class LowEndRecipeCache {
         this.cachingData = CacheData.EMPTY;
         this.receivedData.clear();
         this.expectedTypes = 0;
+        this.expectedStackSensitives = 0;
+        this.receivedStackSensitives = 0;
     }
+
+
+    public void stackSensitiveStartReceived(int amount) {
+        this.expectedStackSensitives = amount;
+        ClientRecipeCache.INSTANCE.clearStackSensitives();
+        ClientRecipeManager.INSTANCE.status().setStatusStep("Caching Stack-Sensitives");
+    }
+
+    public void stackSensitiveReceived(ItemView.StackSensitive stackSensitive) {
+        this.receivedStackSensitives++;
+        ClientRecipeCache.INSTANCE.addStackSensitive(stackSensitive);
+        ClientRecipeManager.INSTANCE.status().setStatusProgress(this.receivedStackSensitives + "/" + this.expectedStackSensitives);
+    }
+
+    public void stackSensitiveEndReceived() {
+        if(this.receivedStackSensitives == this.expectedStackSensitives){
+            LOGGER.info("Successfully updated Stack-Sensitives");
+            this.receivedStackSensitives = 0;
+            this.expectedStackSensitives = 0;
+        }
+        else
+            LOGGER.warn("Received {} stack-sensitives, but expected {}; There might be some strange behaviour", this.receivedStackSensitives, this.expectedStackSensitives);
+    }
+
 
     public boolean processRecipes() {
         boolean success = this.receivedData.size() == this.expectedTypes;
