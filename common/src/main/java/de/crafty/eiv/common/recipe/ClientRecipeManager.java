@@ -7,11 +7,16 @@ import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
+
 public class ClientRecipeManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("ClientRecipeManager");
 
     public static final ClientRecipeManager INSTANCE = new ClientRecipeManager();
+
+    private volatile LinkedList<Runnable> queuedRecipeTasks = new LinkedList<>();
 
     private volatile Status status;
 
@@ -23,6 +28,17 @@ public class ClientRecipeManager {
         return this.status;
     }
 
+    public void queueTask(Runnable runnable) {
+        this.queuedRecipeTasks.add(runnable);
+    }
+
+    public void runTasks(){
+        CompletableFuture.runAsync(() -> {
+            this.queuedRecipeTasks.forEach(Runnable::run);
+            this.queuedRecipeTasks.clear();
+        }).thenRun(() -> LOGGER.info("All recipe updates finished"));
+
+    }
 
     public void startUpdate() {
         if (!this.status().isIdle())
@@ -38,6 +54,7 @@ public class ClientRecipeManager {
                 if (this.status().networkTimeout()) {
                     this.status().setIdle(true);
                     LowEndRecipeCache.INSTANCE.clear();
+                    this.queuedRecipeTasks.clear();
                     return;
                 }
             }
@@ -47,8 +64,6 @@ public class ClientRecipeManager {
 
     public void processRecipes() {
 
-        new Thread(() -> {
-
             this.status.setStatusStep("Processing Recipes");
             this.status.setStatusProgress("0%");
 
@@ -56,12 +71,11 @@ public class ClientRecipeManager {
 
             LowEndRecipeCache.INSTANCE.clear();
 
+
             if (!success)
                 LOGGER.error("Something went wrong while processing recipes, there might be some strange appearances");
 
             this.status.setIdle(true);
-        }, "EIV-Process-Recipe-Cache Thread").start();
-
     }
 
     public void requestServerEivData() {

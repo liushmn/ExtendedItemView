@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.mixin.client.multiplayer;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.network.EivNetworkManager;
@@ -21,10 +22,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.concurrent.CompletableFuture;
+
 @Mixin(ClientPacketListener.class)
 public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl implements ClientGamePacketListener, TickablePacketListener {
 
     @Shadow protected abstract ParseResults<SharedSuggestionProvider> parseCommand(String p_249982_);
+
+    @Shadow public CommandDispatcher<SharedSuggestionProvider> commands;
 
     protected MixinClientPacketListener(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
@@ -48,7 +53,6 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
 
             if (EivNetworkManager.INSTANCE.clientPayloadHandlers().containsKey(payloadId)) {
                 EivNetworkManager.INSTANCE.clientPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ClientContext(this.minecraft), EivNetworkManager.INSTANCE.castPayload(payload));
-
             } else
                 CommonEIV.LOGGER.error("Cannot resolve payload handler for id: {}", payloadId);
 

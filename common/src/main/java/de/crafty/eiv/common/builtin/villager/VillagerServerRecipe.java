@@ -527,7 +527,6 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     out.putInt("villagerXp", accessor.getVillagerXp());
                     out.putInt("maxUses", accessor.getMaxUses());
 
-                    System.out.println(out);
                 },
                 (profession, professionLevel, in) -> {
 

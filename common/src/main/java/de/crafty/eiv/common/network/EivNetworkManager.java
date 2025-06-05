@@ -98,7 +98,6 @@ public class EivNetworkManager {
         });
 
         this.registerClientbound(ClientboundStackSensitivePayload.TYPE, ClientboundStackSensitivePayload.STREAM_CODEC, (context, payload) -> {
-            System.out.println("Received stack sensitive: " + payload.stackSensitive());
             LowEndRecipeCache.INSTANCE.stackSensitiveReceived(payload.stackSensitive());
         });
 
@@ -108,25 +107,26 @@ public class EivNetworkManager {
 
         //Enclosing payloads
         this.registerClientbound(ClientboundStartUpdatesPayload.TYPE, ClientboundStartUpdatesPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.startUpdate();
+            ClientRecipeManager.INSTANCE.queueTask(ClientRecipeManager.INSTANCE::startUpdate);
         });
 
         this.registerClientbound(ClientboundFinishUpdatesPayload.TYPE, ClientboundFinishUpdatesPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.processRecipes();
+            ClientRecipeManager.INSTANCE.queueTask(ClientRecipeManager.INSTANCE::processRecipes);
+            ClientRecipeManager.INSTANCE.runTasks();
         });
 
         //Recipes
         this.registerClientbound(ClientboundCacheStartPayload.TYPE, ClientboundCacheStartPayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.cacheStartReceived(payload.types());
+            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.cacheStartReceived(payload.types()));
         });
         this.registerClientbound(ClientboundTypeUpdateStartPayload.TYPE, ClientboundTypeUpdateStartPayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.startCaching(payload.recipeType(), payload.amount());
+            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.startCaching(payload.recipeType(), payload.amount()));
         });
         this.registerClientbound(ClientboundTypeUpdatePayload.TYPE, ClientboundTypeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.cacheModRecipe(payload.entry());
+            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.cacheModRecipe(payload.entry()));
         });
         this.registerClientbound(ClientboundTypeUpdateEndPayload.TYPE, ClientboundTypeUpdateEndPayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.endCaching(payload.recipeType());
+            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.endCaching(payload.recipeType()));
         });
 
 

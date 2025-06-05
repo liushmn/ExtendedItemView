@@ -39,7 +39,6 @@ public class ClientRecipeCache {
     }
 
     public void addStackSensitive(ItemView.StackSensitive stackSensitive) {
-        System.out.println("Added: " + stackSensitive.stack());
         List<ItemView.StackSensitive> present = this.stackSensitives.getOrDefault(stackSensitive.stack().getItem(), new ArrayList<>());
         present.add(stackSensitive);
         this.stackSensitives.put(stackSensitive.stack().getItem(), present);
@@ -74,7 +73,6 @@ public class ClientRecipeCache {
     }
 
 
-    //TODO sort by exact matching
     public List<IEivViewRecipe> getRecipesForCraftingInput(ItemStack inputStack) {
         List<IEivViewRecipe> recipes = new ArrayList<>();
         this.byItemIngredient.getOrDefault(inputStack.getItem(), List.of()).forEach(resourceLocation -> {
@@ -82,6 +80,30 @@ public class ClientRecipeCache {
         });
 
         recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsIngredient(inputStack) && !viewRecipe.getViewType().getCraftReferences().contains(inputStack));
+
+        if (!ClientRecipeCache.INSTANCE.getStackSensitives(inputStack.getItem()).isEmpty()) {
+
+            List<IEivViewRecipe> firstPrio = new ArrayList<>();
+            List<IEivViewRecipe> secondPrio = new ArrayList<>();
+
+            ItemView.StackSensitive foundSensitive = ClientRecipeCache.INSTANCE.getStackSensitives(inputStack.getItem()).stream().filter(stackSensitive -> {
+                return stackSensitive.validator().isSame(stackSensitive.stack(), inputStack);
+            }).findFirst().orElse(null);
+
+            if (foundSensitive != null) {
+                recipes.forEach(viewRecipe -> {
+                    if (viewRecipe.getIngredients().stream().anyMatch(slotContent -> slotContent.getValidContents().stream().anyMatch(stack -> foundSensitive.validator().isSame(inputStack, stack))))
+                        firstPrio.add(viewRecipe);
+                    else
+                        secondPrio.add(viewRecipe);
+                });
+            } else
+                firstPrio.addAll(recipes);
+
+            recipes.clear();
+            recipes.addAll(firstPrio);
+            recipes.addAll(secondPrio);
+        }
         return recipes;
     }
 
@@ -94,10 +116,12 @@ public class ClientRecipeCache {
 
         recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsResult(outputStack));
 
-        List<IEivViewRecipe> firstPrio = new ArrayList<>();
-        List<IEivViewRecipe> secondPrio = new ArrayList<>();
+
 
         if (!ClientRecipeCache.INSTANCE.getStackSensitives(outputStack.getItem()).isEmpty()) {
+
+            List<IEivViewRecipe> firstPrio = new ArrayList<>();
+            List<IEivViewRecipe> secondPrio = new ArrayList<>();
 
             ItemView.StackSensitive foundSensitive = ClientRecipeCache.INSTANCE.getStackSensitives(outputStack.getItem()).stream().filter(stackSensitive -> {
                 return stackSensitive.validator().isSame(stackSensitive.stack(), outputStack);
