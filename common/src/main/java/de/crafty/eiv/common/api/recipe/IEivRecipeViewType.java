@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IEivRecipeViewType {
@@ -73,5 +74,17 @@ public interface IEivRecipeViewType {
 
     default List<ItemStack> getCraftReferences() {
         return List.of();
+    }
+
+    default ReferenceCondition getCraftReferenceCondition() {
+        return (stack, viewRecipe) -> true;
+    }
+
+
+
+    interface ReferenceCondition {
+
+        boolean matches(ItemStack stack, IEivViewRecipe viewRecipe);
+
     }
 }

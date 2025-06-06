@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "eiv.refmap.json",
   "mixins": [
+    "neoforge.common.BasicItemListingAccessor",
     "neoforge.network.registration.MixinNetworkRegistry"
   ],
   "injectors": {

@@ -11,11 +11,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +25,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 public class VillagerViewRecipe implements IEivViewRecipe {
@@ -37,7 +32,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
 
     private final SlotContent offer, cost1, cost2;
 
-    VillagerServerRecipe.VillagerOffer villagerOffer;
+    protected VillagerServerRecipe.VillagerOffer villagerOffer;
 
     private Villager previewVillager = null;
     private boolean prevVillagerLookLeft, villagerLookLeft = false;

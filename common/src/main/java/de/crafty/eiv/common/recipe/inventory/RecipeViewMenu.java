@@ -50,6 +50,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     private RecipeViewScreen viewScreen;
     private final Screen parentScreen;
 
+    private int currentCraftReference;
     private final List<RecipeTransferData> transferData;
 
 
@@ -58,6 +59,8 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         this.parentScreen = parentScreen;
         this.transferData = new ArrayList<>();
+
+        this.currentCraftReference = 0;
 
         this.origin = origin;
         this.additionalStackModifiers = new HashMap<>();
@@ -119,6 +122,10 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
 
+    public int getCurrentCraftReference() {
+        return this.currentCraftReference;
+    }
+
     public Screen getParentScreen() {
         return this.parentScreen;
     }
@@ -156,6 +163,16 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
     public int getMaxPageIndex() {
         return this.maxPageIndex;
+    }
+
+    public void nextReference() {
+        this.currentCraftReference = Math.min(this.currentCraftReference + 1, this.viewType.getCraftReferences().size() - this.getDisplayableCraftReferences());
+        this.updateReferences();
+    }
+
+    public void prevReference() {
+        this.currentCraftReference = Math.max(this.currentCraftReference - 1, 0);
+        this.updateReferences();
     }
 
     public void nextPage() {
@@ -225,6 +242,8 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         this.currentDisplay.addAll(this.getRecipeDisplay());
         this.currentDisplay.forEach(IEivViewRecipe::initRecipe);
 
+        this.currentCraftReference = 0;
+
         for (int i = 0; i < this.currentDisplay.size(); i++) {
 
             IEivViewRecipe recipe = this.currentDisplay.get(i);
@@ -267,12 +286,25 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         this.updateDependencies();
 
-        List<ItemStack> craftReferences = this.viewType.getCraftReferences();
-        for (int i = 0; i < Math.min(craftReferences.size(), 10); i++) {
+
+        for (int i = 0; i < this.getDisplayableCraftReferences(); i++) {
             this.addSlot(new Slot(this.viewContainer, this.viewType.getSlotCount() * this.getCurrentDisplay().size() + i, -25 + 4, 4 + 4 + i * 24 + i));
-            this.getSlot(this.viewType.getSlotCount() * this.getCurrentDisplay().size() + i).set(craftReferences.get(i));
         }
 
+        this.updateReferences();
+    }
+
+
+    public int getDisplayableCraftReferences() {
+        List<ItemStack> craftReferences = this.getViewType().getCraftReferences();
+        return Math.min(craftReferences.size(), (this.getHeight() - 4) / 25);
+    }
+
+    private void updateReferences() {
+        List<ItemStack> craftReferences = this.viewType.getCraftReferences();
+        for (int i = this.currentCraftReference; i < Math.min(this.viewType.getCraftReferences().size(), this.currentCraftReference + this.getDisplayableCraftReferences()); i++) {
+            this.getSlot(this.viewType.getSlotCount() * this.getCurrentDisplay().size() + (i - this.currentCraftReference)).set(craftReferences.get(i));
+        }
     }
 
     public List<RecipeTransferData> getTransferData() {
@@ -551,9 +583,9 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
             this.maxPageIndex = i - 1;
 
-            this.viewContainer = new ViewContainer(this.viewType.getSlotCount() * this.maxPossiblePerPage + this.viewType.getCraftReferences().size());
 
             this.setMenuSizes();
+            this.viewContainer = new ViewContainer(this.viewType.getSlotCount() * this.maxPossiblePerPage + this.getDisplayableCraftReferences());
 
             this.updateByPage();
 

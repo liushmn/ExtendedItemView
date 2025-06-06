@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.recipe;
 
+import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.ItemView;
@@ -79,7 +80,7 @@ public class ClientRecipeCache {
             recipes.add(this.recipeMap.get(resourceLocation));
         });
 
-        recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsIngredient(inputStack) && !viewRecipe.getViewType().getCraftReferences().contains(inputStack));
+        recipes.removeIf(viewRecipe -> !viewRecipe.redirectsAsIngredient(inputStack) && (!viewRecipe.getViewType().getCraftReferences().contains(inputStack) || !viewRecipe.getViewType().getCraftReferenceCondition().matches(inputStack, viewRecipe)));
 
         if (!ClientRecipeCache.INSTANCE.getStackSensitives(inputStack.getItem()).isEmpty()) {
 
@@ -179,6 +180,10 @@ public class ClientRecipeCache {
                 });
 
                 wrapped.getViewType().getCraftReferences().forEach(reference -> {
+
+                    if(!wrapped.getViewType().getCraftReferenceCondition().matches(reference, wrapped))
+                        return;
+
                     List<ResourceLocation> byIngredient = this.byItemIngredient.getOrDefault(reference.getItem(), new ArrayList<>());
                     byIngredient.remove(uniqueId);
                     byIngredient.add(uniqueId);

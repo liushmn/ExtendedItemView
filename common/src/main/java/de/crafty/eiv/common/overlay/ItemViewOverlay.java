@@ -220,7 +220,7 @@ public class ItemViewOverlay {
         if (mouseX < this.xStart)
             return;
 
-        if (SEARCHBAR.isHovered()) {
+        if (SEARCHBAR.isHovered() && mouseButton == 0) {
 
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
                 this.itemFilterMode = !this.itemFilterMode;

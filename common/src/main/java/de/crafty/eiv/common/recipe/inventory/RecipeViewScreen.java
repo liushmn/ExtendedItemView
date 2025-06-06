@@ -177,7 +177,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
                         if (player != null && EivUtil.matchesAnyTransferClass(currentView, Minecraft.getInstance().screen)) {
 
-                            if(!currentView.canTransferToScreen((AbstractContainerScreen<?>) Minecraft.getInstance().screen))
+                            if (!currentView.canTransferToScreen((AbstractContainerScreen<?>) Minecraft.getInstance().screen))
                                 return;
 
                             IEivViewRecipe.RecipeTransferMap map = new IEivViewRecipe.RecipeTransferMap();
@@ -267,8 +267,20 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
 
+        if (mouseX <= this.leftPos && mouseX >= this.leftPos - 25 && mouseY >= this.topPos && mouseY <= this.topPos + this.imageHeight) {
+            if(scrollY < 0)
+                this.getMenu().nextReference();
+
+            if(scrollY > 0)
+                this.getMenu().prevReference();
+
+            return true;
+        }
+
         if (!(mouseX >= this.leftPos && mouseX <= this.leftPos + this.imageWidth && mouseY >= this.topPos && mouseY <= this.topPos + this.imageHeight))
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+
+
 
         if (scrollY < 0) {
             this.getMenu().nextPage();
@@ -375,16 +387,15 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
         //Render craft references
 
-        List<ItemStack> craftReferences = this.getMenu().getViewType().getCraftReferences();
-
-        for (int i = 0; i < craftReferences.size(); i++) {
-            if(this.topPos + 4 + i * 24 + i + 24 > this.topPos + this.imageHeight)
-                break;
-
+        for (int i = 0; i < this.getMenu().getDisplayableCraftReferences(); i++) {
             guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 25, this.topPos + 4 + i * 24 + i, 231, 48, 25, 24, 256, 256);
-
         }
 
+        if(this.getMenu().getCurrentCraftReference() > 0)
+            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 - 1 - 4, 248, 72, 8, 4, 256, 256);
+
+        if(this.getMenu().getCurrentCraftReference() < this.getMenu().getViewType().getCraftReferences().size() - this.getMenu().getDisplayableCraftReferences())
+            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 + (this.getMenu().getDisplayableCraftReferences()) * 25, 248, 76, 8, 4, 256, 256);
 
         int guiLeft = this.leftPos + this.getMenu().guiOffsetLeft();
 
