@@ -8,6 +8,7 @@ public class AnimationTicker {
     private int tick;
     private final ResourceLocation id;
 
+
     private AnimationTicker(ResourceLocation id, int duration) {
         this.duration = duration;
         this.id = id;
@@ -17,6 +18,10 @@ public class AnimationTicker {
         return this.id;
     }
 
+    /**
+     *
+     * @return The current tick of this ticker
+     */
     public int getTick() {
         return this.tick;
     }
@@ -27,22 +32,43 @@ public class AnimationTicker {
             this.tick = 0;
     }
 
+    /**
+     * Overwrite the current tick-status of this ticker
+     *
+     * @param tick The new tick
+     */
     public void setTick(int tick) {
         this.tick = tick;
     }
 
+    /**
+     * Reset the ticker back to the start
+     */
     public void resetTick(){
         this.tick = 0;
     }
 
+    /**
+     *
+     * @return The current progress
+     */
     public float getProgress() {
         return (float) this.tick / (float) (this.duration - 1);
     }
 
+    /**
+     *
+     * @return The total duration
+     */
     public int getDuration() {
         return this.duration;
     }
 
+    /**
+     *
+     * @param id The id for this ticker (use the same id for same durations)
+     * @param duration The time this ticker needs to finish one loop (in ticks)
+     */
     public static AnimationTicker create(ResourceLocation id, int duration) {
         return new AnimationTicker(id, duration);
     }

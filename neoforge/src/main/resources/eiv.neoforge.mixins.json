@@ -2,6 +2,7 @@
   "required": true,
   "package": "de.crafty.eiv.neoforge.mixin",
   "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
   "refmap": "eiv.refmap.json",
   "mixins": [
     "neoforge.common.BasicItemListingAccessor",
