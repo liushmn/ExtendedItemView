@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.TransmuteRecipe;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class ShapelessServerRecipe implements IEivServerRecipe {
         this.ingredients = ingredients;
         this.result = result;
     }
+
 
     public List<Ingredient> getIngredients() {
         return this.ingredients;

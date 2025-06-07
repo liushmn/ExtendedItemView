@@ -45,6 +45,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
     private int menuWidth, menuHeight;
     private final ItemStack origin;
+    private final SlotContent.Type originType;
     private final HashMap<Integer, AdditionalStackModifier> additionalStackModifiers;
 
     private RecipeViewScreen viewScreen;
@@ -54,7 +55,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     private final List<RecipeTransferData> transferData;
 
 
-    public RecipeViewMenu(Screen parentScreen, int containerId, Inventory inventory, List<? extends IEivViewRecipe> recipes, ItemStack origin) {
+    public RecipeViewMenu(Screen parentScreen, int containerId, Inventory inventory, List<? extends IEivViewRecipe> recipes, ItemStack origin, SlotContent.Type originType) {
         super(CommonEIVClient.RECIPE_VIEW_MENU, containerId);
 
         this.parentScreen = parentScreen;
@@ -63,6 +64,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         this.currentCraftReference = 0;
 
         this.origin = origin;
+        this.originType = originType;
         this.additionalStackModifiers = new HashMap<>();
 
         this.sortedByType = new LinkedHashMap<>();
@@ -118,7 +120,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
     public RecipeViewMenu(int containerId, Inventory inventory) {
-        this(null, containerId, inventory, IEivViewRecipe.PLACEHOLDER, ItemStack.EMPTY);
+        this(null, containerId, inventory, IEivViewRecipe.PLACEHOLDER, ItemStack.EMPTY, SlotContent.Type.ANY);
     }
 
 
@@ -247,8 +249,8 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         for (int i = 0; i < this.currentDisplay.size(); i++) {
 
             IEivViewRecipe recipe = this.currentDisplay.get(i);
-            recipe.getIngredients().forEach(slotContent -> slotContent.bindOrigin(this.origin));
-            recipe.getResults().forEach(slotContent -> slotContent.bindOrigin(this.origin));
+            recipe.getIngredients().forEach(slotContent -> slotContent.bindOrigin(this.origin, this.originType));
+            recipe.getResults().forEach(slotContent -> slotContent.bindOrigin(this.origin, this.originType));
 
             recipe.getIngredients().forEach(slotContent -> slotContent.setType(SlotContent.Type.INGREDIENT));
             recipe.getResults().forEach(slotContent -> slotContent.setType(SlotContent.Type.RESULT));

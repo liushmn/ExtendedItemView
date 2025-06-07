@@ -43,9 +43,9 @@ public class ItemView {
         Arrays.stream(items).filter(item -> !EXCLUDED.contains(item)).forEach(EXCLUDED::add);
     }
 
-    public static void addStackSensitive(ItemStack stack, ResourceLocation validatorId) {
+    public static void addStackSensitive(ItemStack stack) {
         List<StackSensitive> present = STACK_SENSITIVE.getOrDefault(stack.getItem(), new ArrayList<>());
-        present.add(new StackSensitive(stack, validatorId));
+        present.add(new StackSensitive(stack));
         STACK_SENSITIVE.put(stack.getItem(), present);
     }
 
@@ -71,14 +71,12 @@ public class ItemView {
         void onReload();
     }
 
-    public record StackSensitive(ItemStack stack, ResourceLocation validatorId) {
+    public record StackSensitive(ItemStack stack) {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, StackSensitive> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.COMPOUND_TAG,
                 stackSensitive -> EivTagUtil.encodeItemStack(stackSensitive.stack()),
-                ByteBufCodecs.STRING_UTF8,
-                stackSensitive -> stackSensitive.validatorId().toString(),
-                (compoundTag, s) -> new StackSensitive(EivTagUtil.decodeItemStack(compoundTag), ResourceLocation.tryParse(s))
+                (compoundTag) -> new StackSensitive(EivTagUtil.decodeItemStack(compoundTag))
         );
 
         @Override
@@ -86,9 +84,6 @@ public class ItemView {
             return stack.copy();
         }
 
-        public UniqueValidator validator() {
-            return UniqueValidator.VALIDATORS.get(this.validatorId());
-        }
 
         public interface UniqueValidator {
 

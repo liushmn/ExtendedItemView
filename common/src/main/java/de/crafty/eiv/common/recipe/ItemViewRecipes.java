@@ -3,8 +3,13 @@ package de.crafty.eiv.common.recipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.recipe.inventory.SlotContent;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
@@ -21,13 +26,11 @@ public class ItemViewRecipes {
 
     private final HashMap<Fluid, Item> fluidItemMap;
 
-
     private ItemViewRecipes() {
         this.recipeWrappers = new HashMap<>();
         this.recipeProviders = new ArrayList<>();
         this.fluidItemMap = new HashMap<>();
     }
-
 
 
     @Deprecated
@@ -59,6 +62,68 @@ public class ItemViewRecipes {
     }
 
 
+    public static boolean makePotionRedirectCheck(ItemStack stack, List<SlotContent> slotContents) {
+        if (!stack.has(DataComponents.POTION_CONTENTS))
+            return true;
+
+        for (SlotContent slotContent : slotContents) {
+            for (ItemStack validStack : slotContent.getValidContents()) {
+                if (!stack.is(validStack.getItem()))
+                    continue;
+
+                if (ItemViewRecipes.makePotionCheck(stack, validStack))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean makeEnchantedRedirectCheck(ItemStack stack, List<SlotContent> slotContents) {
+        if (!stack.has(DataComponents.ENCHANTMENTS))
+            return true;
+
+        for (SlotContent slotContent : slotContents) {
+            for (ItemStack validStack : slotContent.getValidContents()) {
+
+                if (!stack.is(validStack.getItem()))
+                    continue;
+
+                if (ItemViewRecipes.makeEnchantmentCheck(stack, validStack))
+                    return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Whether the potion component of two itemStacks matches
+     */
+    public static boolean makePotionCheck(ItemStack stack1, ItemStack stack2) {
+        if (!(stack1.has(DataComponents.POTION_CONTENTS) && stack2.has(DataComponents.POTION_CONTENTS)))
+            return true;
+
+        PotionContents contents = stack1.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        return contents.potion().isPresent() && contents.is(stack2.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElseThrow());
+    }
+
+    /**
+     * @return Whether the enchantments of two itemStacks match
+     */
+    public static boolean makeEnchantmentCheck(ItemStack stack1, ItemStack stack2) {
+        if (!(stack1.has(DataComponents.ENCHANTMENTS) && stack2.has(DataComponents.ENCHANTMENTS)))
+            return true;
+
+        ItemEnchantments enchantments = stack1.getOrDefault(stack1.is(Items.ENCHANTED_BOOK) ? DataComponents.STORED_ENCHANTMENTS : DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        ItemEnchantments stackEnchantments = stack2.getOrDefault(stack2.is(Items.ENCHANTED_BOOK) ? DataComponents.STORED_ENCHANTMENTS : DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+
+        return enchantments.keySet().stream().allMatch(enchantment -> {
+            return stackEnchantments.getLevel(enchantment) == enchantments.getLevel(enchantment);
+        }) && stackEnchantments.size() == enchantments.size();
+    }
+
 
     public interface ClientRecipeWrapper<T extends IEivServerRecipe> {
 
@@ -72,5 +137,6 @@ public class ItemViewRecipes {
         void provide(List<IEivServerRecipe> recipeList);
 
     }
+
 
 }

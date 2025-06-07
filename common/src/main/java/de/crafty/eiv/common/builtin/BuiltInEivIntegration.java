@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.builtin;
 
+import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
@@ -15,10 +16,14 @@ import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
 import de.crafty.eiv.common.builtin.smithing.SmithingServerRecipe;
 import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.builtin.stonecutting.StonecutterServerRecipe;
+import de.crafty.eiv.common.builtin.tipped_arrow.TippedArrowServerRecipe;
+import de.crafty.eiv.common.builtin.transmute.TransmuteServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerViewRecipe;
 import de.crafty.eiv.common.mixin.world.entity.npc.*;
 import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
+import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.builtin.blasting.BlastingViewRecipe;
@@ -45,6 +50,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -87,17 +93,16 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             Registry<Potion> potionRegistry = ServerRecipeManager.INSTANCE.getServer().registryAccess().lookupOrThrow(Registries.POTION);
 
             potionRegistry.forEach(potion -> {
-                ItemView.addStackSensitive(PotionContents.createItemStack(Items.POTION, potionRegistry.wrapAsHolder(potion)), ItemView.StackSensitive.UniqueValidator.POTION);
-                ItemView.addStackSensitive(PotionContents.createItemStack(Items.SPLASH_POTION, potionRegistry.wrapAsHolder(potion)), ItemView.StackSensitive.UniqueValidator.POTION);
-                ItemView.addStackSensitive(PotionContents.createItemStack(Items.LINGERING_POTION, potionRegistry.wrapAsHolder(potion)), ItemView.StackSensitive.UniqueValidator.POTION);
+                ItemView.addStackSensitive(PotionContents.createItemStack(Items.POTION, potionRegistry.wrapAsHolder(potion)));
+                ItemView.addStackSensitive(PotionContents.createItemStack(Items.SPLASH_POTION, potionRegistry.wrapAsHolder(potion)));
+                ItemView.addStackSensitive(PotionContents.createItemStack(Items.LINGERING_POTION, potionRegistry.wrapAsHolder(potion)));
 
-                if(ServerRecipeManager.INSTANCE.getServer().potionBrewing().isBrewablePotion(potionRegistry.wrapAsHolder(potion))){
+                if (ServerRecipeManager.INSTANCE.getServer().potionBrewing().isBrewablePotion(potionRegistry.wrapAsHolder(potion))) {
                     ItemStack tipped = new ItemStack(Items.TIPPED_ARROW);
                     tipped.set(DataComponents.POTION_CONTENTS, new PotionContents(potionRegistry.wrapAsHolder(potion)));
-                    ItemView.addStackSensitive(tipped, ItemView.StackSensitive.UniqueValidator.POTION);
+                    ItemView.addStackSensitive(tipped);
                 }
             });
-
 
 
             Registry<Enchantment> enchantmentRegistry = ServerRecipeManager.INSTANCE.getServer().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
@@ -105,7 +110,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                 for (int i = enchantment.getMinLevel(); i <= enchantment.getMaxLevel(); i++) {
 
                     ItemStack enchantedBook = EnchantmentHelper.createBook(new EnchantmentInstance(enchantmentRegistry.wrapAsHolder(enchantment), i));
-                    ItemView.addStackSensitive(enchantedBook, ItemView.StackSensitive.UniqueValidator.ENCHANTMENT);
+                    ItemView.addStackSensitive(enchantedBook);
 
                 }
             });
@@ -145,6 +150,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                 if (recipe instanceof ShapelessRecipe shapelessRecipe)
                     recipeList.add(new ShapelessServerRecipe(shapelessRecipe.ingredients, shapelessRecipe.result));
 
+
                 if (recipe instanceof ShapedRecipe shapedRecipe) {
 
                     HashMap<Integer, Ingredient> ingredients = new HashMap<>();
@@ -166,6 +172,41 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
                     recipeList.add(new ShapedServerRecipe(shapedRecipe.getWidth(), shapedRecipe.getHeight(), ingredients, shapedRecipe.result));
                 }
+
+                if (recipe instanceof TransmuteRecipe) {
+                    TransmuteRecipeAccessor accessor = (TransmuteRecipeAccessor) recipe;
+
+                    List<ItemStack> results = new ArrayList<>();
+
+                    Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) accessor.getInput()).getValues().unwrap();
+
+                    List<Item> ingredients = new ArrayList<>();
+
+                    if (ingredientContent.left().isPresent()) {
+                        SlotContent.getItemsFromTag(ingredientContent.left().get()).ifPresent(holders -> {
+                            holders.forEach(holder -> ingredients.add(holder.value()));
+                        });
+                    }
+                    if (ingredientContent.right().isPresent())
+                        ingredients.addAll(ingredientContent.right().get().stream().map(Holder::value).toList());
+
+
+                    ingredients.forEach(ingredient -> {
+                            results.add(accessor.getResult().apply(new ItemStack(ingredient)));
+                    });
+
+                    if (!ingredients.isEmpty() && !results.isEmpty())
+                        recipeList.add(new TransmuteServerRecipe(accessor.getInput(), accessor.getMaterial(), results));
+
+                }
+
+            });
+
+            //Tipped arrows
+            Registry<Potion> potionRegistry = ServerRecipeManager.INSTANCE.getServer().registryAccess().lookupOrThrow(Registries.POTION);
+            potionRegistry.forEach(potion -> {
+                ItemStack potionStack = PotionContents.createItemStack(Items.LINGERING_POTION, potionRegistry.wrapAsHolder(potion));
+                recipeList.add(new TippedArrowServerRecipe(potionStack));
             });
         });
 
@@ -211,7 +252,6 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             });
 
         });
-        //this.addVillagerRecipes();
 
         ItemView.addRecipeProvider(recipeList -> {
 
@@ -223,34 +263,34 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                         if (listing instanceof VillagerTrades.EmeraldForItems emeraldForItems)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.EMERALD_FOR_ITEMS, emeraldForItems)));
 
-                        if(listing instanceof VillagerTrades.ItemsForEmeralds itemsForEmeralds)
+                        if (listing instanceof VillagerTrades.ItemsForEmeralds itemsForEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.ITEMS_FOR_EMERALDS, itemsForEmeralds)));
 
-                        if(listing instanceof VillagerTrades.SuspiciousStewForEmerald suspiciousStewForEmerald)
+                        if (listing instanceof VillagerTrades.SuspiciousStewForEmerald suspiciousStewForEmerald)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.SUSPICIOUS_STEW, suspiciousStewForEmerald)));
 
-                        if(listing instanceof VillagerTrades.EnchantBookForEmeralds enchantBookForEmeralds)
+                        if (listing instanceof VillagerTrades.EnchantBookForEmeralds enchantBookForEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.ENCHANT_BOOK, enchantBookForEmeralds)));
 
-                        if(listing instanceof VillagerTrades.TreasureMapForEmeralds treasureMapForEmeralds)
+                        if (listing instanceof VillagerTrades.TreasureMapForEmeralds treasureMapForEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.TREASURE_MAP, treasureMapForEmeralds)));
 
-                        if(listing instanceof VillagerTrades.TippedArrowForItemsAndEmeralds tippedArrowForItemsAndEmeralds)
+                        if (listing instanceof VillagerTrades.TippedArrowForItemsAndEmeralds tippedArrowForItemsAndEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.TIPPED_ARROW, tippedArrowForItemsAndEmeralds)));
 
-                        if(listing instanceof VillagerTrades.EnchantedItemForEmeralds enchantedItemForEmeralds)
+                        if (listing instanceof VillagerTrades.EnchantedItemForEmeralds enchantedItemForEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.ENCHANTED_ITEM_FOR_EMERALDS, enchantedItemForEmeralds)));
 
-                        if(listing instanceof VillagerTrades.DyedArmorForEmeralds dyedArmorForEmeralds)
+                        if (listing instanceof VillagerTrades.DyedArmorForEmeralds dyedArmorForEmeralds)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.DYED_ARMOR, dyedArmorForEmeralds)));
 
-                        if(listing instanceof VillagerTrades.ItemsAndEmeraldsToItems itemsAndEmeraldsToItems)
+                        if (listing instanceof VillagerTrades.ItemsAndEmeraldsToItems itemsAndEmeraldsToItems)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.ITEMS_AND_EMERALDS_TO_ITEMS, itemsAndEmeraldsToItems)));
 
-                        if(listing instanceof VillagerTrades.EmeraldsForVillagerTypeItem emeraldsForVillagerTypeItem)
+                        if (listing instanceof VillagerTrades.EmeraldsForVillagerTypeItem emeraldsForVillagerTypeItem)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.EMERALDS_FOR_VILLAGER_TYPE, emeraldsForVillagerTypeItem)));
 
-                        if(listing instanceof VillagerTrades.TypeSpecificTrade typeSpecificTrade)
+                        if (listing instanceof VillagerTrades.TypeSpecificTrade typeSpecificTrade)
                             recipeList.add(new VillagerServerRecipe(profession, professionLevel, new VillagerServerRecipe.VillagerDataObject<>(VillagerServerRecipe.VillagerOfferType.TYPE_SPECIFIC, typeSpecificTrade)));
                     });
                 });
@@ -266,6 +306,8 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         ItemView.registerRecipeWrapper(SmokingServerRecipe.TYPE, unwrapped -> List.of(new SmokingViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(ShapelessServerRecipe.TYPE, unwrapped -> List.of(new ShapelessViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(ShapedServerRecipe.TYPE, unwrapped -> List.of(new CraftingViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(TransmuteServerRecipe.TYPE, unwrapped -> List.of(new ShapelessViewRecipe(unwrapped)));
+        ItemView.registerRecipeWrapper(TippedArrowServerRecipe.TYPE, unwrapped -> List.of(new CraftingViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(CampfireServerRecipe.TYPE, unwrapped -> List.of(new CampfireViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(StonecutterServerRecipe.TYPE, unwrapped -> List.of(new StonecutterViewRecipe(unwrapped)));
         ItemView.registerRecipeWrapper(SmithingServerRecipe.TYPE, unwrapped -> {

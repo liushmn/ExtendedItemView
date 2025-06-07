@@ -21,7 +21,8 @@
     "world.entity.npc.TreasureMapForEmeraldsAccessor",
     "world.item.alchemy.PotionBrewingAccessor",
     "world.item.crafting.IngredientAccessor",
-    "world.item.crafting.MixinRecipeManager"
+    "world.item.crafting.MixinRecipeManager",
+    "world.item.crafting.TransmuteRecipeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

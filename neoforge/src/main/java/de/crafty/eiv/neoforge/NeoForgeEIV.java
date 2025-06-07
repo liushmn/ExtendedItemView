@@ -1,27 +1,13 @@
 package de.crafty.eiv.neoforge;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
-import de.crafty.eiv.common.extra.FluidItemModel;
-import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
-import de.crafty.eiv.neoforge.resolver.NeoForgeEivResolver;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.Optional;
 

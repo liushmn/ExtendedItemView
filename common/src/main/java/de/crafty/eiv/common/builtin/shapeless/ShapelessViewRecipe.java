@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.shapeless;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.transmute.TransmuteServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -26,6 +27,14 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(shapelessRecipe.getResult());
     }
 
+    public ShapelessViewRecipe(TransmuteServerRecipe transmuteRecipe) {
+        this.ingredients = new ArrayList<>();
+        this.ingredients.add(SlotContent.of(transmuteRecipe.getInput()));
+        this.ingredients.add(SlotContent.of(transmuteRecipe.getMaterial()));
+
+        this.result = SlotContent.of(transmuteRecipe.getResults());
+    }
+
     @Override
     public IEivRecipeViewType getViewType() {
         return ShapelessViewType.INSTANCE;
@@ -34,7 +43,7 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     @Override
     public void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
 
-        for(int i = 0; i < ingredients.size() && i < this.getViewType().getSlotCount() - 1; i++) {
+        for (int i = 0; i < ingredients.size() && i < this.getViewType().getSlotCount() - 1; i++) {
             slotFillContext.bindSlot(i, ingredients.get(i));
         }
 
@@ -60,6 +69,14 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     @Override
     public void mapRecipeItems(RecipeTransferMap transferMap, AbstractContainerScreen<?> screen) {
 
+        if (screen instanceof InventoryScreen invScreen) {
+            transferMap.linkSlots(0, 1);
+            transferMap.linkSlots(1, 2);
+            transferMap.linkSlots(3, 3);
+            transferMap.linkSlots(4, 4);
+            return;
+        }
+
         transferMap.linkSlots(0, 1);
         transferMap.linkSlots(1, 2);
         transferMap.linkSlots(2, 3);
@@ -79,6 +96,6 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
 
     @Override
     public boolean canTransferToScreen(AbstractContainerScreen<?> screen) {
-        return this.ingredients.size() <= 4;
+        return screen instanceof CraftingScreen || this.ingredients.size() <= 4;
     }
 }

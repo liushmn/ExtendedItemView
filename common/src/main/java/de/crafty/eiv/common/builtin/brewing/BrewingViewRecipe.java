@@ -59,47 +59,7 @@ public class BrewingViewRecipe implements IEivViewRecipe {
 
     }
 
-    @Override
-    public boolean redirectsAsIngredient(ItemStack stack) {
 
-        PotionContents stackContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-
-        if (stackContents == PotionContents.EMPTY)
-            return true;
-
-        for (ItemStack magicIngredient : this.magicIngredient.getValidContents()) {
-
-            PotionContents contents = magicIngredient.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            if (contents != PotionContents.EMPTY && stackContents.is(contents.potion().orElseThrow()))
-                return true;
-        }
-
-        for (ItemStack magicIngredient : this.bottle1.getValidContents()) {
-
-            PotionContents contents = magicIngredient.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            if (contents != PotionContents.EMPTY && stackContents.is(contents.potion().orElseThrow()))
-                return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean redirectsAsResult(ItemStack stack) {
-
-        PotionContents stackContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-        if (stackContents == PotionContents.EMPTY)
-            return true;
-
-        for (ItemStack resultStack : this.result.getValidContents()) {
-
-            PotionContents contents = resultStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-            if (contents != PotionContents.EMPTY && stackContents.is(contents.potion().orElseThrow()))
-                return true;
-        }
-
-        return false;
-    }
 
     @Override
     public List<SlotContent> getIngredients() {

@@ -6,6 +6,7 @@ import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
+import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -331,7 +332,7 @@ public class ItemViewOverlay {
             if (parent instanceof RecipeViewScreen viewScreen)
                 parent = viewScreen.getMenu().getParentScreen();
 
-            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack), clientPlayer.getInventory(), Component.empty()));
+            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT), clientPlayer.getInventory(), Component.empty()));
         }
 
 

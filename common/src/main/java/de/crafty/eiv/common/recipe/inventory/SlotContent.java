@@ -6,8 +6,10 @@ import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.extra.FluidStack;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
+import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +36,7 @@ public class SlotContent {
     private TagKey<Item> itemTag;
 
     private ItemStack itemOrigin;
+    private SlotContent.Type originType;
 
     private Type type;
 
@@ -46,6 +49,7 @@ public class SlotContent {
         this.current = 0;
 
         this.itemOrigin = ItemStack.EMPTY;
+        this.originType = SlotContent.Type.ANY;
 
         this.type = Type.INGREDIENT;
     }
@@ -65,8 +69,9 @@ public class SlotContent {
     }
 
 
-    public void bindOrigin(ItemStack stack) {
+    public void bindOrigin(ItemStack stack, SlotContent.Type originType) {
         this.itemOrigin = stack.copy();
+        this.originType = originType;
     }
 
     public int size() {
@@ -79,7 +84,7 @@ public class SlotContent {
 
     public int index() {
 
-        if (this.hasItem(this.itemOrigin.getItem()))
+        if (this.hasItem(this.itemOrigin.getItem()) && this.originType == this.type)
             return this.getNextMatching(this.itemOrigin);
 
         return this.current;
@@ -100,6 +105,7 @@ public class SlotContent {
     public void resetPointer() {
         this.current = 0;
         this.itemOrigin = ItemStack.EMPTY;
+        this.originType = SlotContent.Type.ANY;
     }
 
 
@@ -133,17 +139,11 @@ public class SlotContent {
             if (stack.getItem() != origin.getItem())
                 continue;
 
-            if (ClientRecipeCache.INSTANCE.getStackSensitives(origin.getItem()).isEmpty())
+            boolean potionCheck = ItemViewRecipes.makePotionCheck(origin, stack);
+            boolean enchantCheck = ItemViewRecipes.makeEnchantmentCheck(origin, stack);
+
+            if(potionCheck && enchantCheck)
                 return index;
-
-
-            for (ItemView.StackSensitive sensitive : ClientRecipeCache.INSTANCE.getStackSensitives(origin.getItem())) {
-                ItemStack sensitiveStack = sensitive.stack();
-
-                if (sensitive.validator().isSame(sensitiveStack, origin) && sensitive.validator().isSame(origin, stack))
-                    return index;
-
-            }
         }
 
         return this.current;
@@ -184,7 +184,7 @@ public class SlotContent {
 
     public static SlotContent of(TagKey<Item> itemTag) {
         List<Item> items = new ArrayList<>();
-        BuiltInRegistries.ITEM.get(itemTag).ifPresent(holders -> {
+        SlotContent.getItemsFromTag(itemTag).ifPresent(holders -> {
             holders.forEach(holder -> {
                 items.add(holder.value());
             });
@@ -210,10 +210,15 @@ public class SlotContent {
 
     }
 
+    public static Optional<HolderSet.Named<Item>> getItemsFromTag(TagKey<Item> tag) {
+        return BuiltInRegistries.ITEM.get(tag);
+    }
+
 
     public enum Type {
         INGREDIENT,
-        RESULT
+        RESULT,
+        ANY
     }
 
 }
