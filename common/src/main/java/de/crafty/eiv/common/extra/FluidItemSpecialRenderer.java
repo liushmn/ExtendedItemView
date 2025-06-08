@@ -53,7 +53,7 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         Color unmodified = new Color(color);
         color = new Color(unmodified.getRed(), unmodified.getGreen(), unmodified.getBlue(), 255).getRGB();
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(fluid.defaultFluidState().createLegacyBlock()).particleIcon();
+        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(fluid.defaultFluidState().createLegacyBlock()).getParticleIcon();
         IEivClientResolver.UVInfo uvInfo = CommonEIVClient.resolver().getUVInfo(sprite);
 
         float u0 = uvInfo.u0();

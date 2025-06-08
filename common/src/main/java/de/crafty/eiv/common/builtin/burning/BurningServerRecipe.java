@@ -43,8 +43,8 @@ public class BurningServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.fuel = EivTagUtil.itemFromString(tag.getStringOr("fuel", ""));
-        this.burnTime = tag.getIntOr("burnTime", AbstractFurnaceBlockEntity.BURN_TIME_STANDARD);
+        this.fuel = EivTagUtil.itemFromString(tag.getString("fuel"));
+        this.burnTime = tag.getInt("burnTime");
     }
 
     @Override

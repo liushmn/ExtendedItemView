@@ -12,6 +12,7 @@ pluginManagement {
         maven { url = 'https://maven.neoforged.net/releases' }
 
         mavenCentral()
+        mavenLocal()
     }
 }
 

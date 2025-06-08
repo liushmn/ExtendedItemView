@@ -32,15 +32,21 @@ public class EivTagUtil {
     }
 
     private static <T> List<T> reconstructRegistryList(CompoundTag srcTag, String key, DefaultedRegistry<T> registry) {
-        return srcTag.getListOrEmpty(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).toList();
+        return srcTag.getList(key, Tag.TAG_STRING).stream().map(s -> stringToRegistry(s.getAsString(), registry)).toList();
     }
 
 
     public static CompoundTag encodeItemStack(ItemStack stack) {
-        return stack.save(ServerRecipeManager.INSTANCE.getServer().registryAccess()).asCompound().orElseGet(CompoundTag::new);
+        if(stack.isEmpty())
+            return new CompoundTag();
+
+        return (CompoundTag) stack.save(ServerRecipeManager.INSTANCE.getServer().registryAccess());
     }
 
     public static ItemStack decodeItemStack(CompoundTag tag) {
+        if(tag.isEmpty())
+            return ItemStack.EMPTY;
+
         return ItemStack.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
     }
 
@@ -60,7 +66,7 @@ public class EivTagUtil {
 
     public static Ingredient readIngredient(CompoundTag tag) {
         if (tag.contains("tag")) {
-            TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getStringOr("tag", "")));
+            TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getString("tag")));
             return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).orElse(null)));
         }
 
@@ -106,7 +112,7 @@ public class EivTagUtil {
     }
 
     public static <T> List<T> readList(CompoundTag srcTag, String key, CompoundReconstructor<T> builder) {
-        return srcTag.getListOrEmpty(key).stream().map(Tag::asCompound).map(compoundTag -> builder.reconstructSingle(compoundTag.orElseGet(CompoundTag::new))).toList();
+        return srcTag.getList(key, Tag.TAG_COMPOUND).stream().map(compoundTag -> builder.reconstructSingle((CompoundTag) compoundTag)).toList();
     }
 
 

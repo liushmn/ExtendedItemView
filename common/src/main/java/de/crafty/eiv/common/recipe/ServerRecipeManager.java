@@ -175,12 +175,12 @@ public class ServerRecipeManager {
             if (!tag.contains("recipeType"))
                 return null;
 
-            EivRecipeType<?> recipeType = EivRecipeType.byId(ResourceLocation.parse(tag.getString("recipeType").orElseThrow()));
+            EivRecipeType<?> recipeType = EivRecipeType.byId(ResourceLocation.parse(tag.getString("recipeType")));
             if (recipeType == null)
                 return null;
 
             IEivServerRecipe modRecipe = recipeType.getEmptyConstructor().construct();
-            modRecipe.loadFromTag(tag.getCompound("recipeData").orElseGet(CompoundTag::new));
+            modRecipe.loadFromTag(tag.getCompound("recipeData"));
             return modRecipe;
         }
     }

@@ -55,8 +55,8 @@ public class SmeltingServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.input = EivTagUtil.readIngredient(tag.getCompound("input").orElseGet(CompoundTag::new));
-        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.input = EivTagUtil.readIngredient(tag.getCompound("input"));
+        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result"));
     }
 
     @Override

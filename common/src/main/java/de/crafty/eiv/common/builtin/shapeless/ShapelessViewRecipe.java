@@ -32,7 +32,7 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
         this.ingredients.add(SlotContent.of(transmuteRecipe.getInput()));
         this.ingredients.add(SlotContent.of(transmuteRecipe.getMaterial()));
 
-        this.result = SlotContent.of(transmuteRecipe.getResults());
+        this.result = SlotContent.of(transmuteRecipe.getResult());
     }
 
     @Override

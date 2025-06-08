@@ -108,12 +108,12 @@ public class VillagerViewRecipe implements IEivViewRecipe {
             return;
 
 
-        this.previewVillager.setVillagerData(this.previewVillager.getVillagerData().withLevel(this.villagerOffer.professionLevel()).withType(level.registryAccess(), VillagerType.PLAINS).withProfession(level.registryAccess(), this.villagerOffer.profession()));
+        this.previewVillager.setVillagerData(this.previewVillager.getVillagerData().setLevel(this.villagerOffer.professionLevel()).setType(VillagerType.PLAINS).setProfession(this.villagerOffer.profession()));
         this.previewVillager.setNoAi(true);
         this.previewVillager.setYHeadRot((this.villagerLookLeft ? -1.0F : 1.0F) * 15.0F);
 
         if(this.villagerOffer.requiredtype() != null)
-            this.previewVillager.setVillagerData(this.previewVillager.getVillagerData().withType(level.registryAccess().lookupOrThrow(Registries.VILLAGER_TYPE).getOrThrow(this.villagerOffer.requiredtype())));
+            this.previewVillager.setVillagerData(this.previewVillager.getVillagerData().setType(this.villagerOffer.requiredtype()));
 
     }
 
@@ -128,9 +128,9 @@ public class VillagerViewRecipe implements IEivViewRecipe {
 
         Font font = Minecraft.getInstance().font;
 
-        ResourceKey<VillagerProfession> profession = this.villagerOffer.profession();
-        String namespace = profession.location().getNamespace();
-        String path = profession.location().getPath();
+        VillagerProfession profession = this.villagerOffer.profession();
+        String namespace = "minecraft";
+        String path = profession.name();
         float scale = 0.75F;
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
@@ -153,7 +153,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
             return;
 
         if(mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36){
-            ResourceLocation typeLocation = this.villagerOffer.requiredtype().location();
+            ResourceLocation typeLocation = ResourceLocation.withDefaultNamespace(this.villagerOffer.requiredtype().toString());
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
             guiGraphics.renderTooltip(font, typeComponent, mouseX, mouseY);
         }

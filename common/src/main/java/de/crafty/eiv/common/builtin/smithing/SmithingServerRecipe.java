@@ -23,15 +23,15 @@ public class SmithingServerRecipe implements IEivServerRecipe {
 
     private boolean isTrim;
     private Ingredient base, template, addition;
-    private TrimPattern pattern;
+    private ItemStack result;
 
-    public SmithingServerRecipe(boolean isTrim, Ingredient base, Ingredient template, Ingredient addition, TrimPattern pattern) {
+    public SmithingServerRecipe(boolean isTrim, Ingredient base, Ingredient template, Ingredient addition, ItemStack result) {
         this.isTrim = isTrim;
         this.base = base;
         this.template = template;
         this.addition = addition;
 
-        this.pattern = pattern;
+        this.result = result;
     }
 
     public boolean isTrim() {
@@ -50,8 +50,8 @@ public class SmithingServerRecipe implements IEivServerRecipe {
         return this.addition;
     }
 
-    public TrimPattern getPattern() {
-        return this.pattern;
+    public ItemStack getResult() {
+        return this.result;
     }
 
     @Override
@@ -61,21 +61,18 @@ public class SmithingServerRecipe implements IEivServerRecipe {
         tag.put("base", EivTagUtil.writeIngredient(this.base));
         tag.put("template", EivTagUtil.writeIngredient(this.template));
         tag.put("addition", EivTagUtil.writeIngredient(this.addition));
-
-        if(this.pattern != null)
-            tag.put("pattern", TrimPattern.DIRECT_CODEC.encode(this.pattern, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+        tag.put("result", EivTagUtil.encodeItemStack(this.result));
 
     }
 
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.isTrim = tag.getBooleanOr("isTrim", false);
-        this.base = EivTagUtil.readIngredient(tag.getCompound("base").orElseGet(CompoundTag::new));
-        this.template = EivTagUtil.readIngredient(tag.getCompound("template").orElseGet(CompoundTag::new));
-        this.addition = EivTagUtil.readIngredient(tag.getCompound("addition").orElseGet(CompoundTag::new));
-
-        this.pattern = TrimPattern.DIRECT_CODEC.decode(NbtOps.INSTANCE, tag.getCompound("pattern").orElseGet(CompoundTag::new)).mapOrElse(Pair::getFirst, pairError -> null);
+        this.isTrim = tag.getBoolean("isTrim");
+        this.base = EivTagUtil.readIngredient(tag.getCompound("base"));
+        this.template = EivTagUtil.readIngredient(tag.getCompound("template"));
+        this.addition = EivTagUtil.readIngredient(tag.getCompound("addition"));
+        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result"));
 
     }
 

@@ -36,7 +36,7 @@ public class TippedArrowServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.potionStack = EivTagUtil.decodeItemStack(tag.getCompound("potionStack").orElseGet(CompoundTag::new));
+        this.potionStack = EivTagUtil.decodeItemStack(tag.getCompound("potionStack"));
 
     }
 

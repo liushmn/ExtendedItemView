@@ -57,22 +57,22 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
     private static ServerboundTransferPayload decodeMap(CompoundTag encoded) {
 
         HashMap<Integer, Integer> transferMap = new HashMap<>();
-        CompoundTag encodedTransferMap = encoded.getCompound("transferMap").orElseGet(CompoundTag::new);
+        CompoundTag encodedTransferMap = encoded.getCompound("transferMap");
 
-        encodedTransferMap.keySet().forEach(recipeSlot -> {
-            transferMap.put(Integer.valueOf(recipeSlot), encodedTransferMap.getInt(recipeSlot).orElse(Integer.valueOf(recipeSlot)));
+        encodedTransferMap.getAllKeys().forEach(recipeSlot -> {
+            transferMap.put(Integer.valueOf(recipeSlot), encodedTransferMap.getInt(recipeSlot));
         });
 
         HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = new HashMap<>();
-        CompoundTag encodedUsedPlayerSlots = encoded.getCompound("usedPlayerSlots").orElseGet(CompoundTag::new);
+        CompoundTag encodedUsedPlayerSlots = encoded.getCompound("usedPlayerSlots");
 
-        encodedUsedPlayerSlots.keySet().forEach(recipeSlot -> {
+        encodedUsedPlayerSlots.getAllKeys().forEach(recipeSlot -> {
             HashMap<Integer, ItemStack> usedSlots = new HashMap<>();
 
-            CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot).orElseGet(CompoundTag::new);
-            playerSlotsTag.keySet().forEach(playerSlot -> {
+            CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot);
+            playerSlotsTag.getAllKeys().forEach(playerSlot -> {
 
-                Optional<ItemStack> stack = ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), playerSlotsTag.getCompound(playerSlot).orElseGet(CompoundTag::new));
+                Optional<ItemStack> stack = ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), playerSlotsTag.getCompound(playerSlot));
                 usedSlots.put(Integer.valueOf(playerSlot), stack.orElseGet(ItemStack.EMPTY::copy));
             });
 

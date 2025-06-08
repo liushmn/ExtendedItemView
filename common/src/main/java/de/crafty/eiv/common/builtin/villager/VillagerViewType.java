@@ -36,7 +36,7 @@ public class VillagerViewType implements IEivRecipeViewType {
         if(!(viewRecipe instanceof VillagerViewRecipe villagerViewRecipe) || Minecraft.getInstance().level == null)
             return true;
 
-        VillagerProfession profession = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.VILLAGER_PROFESSION).getValue(villagerViewRecipe.villagerOffer.profession());
+        VillagerProfession profession = villagerViewRecipe.villagerOffer.profession();
 
         if(profession == null)
             return true;

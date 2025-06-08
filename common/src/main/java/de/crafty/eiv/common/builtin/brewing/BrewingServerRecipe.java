@@ -49,9 +49,9 @@ public class BrewingServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.result = EivTagUtil.decodeItemStack(tag.getCompoundOrEmpty("result"));
-        this.magicIngredient = EivTagUtil.readIngredient(tag.getCompoundOrEmpty("magicIngredient"));
-        this.bottleIngredient = EivTagUtil.decodeItemStack(tag.getCompoundOrEmpty("bottleIngredient"));
+        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result"));
+        this.magicIngredient = EivTagUtil.readIngredient(tag.getCompound("magicIngredient"));
+        this.bottleIngredient = EivTagUtil.decodeItemStack(tag.getCompound("bottleIngredient"));
 
     }
 

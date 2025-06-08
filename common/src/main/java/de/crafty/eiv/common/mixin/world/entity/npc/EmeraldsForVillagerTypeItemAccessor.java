@@ -19,7 +19,7 @@ public interface EmeraldsForVillagerTypeItemAccessor {
     int getMaxUses();
 
     @Accessor("trades")
-    Map<ResourceKey<VillagerType>, Item> getTrades();
+    Map<VillagerType, Item> getTrades();
 
     @Accessor("cost")
     int getCost();

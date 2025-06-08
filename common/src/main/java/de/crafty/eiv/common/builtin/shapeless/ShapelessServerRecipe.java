@@ -50,7 +50,7 @@ public class ShapelessServerRecipe implements IEivServerRecipe {
     public void loadFromTag(CompoundTag tag) {
 
         this.ingredients = EivTagUtil.readList(tag, "ingredients", EivTagUtil::readIngredient);
-        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result"));
 
     }
 

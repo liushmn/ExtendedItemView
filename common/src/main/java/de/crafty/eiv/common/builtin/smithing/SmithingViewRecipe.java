@@ -25,7 +25,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
 
     private final boolean isTrimType;
 
-    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, TrimPattern trimPattern) {
+    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, ItemStack result) {
         this.isTrimType = isTrimType;
 
         this.template = template;
@@ -44,7 +44,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             List<ItemStack> possibleResults = new ArrayList<>();
 
             this.additionIngredient.getValidContents().forEach(addition -> {
-                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base, addition, Holder.direct(trimPattern)));
+                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base, addition, template));
             });
 
             this.result = SlotContent.of(possibleResults);
@@ -52,7 +52,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        this.result = SlotContent.of(new TransmuteResult(this.template.getItem()).apply(this.base));
+        this.result = SlotContent.of(result);
     }
 
     @Override

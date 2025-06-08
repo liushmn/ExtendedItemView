@@ -1,8 +1,9 @@
 package de.crafty.eiv.common.mixin.world.item.crafting;
 
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.TransmuteRecipe;
-import net.minecraft.world.item.crafting.TransmuteResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -16,6 +17,6 @@ public interface TransmuteRecipeAccessor {
     Ingredient getMaterial();
 
     @Accessor("result")
-    TransmuteResult getResult();
+    Holder<Item> getResult();
 
 }

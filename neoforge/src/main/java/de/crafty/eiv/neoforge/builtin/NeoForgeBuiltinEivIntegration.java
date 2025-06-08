@@ -36,14 +36,14 @@ public class NeoForgeBuiltinEivIntegration extends BuiltInEivIntegration {
             },
             (profession, professionLevel, in) -> {
 
-                ItemStack offerStack = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("offerStack"));
-                ItemStack price = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("price"));
-                ItemStack price2 = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("price2"));
+                ItemStack offerStack = EivTagUtil.decodeItemStack(in.getCompound("offerStack"));
+                ItemStack price = EivTagUtil.decodeItemStack(in.getCompound("price"));
+                ItemStack price2 = EivTagUtil.decodeItemStack(in.getCompound("price2"));
 
-                int villagerXp = in.getIntOr("villagerXp", 0);
-                int maxUses = in.getIntOr("maxUses", 0);
+                int villagerXp = in.getInt("villagerXp");
+                int maxUses = in.getInt("maxUses");
 
-                ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                VillagerType villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.getValue(ResourceLocation.parse(in.getString("requiredType")));
 
                 return List.of(new VillagerServerRecipe.VillagerOffer(profession, professionLevel, villagerType, List.of(offerStack), List.of(price), List.of(price2), villagerXp, maxUses));
             }
