@@ -1,48 +1,98 @@
 package de.crafty.eiv.common.api.recipe;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Main API class used to register EIV compat for other mods
+ */
 public class ItemView {
 
+    /**
+     * A list of client-side excluded items that won't show up in the ItemView overlay
+     */
     private static final List<Item> EXCLUDED = new ArrayList<>();
+
+    /**
+     * Server-Side map of "item-variants", the client gets informed about on every server reload
+     */
     private static final HashMap<Item, List<StackSensitive>> STACK_SENSITIVE = new HashMap<>();
+
+    /**
+     * A list of Callbacks used for mods to hook into a server reload
+     * <br>
+     * <br>
+     * Stack-Sensitives should also be registered here
+     */
     private static final List<ReloadCallback> RELOAD_CALLBACKS = new ArrayList<>();
 
+
+    /**
+     * ServerRecipeProviders offer a recipeList where mods can easily add their own server recipes
+     *
+     * @param provider The recipe provider
+     */
     public static void addRecipeProvider(ItemViewRecipes.ServerRecipeProvider provider) {
         ItemViewRecipes.INSTANCE.addRecipeProvider(provider);
     }
 
+    /**
+     *
+     * ClientRecipeWrappers convert an incoming server recipe into a displayable viewRecipe later shown in the recipeView
+     * <br>
+     * <br>
+     * They can also split a server recipe up into multiple viewRecipes if desired, since they require a list to be returned
+     *
+     * @param recipeType The server recipe type
+     * @param wrapper The wrapper
+     * @param <T> The class of the server recipe
+     */
     public static <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ItemViewRecipes.ClientRecipeWrapper<T> wrapper) {
         ItemViewRecipes.INSTANCE.registerRecipeWrapper(recipeType, wrapper);
     }
 
 
+    /**
+     * A method used to exclude an item from the ItemView overlay
+     * <br>
+     * <br>
+     * NOTE: The item still shows up in recipes
+     * <br>
+     * <br>
+     * <b>Example</b>: minecraft:air
+     * @param item The excluded item
+     */
     public static void excludeItem(Item item) {
         excludeItems(item);
     }
 
+    /**
+     * Register multiple items to exclude at once
+     *
+     * @param items An array of items to exclude
+     */
     public static void excludeItems(Item... items) {
         Arrays.stream(items).filter(item -> !EXCLUDED.contains(item)).forEach(EXCLUDED::add);
     }
 
+
+    /**
+     * Add "item-variants", called stack-sensitives to the overlay
+     * <br>
+     * <br>
+     * These sensitives are also used to make proper ingredient/result redirections
+     * @param stack The stack-sensitive
+     */
     public static void addStackSensitive(ItemStack stack) {
         List<StackSensitive> present = STACK_SENSITIVE.getOrDefault(stack.getItem(), new ArrayList<>());
         present.add(new StackSensitive(stack));
@@ -50,18 +100,38 @@ public class ItemView {
     }
 
 
+    /**
+     *
+     * @return The list of currently present stack-sensitives (server-side)
+     */
     public static HashMap<Item, List<StackSensitive>> getStackSensitive() {
         return STACK_SENSITIVE;
     }
 
+    /**
+     *
+     * @return The list of currently excluded items (client-side)
+     */
     public static List<Item> getExcluded() {
         return EXCLUDED;
     }
 
+    /**
+     * Mods can add a ReloadCallback to hook into a server reload
+     * <br>
+     * <br>
+     * They should register their stack-sensitives here, because the list of stack-sensitives is cleared before every reload
+     *
+     * @param callback The reload callback
+     */
     public static void addReloadCallback(ReloadCallback callback) {
         RELOAD_CALLBACKS.add(callback);
     }
 
+    /**
+     *
+     * @return A list of currently present reload callbacks
+     */
     public static List<ReloadCallback> getReloadCallbacks() {
         return RELOAD_CALLBACKS;
     }
@@ -71,6 +141,11 @@ public class ItemView {
         void onReload();
     }
 
+    /**
+     * Representation of a stack-sensitive
+     *
+     * @param stack The itemStack used as an item-variant
+     */
     public record StackSensitive(ItemStack stack) {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, StackSensitive> STREAM_CODEC = StreamCodec.composite(
@@ -85,45 +160,5 @@ public class ItemView {
         }
 
 
-        public interface UniqueValidator {
-
-            HashMap<ResourceLocation, UniqueValidator> VALIDATORS = new HashMap<>();
-
-
-            ResourceLocation POTION = register(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "potion"),
-                    (sensitive, stack) -> {
-
-                        PotionContents sensitiveContent = sensitive.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-                        PotionContents stackContent = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-
-                        return sensitiveContent.equals(stackContent);
-
-                    }
-            );
-
-            ResourceLocation ENCHANTMENT = register(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "enchantment"),
-                    (sensitive, stack) -> {
-                        DataComponentType<ItemEnchantments> compType = sensitive.is(Items.ENCHANTED_BOOK) ? DataComponents.STORED_ENCHANTMENTS : DataComponents.ENCHANTMENTS;
-
-                        ItemEnchantments sensitiveEnchantments = sensitive.getOrDefault(compType, ItemEnchantments.EMPTY);
-                        ItemEnchantments stackEnchantments = stack.getOrDefault(compType, ItemEnchantments.EMPTY);
-
-
-                        boolean bl = stackEnchantments.keySet().stream().allMatch(enchantment -> {
-                            return sensitiveEnchantments.getLevel(enchantment) == stackEnchantments.getLevel(enchantment);
-                        }) && sensitiveEnchantments.size() == stackEnchantments.size();
-
-                        return bl;
-                    }
-            );
-
-            static ResourceLocation register(ResourceLocation id, UniqueValidator validator) {
-                VALIDATORS.put(id, validator);
-                return id;
-            }
-
-            boolean isSame(ItemStack sensitive, ItemStack stack);
-
-        }
     }
 }

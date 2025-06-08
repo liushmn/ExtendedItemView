@@ -2,6 +2,12 @@ package de.crafty.eiv.common.api.recipe;
 
 import net.minecraft.nbt.CompoundTag;
 
+/**
+ * Server-Side representation of a recipe used to update the client efficiently
+ * <br>
+ * <br>
+ * Only send neccessary data here (everything else can be done in the {@link de.crafty.eiv.common.recipe.ItemViewRecipes.ClientRecipeWrapper})
+ */
 public interface IEivServerRecipe {
 
 

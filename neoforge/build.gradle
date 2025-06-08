@@ -1,79 +1,41 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version '7.+'
-    id 'net.neoforged.gradle.mixin' version '7.+'
-
+    id 'net.neoforged.gradle.userdev' version '7.0.185'
 }
-
-
 
 base {
-    archivesName.set("${mod_id}-neoforge")
+    archivesBaseName("${mod_id}-neoforge-${mod_version}+${minecraft_version}")
 }
 
-mixin {
-    config "${mod_id}.mixins.json"
-    config "${mod_id}.neoforge.mixins.json"
 
-}
-
-minecraft {
-    mappings {
-        channel = official()
-        version.put "minecraft", minecraft_version
-    }
-
-}
-
-minecraft.accessTransformers.file file('src/main/resources/META-INF/accesstransformer.cfg')
-
-
-TaskCollection.metaClass.excludingNeoTasks = { ->
-    delegate.matching { !it.name.startsWith("neo")}
-}
-
-tasks.withType(JavaCompile).excludingNeoTasks().configureEach {
-    source(project(":Common").sourceSets.main.allSource)
-}
-
-tasks.withType(Javadoc).excludingNeoTasks().configureEach {
-    source(project(":Common").sourceSets.main.allJava)
-}
-
-tasks.named("sourcesJar", Jar) {
-    from(project(":Common").sourceSets.main.allSource)
-}
-
-tasks.withType(ProcessResources).excludingNeoTasks().configureEach {
-    from project(":Common").sourceSets.main.resources
-    filesMatching("${mod_id}.mixins.json") {
-        expand "refmap_target": "${mod_id}."
-    }
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
     mavenLocal()
 }
 
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+
+    compileOnly project(":common")
+}
+
+minecraft {
+    accessTransformers {
+        file("src/main/resources/META-INF/accesstransformer.cfg")
+    }
+}
+
 runs {
     // applies to all the run configs below
     configureEach {
-        // Recommended logging data for a userdev environment
-        // The markers can be added/remove as needed separated by commas.
-        // "SCAN": For mods scan.
-        // "REGISTRIES": For firing of registry events.
-        // "REGISTRYDUMP": For getting the contents of all registries.
-        systemProperty 'forge.logging.markers', 'REGISTRIES'
 
-        // Recommended logging level for the console
-        // You can set various levels here.
-        // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
         systemProperty 'forge.logging.console.level', 'debug'
 
         modSource project.sourceSets.main
     }
 
     client {
-        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
         systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
     }
 
@@ -82,25 +44,24 @@ runs {
         argument '--nogui'
     }
 
-    // This run config launches GameTestServer and runs all registered gametests, then exits.
-    // By default, the server will crash when no gametests are provided.
-    // The gametest system is also enabled by default for other run configs under the /test command.
-    gameTestServer {
-        systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
-    }
-
     clientData {
-        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
-        // workingDirectory project.file('run-data')
-
-        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
         arguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
-dependencies {
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-    implementation "net.neoforged:neoforge:${neoforge_version}"
+processResources {
 
-    compileOnly(project(":Common"))
+    filesMatching(["META-INF/neoforge.mods.toml"]) {
+        expand project.properties
+    }
+
+    from project(":common").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+
+    source(project(":common").sourceSets.main.allSource)
 }

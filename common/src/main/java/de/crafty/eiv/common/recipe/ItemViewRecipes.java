@@ -16,14 +16,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Internal (intermediate) class that connects {@link de.crafty.eiv.common.api.recipe.ItemView} (Api-class) with EIV logic
+ * <br>
+ * <br>
+ * Also contains some helper functions
+ */
 public class ItemViewRecipes {
 
     public static final ItemViewRecipes INSTANCE = new ItemViewRecipes();
 
 
+    /**
+     * A map of recipe wrappers
+     */
     private final HashMap<EivRecipeType<?>, ClientRecipeWrapper<?>> recipeWrappers;
+
+    /**
+     * A map of recipe providers
+     */
     private final List<ServerRecipeProvider> recipeProviders;
 
+    /**
+     * A map of items by fluid
+     */
     private final HashMap<Fluid, Item> fluidItemMap;
 
     private ItemViewRecipes() {
@@ -33,11 +49,27 @@ public class ItemViewRecipes {
     }
 
 
+    /**
+     * Old way to register recipe wrappers
+     * <br>
+     * <br>
+     * Will be removed soon
+     * @param recipeType
+     * @param wrapper
+     * @param <T>
+     */
     @Deprecated
     public <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ClientRecipeWrapper<T> wrapper) {
         this.recipeWrappers.put(recipeType, wrapper);
     }
 
+    /**
+     * Old way to register recipe providers
+     * <br>
+     * <br>
+     * Will be removed soon
+     * @param provider
+     */
     @Deprecated
     public void addRecipeProvider(ServerRecipeProvider provider) {
         this.recipeProviders.add(provider);
@@ -57,11 +89,19 @@ public class ItemViewRecipes {
         this.fluidItemMap.putAll(fluidItemMap);
     }
 
+    /**
+     *
+     * @param fluid The fluid
+     * @return The corresponding item to a fluid
+     */
     public Item itemForFluid(Fluid fluid) {
         return this.fluidItemMap.getOrDefault(fluid, Items.AIR);
     }
 
-
+    /**
+     *
+     * @return Whether any of the listed SlotContents contains an itemStack matching the potion of the given stack
+     */
     public static boolean makePotionRedirectCheck(ItemStack stack, List<SlotContent> slotContents) {
         if (!stack.has(DataComponents.POTION_CONTENTS))
             return true;
@@ -79,6 +119,10 @@ public class ItemViewRecipes {
         return false;
     }
 
+    /**
+     *
+     * @return Whether any of the listed SlotContents contains an itemStack matching the enchantments of the given stack
+     */
     public static boolean makeEnchantedRedirectCheck(ItemStack stack, List<SlotContent> slotContents) {
         if (!stack.has(DataComponents.ENCHANTMENTS))
             return true;
@@ -106,7 +150,9 @@ public class ItemViewRecipes {
             return true;
 
         PotionContents contents = stack1.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-        return contents.potion().isPresent() && contents.is(stack2.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElseThrow());
+        PotionContents stackContents = stack2.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+
+        return contents.potion().isPresent() && stackContents.potion().isPresent() && contents.is(stackContents.potion().orElseThrow());
     }
 
     /**
