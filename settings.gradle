@@ -1,5 +1,7 @@
 pluginManagement {
     repositories {
+        mavenLocal()
+        mavenCentral()
         gradlePluginPortal()
         maven {
             name = 'Fabric'
@@ -11,8 +13,10 @@ pluginManagement {
         }
         maven { url = 'https://maven.neoforged.net/releases' }
 
-        mavenCentral()
-        mavenLocal()
+        maven  {
+            name = "sponge"
+            url = "https://repo.spongepowered.org/repository/maven-public/"
+        }
     }
 }
 
