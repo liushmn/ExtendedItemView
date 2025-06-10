@@ -19,6 +19,17 @@ Currently supported functions are:
 
 # Developer Guide
 
+## Adding the depedency
+```gradle
+dependencies {
+	//For fabric
+	modImplementation "maven.modrinth:eiv:${eiv_version}+${minecraft_version}"
+
+	//For forge
+	implementation "maven.modrinth:eiv:${eiv_version}+${minecraft_version}"
+}
+```
+
 ## Creating your mod's integration
 
 Before you can implement your own recipes you first have to create an eiv-integration for your Mod.
