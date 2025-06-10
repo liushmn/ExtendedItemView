@@ -21,6 +21,22 @@ Currently supported functions are:
 
 ## Adding the depedency
 ```gradle
+//Taken from https://support.modrinth.com/en/articles/8801191-modrinth-maven
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
 dependencies {
 	//For fabric
 	modImplementation "maven.modrinth:eiv:${eiv_version}+${minecraft_version}"
