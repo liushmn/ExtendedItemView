@@ -23,9 +23,9 @@ import de.crafty.eiv.common.builtin.villager.VillagerViewRecipe;
 import de.crafty.eiv.common.mixin.world.entity.npc.*;
 import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.mixin.world.item.crafting.SmithingTransformRecipeAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
-import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.builtin.blasting.BlastingViewRecipe;
 import de.crafty.eiv.common.builtin.campfire.CampfireViewRecipe;
@@ -38,7 +38,6 @@ import de.crafty.eiv.common.builtin.stonecutting.StonecutterViewRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -82,9 +81,8 @@ import static de.crafty.eiv.common.CommonEIV.*;
 public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
     public static final ResourceLocation WIDGETS = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/eiv_widgets.png");
-
-    //Default slot rendering
     public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
+
 
     @Override
     public void onIntegrationInitialize() {
@@ -180,8 +178,6 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                 if (recipe instanceof TransmuteRecipe) {
                     TransmuteRecipeAccessor accessor = (TransmuteRecipeAccessor) recipe;
 
-                    List<ItemStack> results = new ArrayList<>();
-
                     Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) accessor.getInput()).getValues().unwrap();
 
                     List<Item> ingredients = new ArrayList<>();
@@ -195,12 +191,10 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                         ingredients.addAll(ingredientContent.right().get().stream().map(Holder::value).toList());
 
 
-                    ingredients.forEach(ingredient -> {
-                        results.add(accessor.getResult().apply(new ItemStack(ingredient)));
-                    });
 
-                    if (!ingredients.isEmpty() && !results.isEmpty())
-                        recipeList.add(new TransmuteServerRecipe(accessor.getInput(), accessor.getMaterial(), results));
+
+                    if (!ingredients.isEmpty())
+                        recipeList.add(new TransmuteServerRecipe(accessor.getInput(), accessor.getMaterial(), new ItemStack(accessor.getResult().value())));
 
                 }
 
@@ -230,10 +224,10 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMITHING).forEach(smithingRecipe -> {
 
                 if (smithingRecipe instanceof SmithingTrimRecipe trimRecipe)
-                    recipeList.add(new SmithingServerRecipe(true, trimRecipe.baseIngredient(), trimRecipe.templateIngredient().orElse(null), trimRecipe.additionIngredient().orElse(null), trimRecipe.pattern.value()));
+                    recipeList.add(new SmithingServerRecipe(true, trimRecipe.baseIngredient().orElseThrow(), trimRecipe.templateIngredient().orElse(null), trimRecipe.additionIngredient().orElse(null), ItemStack.EMPTY));
 
                 if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe)
-                    recipeList.add(new SmithingServerRecipe(false, transformRecipe.baseIngredient(), transformRecipe.templateIngredient().orElse(null), transformRecipe.additionIngredient().orElse(null), null));
+                    recipeList.add(new SmithingServerRecipe(false, transformRecipe.baseIngredient().orElseThrow(), transformRecipe.templateIngredient().orElse(null), transformRecipe.additionIngredient().orElse(null), ((SmithingTransformRecipeAccessor) (Object) transformRecipe).getResult()));
 
             });
         });
@@ -320,7 +314,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
 
                 SlotContent.of(unwrapped.getBase()).getValidContents().forEach(baseStack -> {
-                    recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), baseStack, templateStack, unwrapped.getPattern()));
+                    recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), baseStack, templateStack, unwrapped.getResult()));
                 });
 
             });
@@ -353,17 +347,5 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         });
 
     }
-
-
-    /*private void itemListingToRecipe(ResourceKey<VillagerProfession> profession, int professionLevel, ResourceKey<VillagerType> requiredType, VillagerTrades.ItemListing listing, List<IEivServerRecipe> recipeList) {
-
-
-        if (listing instanceof VillagerTrades.TypeSpecificTrade typeSpecificTrade) {
-            typeSpecificTrade.trades().forEach((villagerTypeResourceKey, itemListing) -> {
-                //this.itemListingToRecipe(profession, professionLevel, villagerTypeResourceKey, listing, recipeList);
-            });
-        }
-
-    }*/
 
 }
