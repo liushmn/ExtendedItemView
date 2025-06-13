@@ -22,6 +22,9 @@ import net.minecraft.world.level.material.Fluid;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Helper class for network encoding based on CompoundTags
+ */
 public class EivTagUtil {
 
 

@@ -4,9 +4,12 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -47,6 +50,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     private final ItemStack origin;
     private final SlotContent.Type originType;
     private final HashMap<Integer, AdditionalStackModifier> additionalStackModifiers;
+    private final HashMap<Integer, OptionalSlotRenderer> optionalSlotRenderers;
 
     private RecipeViewScreen viewScreen;
     private final Screen parentScreen;
@@ -66,6 +70,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         this.origin = origin;
         this.originType = originType;
         this.additionalStackModifiers = new HashMap<>();
+        this.optionalSlotRenderers = new HashMap<>();
 
         this.sortedByType = new LinkedHashMap<>();
         HashMap<IEivRecipeViewType, HashMap<Integer, List<IEivViewRecipe>>> prioOrder = new HashMap<>();
@@ -142,6 +147,14 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
     public AdditionalStackModifier getAdditionalStackModifier(int slot) {
         return this.additionalStackModifiers.getOrDefault(slot, AdditionalStackModifier.NONE);
+    }
+
+    public boolean isOptionalSlot(int slot){
+        return this.optionalSlotRenderers.containsKey(slot);
+    }
+
+    public OptionalSlotRenderer getOptionalSlotRenderer(int slot) {
+        return this.optionalSlotRenderers.getOrDefault(slot, OptionalSlotRenderer.DEFAULT);
     }
 
     @Override
@@ -235,6 +248,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
     protected void updateByPage() {
         this.additionalStackModifiers.clear();
+        this.optionalSlotRenderers.clear();
 
         this.slots.clear();
 
@@ -272,6 +286,9 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
                 if (slotFillContext.getAdditionalTooltips().containsKey(j))
                     this.additionalStackModifiers.put(slotId, slotFillContext.getAdditionalTooltips().get(j));
+
+                if(slotFillContext.getOptionalSlotRenderers().containsKey(j))
+                    this.optionalSlotRenderers.put(slotId, slotFillContext.getOptionalSlotRenderers().get(j));
 
             }
 
@@ -719,12 +736,16 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         private final HashMap<Integer, AdditionalStackModifier> additionalTooltips;
         private final HashMap<Integer, StackValidator> stackValidators;
 
+        private final HashMap<Integer, OptionalSlotRenderer> optionalSlotRenderers;
+
         protected SlotFillContext() {
             this.contents = new HashMap<>();
             this.contentDependencies = new HashMap<>();
 
             this.additionalTooltips = new HashMap<>();
             this.stackValidators = new HashMap<>();
+
+            this.optionalSlotRenderers = new HashMap<>();
         }
 
         public void bindSlot(int slotId, SlotContent slotContent) {
@@ -734,6 +755,17 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         public void bindDepedantSlot(int slotId, Supplier<Integer> dependantIndex, SlotContent slotContent) {
             this.contents.put(slotId, slotContent);
             this.contentDependencies.put(slotId, dependantIndex);
+        }
+
+        /**
+         * Optional slots are only rendered if an itemstack is in there
+         * @param slotId The slot id
+         * @param slotContent The slot content
+         * @param optionalSlotRenderer The renderer used for this slot
+         */
+        public void bindOptionalSlot(int slotId, SlotContent slotContent, OptionalSlotRenderer optionalSlotRenderer) {
+            this.contents.put(slotId, slotContent);
+            this.optionalSlotRenderers.put(slotId, optionalSlotRenderer);
         }
 
         public HashMap<Integer, Supplier<Integer>> contentDependencies() {
@@ -752,6 +784,10 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             return this.contents;
         }
 
+        protected HashMap<Integer, OptionalSlotRenderer> getOptionalSlotRenderers() {
+            return this.optionalSlotRenderers;
+        }
+
         protected SlotContent contentBySlot(int slotId) {
             return this.contents.getOrDefault(slotId, SlotContent.of(List.of()));
         }
@@ -760,11 +796,32 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             return this.additionalTooltips;
         }
 
+
         private HashMap<Integer, StackValidator> getStackValidators() {
             return this.stackValidators;
         }
     }
 
+
+    /**
+     * Used to render an optional slot
+     */
+    public interface OptionalSlotRenderer {
+
+        RecipeViewMenu.OptionalSlotRenderer DEFAULT = (guiGraphics, mouseX, mouseY, partialTicks) -> {
+            guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
+        };
+
+        /**
+         * Render method for rendering an optional slot
+         * @param guiGraphics GuiGraphics
+         * @param mouseX current mouse position on x-direction (relative to the viewRecipe)
+         * @param mouseY current mouse position on y-direction (relative to the viewRecipe)
+         * @param partialTicks partialTicks
+         */
+        void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
+
+    }
 
     public interface AdditionalStackModifier {
 

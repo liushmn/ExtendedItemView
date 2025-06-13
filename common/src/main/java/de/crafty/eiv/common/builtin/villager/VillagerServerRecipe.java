@@ -300,7 +300,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         List<ItemStack> offerStacks = EivTagUtil.readList(offerTag, "offerStacks", EivTagUtil::decodeItemStack);
                         List<ItemStack> costStacks = EivTagUtil.readList(offerTag, "costStacks", EivTagUtil::decodeItemStack);
 
-                        VillagerOffer offer = new VillagerOffer(profession, professionLevel, villagerType, offerStacks, costStacks, List.of(), villagerXp, maxUses);
+                        VillagerOffer offer = new VillagerOffer(profession, professionLevel, villagerType, offerStacks, costStacks, List.of(new ItemStack(Items.BOOK)), villagerXp, maxUses);
                         villagerOffers.add(offer);
                     });
 

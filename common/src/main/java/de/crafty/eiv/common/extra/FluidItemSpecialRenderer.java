@@ -29,6 +29,9 @@ import org.joml.Matrix4f;
 
 import java.awt.*;
 
+/**
+ * A special renderer used for rendering the fluid-item in the world
+ */
 public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack> {
 
     private final FluidItemModel model;

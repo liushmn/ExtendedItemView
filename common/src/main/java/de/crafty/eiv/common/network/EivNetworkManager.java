@@ -23,6 +23,9 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
 
+/**
+ * Network Manager for all EIV packets
+ */
 public class EivNetworkManager {
 
     public static final EivNetworkManager INSTANCE = new EivNetworkManager().registerPayloads();
@@ -30,6 +33,9 @@ public class EivNetworkManager {
     private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> clientbound;
     private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> serverbound;
 
+    /**
+     * Payload handlers are used for packet processing on the client and server side
+     */
     private final HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers;
     private final HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers;
 
@@ -74,16 +80,32 @@ public class EivNetworkManager {
         return (T) payload;
     }
 
+    /**
+     * Send a payload to the server
+     *
+     * @param payload The payload
+     */
     public void sendPacketToServer(CustomPacketPayload payload) {
         if (Minecraft.getInstance().getConnection() != null)
             Minecraft.getInstance().getConnection().send(new ServerboundCustomPayloadPacket(payload));
     }
 
+    /**
+     * Send a payload to a player
+     *
+     * @param player The player
+     * @param payload The payload
+     */
     public void sendPacket(ServerPlayer player, CustomPacketPayload payload) {
         player.connection.send(new ClientboundCustomPayloadPacket(payload));
     }
 
 
+    /**
+     * Registers all EIV payloads
+     *
+     * @return The instance of the NetworkManager
+     */
     public EivNetworkManager registerPayloads() {
 
         this.registerServerbound(ServerboundRequestEivUpdate.TYPE, ServerboundRequestEivUpdate.STREAM_CODEC, (context, payload) -> {
@@ -105,7 +127,9 @@ public class EivNetworkManager {
             LowEndRecipeCache.INSTANCE.stackSensitiveEndReceived();
         });
 
-        //Enclosing payloads
+        /*
+         * Enclosing payloads (for update start and end)
+         */
         this.registerClientbound(ClientboundStartUpdatesPayload.TYPE, ClientboundStartUpdatesPayload.STREAM_CODEC, (context, payload) -> {
             ClientRecipeManager.INSTANCE.queueTask(ClientRecipeManager.INSTANCE::startUpdate);
         });
@@ -130,7 +154,7 @@ public class EivNetworkManager {
         });
 
 
-        //Transfer
+        //Item-Transfer payloads
         this.registerServerbound(ServerboundTransferPayload.TYPE, ServerboundTransferPayload.STREAM_CODEC, (context, payload) -> {
             ServerRecipeManager.INSTANCE.performRecipeTransfer(context.sender(), payload.transferMap(), payload.usedPlayerSlots());
         });
@@ -143,6 +167,9 @@ public class EivNetworkManager {
     }
 
 
+    /**
+     * The context where the packet is handled in (either client or server)
+     */
     public interface Context {
     }
 

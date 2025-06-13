@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.api.recipe;
 
+import de.crafty.eiv.common.overlay.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -47,15 +48,14 @@ public class ItemView {
     }
 
     /**
-     *
      * ClientRecipeWrappers convert an incoming server recipe into a displayable viewRecipe later shown in the recipeView
      * <br>
      * <br>
      * They can also split a server recipe up into multiple viewRecipes if desired, since they require a list to be returned
      *
      * @param recipeType The server recipe type
-     * @param wrapper The wrapper
-     * @param <T> The class of the server recipe
+     * @param wrapper    The wrapper
+     * @param <T>        The class of the server recipe
      */
     public static <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ItemViewRecipes.ClientRecipeWrapper<T> wrapper) {
         ItemViewRecipes.INSTANCE.registerRecipeWrapper(recipeType, wrapper);
@@ -70,6 +70,7 @@ public class ItemView {
      * <br>
      * <br>
      * <b>Example</b>: minecraft:air
+     *
      * @param item The excluded item
      */
     public static void excludeItem(Item item) {
@@ -91,6 +92,7 @@ public class ItemView {
      * <br>
      * <br>
      * These sensitives are also used to make proper ingredient/result redirections
+     *
      * @param stack The stack-sensitive
      */
     public static void addStackSensitive(ItemStack stack) {
@@ -101,7 +103,6 @@ public class ItemView {
 
 
     /**
-     *
      * @return The list of currently present stack-sensitives (server-side)
      */
     public static HashMap<Item, List<StackSensitive>> getStackSensitive() {
@@ -109,11 +110,27 @@ public class ItemView {
     }
 
     /**
-     *
      * @return The list of currently excluded items (client-side)
      */
     public static List<Item> getExcluded() {
         return EXCLUDED;
+    }
+
+
+    /**
+     * Opens a recipe view for the client-player containing all recipes that use the specified stack as an ingredient
+     * @param stack The ingredient stack
+     */
+    public static void openForStackIngredient(ItemStack stack) {
+        ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.INPUT);
+    }
+
+    /**
+     * Opens a recipe view for the client-player containing all recipes that own the specified stack as a result
+     * @param stack The result stack
+     */
+    public static void openForStackResult(ItemStack stack) {
+        ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.RESULT);
     }
 
     /**
@@ -129,7 +146,6 @@ public class ItemView {
     }
 
     /**
-     *
      * @return A list of currently present reload callbacks
      */
     public static List<ReloadCallback> getReloadCallbacks() {
