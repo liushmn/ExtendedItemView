@@ -188,6 +188,11 @@ public class YourCustomViewRecipe implements IEivViewRecipe {
             tooltip.add(Component.literal("A cool item"));
         });
 
+        //You can also bind a slot as "optional" and provide it with a valid SlotRenderer to ensure a slot is
+        //only rendered if there's an item in it
+	//The default SlotRenderer is used for rendering minecraft's default slot texture
+        slotFillContext.bindOptionalSlot(0, this.result, RecipeViewMenu.OptionalSlotRenderer.DEFAULT);
+
     }
 
     @Override
@@ -259,13 +264,14 @@ public class YourServerRecipe implements IEivServerRecipe {
     }
 }
 ```
+**INFO**: There's a class called `EivTagUtil` that provides a lot of helper functions for en- and decoding different objects
 
 ## Register your recipes
 
 Registering your recipes requires you to call 2 methods in your `onIntegrationInitialize();` method:
 
-- `ItemViewRecipes.INSTANCE.addRecipeProvider();`
-- `ItemViewRecipes.INSTANCE.registerRecipeWrapper();`
+- `ItemView.addRecipeProvider();`
+- `ItemView.registerRecipeWrapper();`
 
 ```java
 public class EivIntegration implements IExtendedItemViewIntegration {
@@ -292,8 +298,17 @@ public class EivIntegration implements IExtendedItemViewIntegration {
 }
 ```
 
-Recipe providers registered by `ItemViewRecipes.INSTANCE.addRecipeProvider();` are used by the server recipe manager to maintain and update the recipe cache.
-Whenever there is an update the client is informed about the update and the mod recipe wrappers registered by `ItemViewRecipes.INSTANCE.registerRecipeWrapper();` are used to convert incoming server recipes into displayable view-recipes.
+Recipe providers registered by `ItemView.addRecipeProvider();` are used by the server recipe manager to maintain and update the recipe cache.
+Whenever there is an update, the client is informed about the update and the mod recipe wrappers registered by `ItemView.registerRecipeWrapper();` are used to convert incoming server recipes into displayable view-recipes.
+
+### Stack-Sensitives
+
+Stack-Sensitives are "item-variants" that only differ in their itemstacks' components.<br>
+Vanilla examples are: _Enchanted Books, Potions, Tipped Arrows..._<br>
+<br>
+If you want to add your own "item-variants" to the ItemView-overlay simply call `ItemView.addStackSensitive();` in a reload callback (`ItemView.addReloadCallback();`).<br>
+<br>
+You can also exclude items from the overlay by calling `ItemView.excludeItem();` This method does not need to be called in a reload callback, since it's only client-side.
 
 ## Conclusion
 
@@ -334,3 +349,12 @@ To be able to shift items from the players inventory into it's crafting gui you 
 
     }
 ```
+
+## General hints
+
+The `ItemView` class is the main API class for EIV, so you can always look in there if you wonder whether something can be realized with EIV or not (yet).<br>
+It is also recommended to look into the github repo's code before opening an issue, since many things are explained by code comments.<br>
+<br>
+If you still have questions, you can always contact me via [Discord](https://discord.gg/vDuYhAAamG)<br>
+<br>
+Have fun modding!
