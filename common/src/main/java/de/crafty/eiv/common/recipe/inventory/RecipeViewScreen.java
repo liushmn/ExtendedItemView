@@ -128,6 +128,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         }
     }
 
+
     protected void checkGui() {
 
         this.prevRecipe.active = this.getMenu().hasPrevRecipe();
@@ -268,10 +269,10 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
 
         if (mouseX <= this.leftPos && mouseX >= this.leftPos - 25 && mouseY >= this.topPos && mouseY <= this.topPos + this.imageHeight) {
-            if(scrollY < 0)
+            if (scrollY < 0)
                 this.getMenu().nextReference();
 
-            if(scrollY > 0)
+            if (scrollY > 0)
                 this.getMenu().prevReference();
 
             return true;
@@ -279,7 +280,6 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
         if (!(mouseX >= this.leftPos && mouseX <= this.leftPos + this.imageWidth && mouseY >= this.topPos && mouseY <= this.topPos + this.imageHeight))
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-
 
 
         if (scrollY < 0) {
@@ -391,10 +391,10 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
             guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 25, this.topPos + 4 + i * 24 + i, 231, 48, 25, 24, 256, 256);
         }
 
-        if(this.getMenu().getCurrentCraftReference() > 0)
+        if (this.getMenu().getCurrentCraftReference() > 0)
             guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 - 1 - 4, 248, 72, 8, 4, 256, 256);
 
-        if(this.getMenu().getCurrentCraftReference() < this.getMenu().getViewType().getCraftReferences().size() - this.getMenu().getDisplayableCraftReferences())
+        if (this.getMenu().getCurrentCraftReference() < this.getMenu().getViewType().getCraftReferences().size() - this.getMenu().getDisplayableCraftReferences())
             guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 + (this.getMenu().getDisplayableCraftReferences()) * 25, 248, 76, 8, 4, 256, 256);
 
         int guiLeft = this.leftPos + this.getMenu().guiOffsetLeft();
@@ -407,12 +407,22 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
             guiGraphics.pose().translate(guiLeft, guiTop, 0);
 
             guiGraphics.blit(RenderType::guiTextured, viewType.getGuiTexture(), 0, 0, 0, 0, viewType.getDisplayWidth(), viewType.getDisplayHeight(), viewType.getDisplayWidth(), viewType.getDisplayHeight());
+
+            //Optional slot rendering
+            this.getMenu().slots.stream().filter(slot -> this.getMenu().isOptionalSlot(slot.index) && slot.hasItem()).forEach(slot -> {
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(slot.x - (guiLeft - this.leftPos) - 1, slot.y - (guiTop - this.topPos) - 1, 0);
+                this.getMenu().getOptionalSlotRenderer(slot.index).render(guiGraphics, mouseX - guiLeft, mouseY - guiTop, partialTicks);
+                guiGraphics.pose().popPose();
+            });
+
             this.renderInvalidSlots(guiGraphics, i);
             this.getMenu().getCurrentDisplay().get(i).renderRecipe(this, guiGraphics, mouseX - guiLeft, mouseY - guiTop, partialTicks);
             guiGraphics.pose().popPose();
         }
 
     }
+
 
     private void renderInvalidSlots(GuiGraphics guiGraphics, int displayId) {
         Button button = this.transferButtons.get(displayId);

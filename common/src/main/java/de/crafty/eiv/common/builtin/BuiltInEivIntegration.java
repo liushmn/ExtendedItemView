@@ -25,6 +25,7 @@ import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
+import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.builtin.blasting.BlastingViewRecipe;
 import de.crafty.eiv.common.builtin.campfire.CampfireViewRecipe;
@@ -37,6 +38,7 @@ import de.crafty.eiv.common.builtin.stonecutting.StonecutterViewRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -81,6 +83,8 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
     public static final ResourceLocation WIDGETS = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/eiv_widgets.png");
 
+    //Default slot rendering
+    public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
 
     @Override
     public void onIntegrationInitialize() {
@@ -192,7 +196,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
 
                     ingredients.forEach(ingredient -> {
-                            results.add(accessor.getResult().apply(new ItemStack(ingredient)));
+                        results.add(accessor.getResult().apply(new ItemStack(ingredient)));
                     });
 
                     if (!ingredients.isEmpty() && !results.isEmpty())

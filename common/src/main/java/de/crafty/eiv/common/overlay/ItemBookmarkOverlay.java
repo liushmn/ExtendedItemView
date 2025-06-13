@@ -21,6 +21,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Class for managing and rendering the bookmarks
+ * TODO make abstract super class for Bookmark and View Overlay
+ */
 public class ItemBookmarkOverlay {
 
     public static final ItemBookmarkOverlay INSTANCE = new ItemBookmarkOverlay();

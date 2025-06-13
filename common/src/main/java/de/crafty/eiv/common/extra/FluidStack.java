@@ -11,20 +11,23 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
+/**
+ * A representation of a fluid-item including its fluid type and stored fluid amount
+ */
 public class FluidStack {
 
     public static final int AMOUNT_FULL = 1000;
     public static final FluidStack EMPTY = new FluidStack(Fluids.EMPTY, 0);
 
     private final Fluid fluid;
-    private int amount;
+    private final int amount;
 
     public FluidStack(final Fluid fluid) {
         this.fluid = fluid;
         this.amount = FluidStack.AMOUNT_FULL;
     }
 
-    public FluidStack(final Fluid fluid, int amount){
+    public FluidStack(final Fluid fluid, int amount) {
         this.fluid = fluid;
         this.amount = amount;
     }
@@ -37,21 +40,21 @@ public class FluidStack {
         return this.amount;
     }
 
-    public static FluidStack fromItemStack(ItemStack stack){
-        if(!(stack.getItem() instanceof FluidItem fluidItem))
+    public static FluidStack fromItemStack(ItemStack stack) {
+        if (!(stack.getItem() instanceof FluidItem fluidItem))
             return FluidStack.EMPTY;
 
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         int amount = FluidStack.AMOUNT_FULL;
-        if(tag.contains("fluidAmount"))
+        if (tag.contains("fluidAmount"))
             amount = tag.getInt("fluidAmount").orElseGet(() -> FluidStack.AMOUNT_FULL);
 
         return new FluidStack(fluidItem.getFluid(), amount);
     }
 
-    public ItemStack createItemStack(){
+    public ItemStack createItemStack() {
         Item item = ItemViewRecipes.INSTANCE.itemForFluid(this.fluid);
-        if(item == Items.AIR)
+        if (item == Items.AIR)
             return ItemStack.EMPTY;
 
         ItemStack stack = new ItemStack(item);

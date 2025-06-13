@@ -26,7 +26,11 @@ import java.util.List;
 
 public class ItemFilters {
 
-
+    /**
+     * Filters just by the items display name and tooltip
+     * @param query The query
+     * @return A list of matching itemstacks
+     */
     protected static List<ItemStack> defaultFilter(String query) {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
@@ -58,6 +62,11 @@ public class ItemFilters {
         return results;
     }
 
+    /**
+     * Filters by modid
+     * @param query The query
+     * @return A list of matching itemstacks
+     */
     protected static List<ItemStack> modId(String query) {
 
         List<ItemStack> firstPrio = new ArrayList<>();
@@ -84,6 +93,11 @@ public class ItemFilters {
         return results;
     }
 
+    /**
+     * Filters by an items tags
+     * @param query The query
+     * @return A list of matching itemstacks
+     */
     protected static List<ItemStack> tag(String query) {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
@@ -114,6 +128,16 @@ public class ItemFilters {
     }
 
 
+    /**
+     * Returns the matching level of the itemstacks tooltip with the query
+     *
+     * @param stack The itemstack
+     * @param query The query
+     * @return 0 means no match; 1 means first prio; 2 means second prio
+     * <br>
+     * <br>
+     * Used for correct listing of itemstacks by match accuracy
+     */
     private static int getTooltipMatch(ItemStack stack, String query) {
 
         List<Component> lore = Screen.getTooltipFromItem(Minecraft.getInstance(), stack);
@@ -130,6 +154,12 @@ public class ItemFilters {
         return 0;
     }
 
+    /**
+     * @return A list of all items that can be displayed in the ViewOverlay
+     * <br>
+     * <br>
+     * <b>Also includes all stack-sensitives</b>
+     */
     private static List<ItemStack> fullStackList() {
         List<ItemStack> results = new ArrayList<>();
 

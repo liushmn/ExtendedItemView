@@ -3,6 +3,7 @@ package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.ItemViewOverlay;
+import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -138,4 +139,17 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
+    //Optional Slots
+
+    @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
+    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci){
+        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+            ci.cancel();
+    }
+
+    @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
+    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci){
+        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+            ci.cancel();
+    }
 }

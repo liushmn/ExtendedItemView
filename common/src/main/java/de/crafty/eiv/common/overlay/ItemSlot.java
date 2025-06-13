@@ -13,6 +13,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represenatation of one slot later rendered in the overlay
+ */
 public class ItemSlot {
 
     private final ItemStack stack;
@@ -27,10 +30,16 @@ public class ItemSlot {
         this.y = y;
     }
 
+    /**
+     * @return The itemStack that is currently hold by this slot
+     */
     public ItemStack getStack() {
         return this.stack;
     }
 
+    /**
+     * Renders the slot
+     */
     void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
@@ -51,6 +60,9 @@ public class ItemSlot {
         }
     }
 
+    /**
+     * Called on a mouse click in any inventory
+     */
     protected void onClicked(int mouseX, int mouseY, int mouseButton) {
 
 
