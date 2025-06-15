@@ -271,7 +271,7 @@ public class ItemViewOverlay {
     private int getPage() {
         int fittingPerPage = this.fittingItemsPerColumn * this.fittingItemsPerRow;
 
-        int page = this.startIndex / fittingPerPage;
+        int page = fittingPerPage > 0 ? this.startIndex / fittingPerPage : 0;
         if (page * fittingPerPage < this.startIndex)
             page++;
 
@@ -281,7 +281,7 @@ public class ItemViewOverlay {
 
     public void render(AbstractContainerScreen<? extends AbstractContainerMenu> screen, InventoryPositionInfo positionInfo, Minecraft client, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
-        if (!this.isEnabled())
+        if (!this.isEnabled() || this.fittingItemsPerColumn * this.fittingItemsPerRow <= 0)
             return;
 
         ItemBookmarkOverlay.INSTANCE.render(screen, positionInfo, client, guiGraphics, mouseX, mouseY, partialTicks);
@@ -289,9 +289,11 @@ public class ItemViewOverlay {
 
         Font font = client.font;
 
+        int maxPageIndex = (this.availableItems.size() / (this.fittingItemsPerColumn * this.fittingItemsPerRow));
+
         guiGraphics.drawCenteredString(font, "ItemView", screen.width - this.getWidth() / 2, 6, -1);
         guiGraphics.fill(this.xStart, 0, screen.width, screen.height, new Color(0, 0, 0, 64).getRGB());
-        guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.availableItems.size() / (this.fittingItemsPerColumn * this.fittingItemsPerRow) + 1), screen.width - this.width / 2, screen.height - 2 - 20 - 10, -1);
+        guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), screen.width - this.width / 2, screen.height - 2 - 20 - 10, -1);
 
         for (ItemSlot slot : this.slots) {
             slot.render(guiGraphics, mouseX, mouseY, partialTicks);
