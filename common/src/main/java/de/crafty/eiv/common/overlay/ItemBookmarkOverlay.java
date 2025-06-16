@@ -3,6 +3,7 @@ package de.crafty.eiv.common.overlay;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
@@ -133,10 +134,20 @@ public class ItemBookmarkOverlay {
 
     }
 
-    public void scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
+    public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
 
         if (mouseX > this.width)
-            return;
+            return false;
+
+        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())) {
+            for (ItemSlot slot : this.slots) {
+                if (!slot.isHovered())
+                    continue;
+
+                slot.changeCheatmodeCount((scrolledY < 0 ? -1 : 1));
+                return true;
+            }
+        }
 
         int fittingPerPage = this.fittingItemsPerRow * this.fittingItemsPerColumn;
 
@@ -148,6 +159,8 @@ public class ItemBookmarkOverlay {
 
         if (scrolledY != 0)
             this.updateSlots();
+
+        return true;
     }
 
     public void clickMouse(int mouseX, int mouseY, int mouseButton) {

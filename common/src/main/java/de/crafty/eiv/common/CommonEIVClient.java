@@ -38,7 +38,9 @@ public class CommonEIVClient {
 
     public static final KeyMapping ADD_BOOKMARK_KEYBIND = new KeyMapping("key.eiv.bookmark", 65, "key.categories.eiv");
 
-    public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND);
+    public static final KeyMapping USE_CHEATMODE = new KeyMapping("key.eiv.cheatmode", 342, "key.categories.eiv_admin");
+
+    public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND, USE_CHEATMODE);
 
     private static IEivClientResolver HELPER = null;
 

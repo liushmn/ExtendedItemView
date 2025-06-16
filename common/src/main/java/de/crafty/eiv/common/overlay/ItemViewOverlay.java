@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.overlay;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
@@ -192,10 +193,21 @@ public class ItemViewOverlay {
         if (!this.isEnabled())
             return false;
 
-        ItemBookmarkOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY);
+        if (ItemBookmarkOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
+            return true;
 
         if (mouseX < this.itemStartX)
             return false;
+
+        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())) {
+            for (ItemSlot slot : this.slots) {
+                if (!slot.isHovered())
+                    continue;
+
+                slot.changeCheatmodeCount((scrolledY < 0 ? -1 : 1));
+                return true;
+            }
+        }
 
         int fittingPerPage = this.fittingItemsPerRow * this.fittingItemsPerColumn;
 

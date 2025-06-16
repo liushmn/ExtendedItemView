@@ -1,6 +1,9 @@
 package de.crafty.eiv.common.overlay;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.network.EivNetworkManager;
+import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,11 +26,20 @@ public class ItemSlot {
 
     private boolean hovered;
 
+    private int currentCheatmodeCount = 1;
+
     public ItemSlot(ItemStack stack, int x, int y) {
         this.stack = stack;
 
         this.x = x;
         this.y = y;
+    }
+
+
+    public void changeCheatmodeCount(int change) {
+        this.currentCheatmodeCount += change;
+
+        this.currentCheatmodeCount = Math.max(1, Math.min(this.currentCheatmodeCount, this.stack.getMaxStackSize()));
     }
 
     /**
@@ -43,8 +55,14 @@ public class ItemSlot {
     void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
+        if(!this.isHovered() && this.currentCheatmodeCount > 1)
+            this.currentCheatmodeCount = 1;
+
         Minecraft mc = Minecraft.getInstance();
         List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(mc, this.stack));
+
+        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue()))
+            tooltip.addLast(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
 
         tooltip.addLast(Component.literal(CommonEIVClient.resolver().getModNameForItem(this.stack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
 
@@ -68,15 +86,22 @@ public class ItemSlot {
 
         LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
-        if(clientPlayer == null)
+        if (clientPlayer == null)
             return;
 
+        if(mouseButton == 2 && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())){
+            this.currentCheatmodeCount = this.stack.getMaxStackSize();
+        }
 
+        if (mouseButton == 0 && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())) {
+            EivNetworkManager.INSTANCE.sendPacketToServer(new ServerboundPickCheatmodeItemPayload(this.stack.copy(), this.currentCheatmodeCount));
+            return;
+        }
 
-        if(mouseButton == 0)
+        if (mouseButton == 0)
             ItemViewOverlay.INSTANCE.openRecipeView(this.stack, ItemViewOverlay.ItemViewOpenType.RESULT);
 
-        if(mouseButton == 1)
+        if (mouseButton == 1)
             ItemViewOverlay.INSTANCE.openRecipeView(this.stack, ItemViewOverlay.ItemViewOpenType.INPUT);
     }
 
@@ -84,7 +109,7 @@ public class ItemSlot {
         return mouseX >= this.x && mouseX < this.x + 20 && mouseY >= this.y && mouseY < this.y + 20;
     }
 
-    public boolean isHovered(){
+    public boolean isHovered() {
         return this.hovered;
     }
 }
