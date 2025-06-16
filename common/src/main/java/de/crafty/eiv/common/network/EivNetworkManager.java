@@ -1,6 +1,7 @@
 package de.crafty.eiv.common.network;
 
 import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
+import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
 import de.crafty.eiv.common.network.payload.recipe.*;
 import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
@@ -11,8 +12,10 @@ import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
@@ -93,7 +96,7 @@ public class EivNetworkManager {
     /**
      * Send a payload to a player
      *
-     * @param player The player
+     * @param player  The player
      * @param payload The payload
      */
     public void sendPacket(ServerPlayer player, CustomPacketPayload payload) {
@@ -161,6 +164,28 @@ public class EivNetworkManager {
         this.registerClientbound(ClientboundUpdateTransferCachePayload.TYPE, ClientboundUpdateTransferCachePayload.STREAM_CODEC, (context, payload) -> {
             if (context.client.screen instanceof RecipeViewScreen viewScreen)
                 viewScreen.getMenu().updateTransferCache();
+        });
+
+
+        //Cheatmode
+        this.registerServerbound(ServerboundPickCheatmodeItemPayload.TYPE, ServerboundPickCheatmodeItemPayload.STREAM_CODEC, (context, payload) -> {
+
+            if (context.server().getPlayerList().isOp(context.sender().getGameProfile())) {
+                context.sender().sendSystemMessage(
+                        Component.literal("Took x").withStyle(ChatFormatting.GRAY)
+                                .append(
+                                        Component.literal(String.valueOf(payload.amount())).withStyle(ChatFormatting.GOLD)
+                                )
+                                .append(" ")
+                                .append(payload.stack().getDisplayName().copy())
+                );
+
+                context.sender().addItem(payload.stack().copyWithCount(payload.amount()));
+            }else
+                context.sender().sendSystemMessage(
+                        Component.translatable("cheatmode.eiv.denied").withStyle(ChatFormatting.RED)
+                );
+
         });
 
         return this;

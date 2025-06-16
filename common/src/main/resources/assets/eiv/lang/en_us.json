@@ -3,9 +3,6 @@
   "view.eiv.tags": "Accepts any",
   "view.eiv.type.shapeless": "Shapeless Crafting",
   "view.eiv.type.smelting": "Smelting",
-  "key.categories.eiv": "Extended ItemView",
-  "key.eiv.usage": "Show Usage",
-  "key.eiv.recipe": "Show Recipes",
   "view.eiv.type.blasting": "Blasting",
   "view.eiv.type.burning": "Burning",
   "view.eiv.type.smoking": "Smoking",
@@ -27,6 +24,14 @@
   "commands.eiv.reloadedStackSensitives": "Reload success (Stack-Sensitives)",
   "key.eiv.toggle_overlay": "Toggle Overlay",
   "eiv.bookmarks": "Bookmarks",
-  "key.eiv.bookmark": "Add Bookmark"
 
+  "key.categories.eiv": "Extended ItemView",
+  "key.eiv.bookmark": "Add Bookmark",
+  "key.eiv.usage": "Show Usage",
+  "key.eiv.recipe": "Show Recipes",
+
+  "key.categories.eiv_admin": "Extended ItemView - Admin",
+  "key.eiv.cheatmode": "Use Cheatmode",
+
+  "cheatmode.eiv.denied": "You do not have permission to use the cheatmode"
 }

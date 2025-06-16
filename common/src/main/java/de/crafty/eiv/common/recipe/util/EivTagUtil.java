@@ -47,6 +47,14 @@ public class EivTagUtil {
         return ItemStack.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
     }
 
+    public static CompoundTag encodeClientSideItemStack(ItemStack stack){
+        return stack.save(Minecraft.getInstance().player.registryAccess()).asCompound().orElseGet(CompoundTag::new);
+    }
+
+    public static ItemStack decodeServerSideItemStack(CompoundTag tag) {
+        return ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), tag).orElse(ItemStack.EMPTY);
+    }
+
     public static CompoundTag writeIngredient(Ingredient ingredient) {
         Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
 
