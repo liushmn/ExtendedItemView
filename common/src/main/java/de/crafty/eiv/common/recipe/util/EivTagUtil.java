@@ -54,7 +54,7 @@ public class EivTagUtil {
     }
 
     public static CompoundTag encodeClientSideItemStack(ItemStack stack){
-        return stack.save(Minecraft.getInstance().player.registryAccess()).asCompound().orElseGet(CompoundTag::new);
+        return (CompoundTag) stack.save(Minecraft.getInstance().player.registryAccess());
     }
 
     public static ItemStack decodeServerSideItemStack(CompoundTag tag) {
