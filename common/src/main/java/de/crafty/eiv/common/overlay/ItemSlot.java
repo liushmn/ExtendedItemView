@@ -55,13 +55,13 @@ public class ItemSlot {
     void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
-        if(!this.isHovered() && this.currentCheatmodeCount > 1)
+        if (!this.isHovered() && this.currentCheatmodeCount > 1)
             this.currentCheatmodeCount = 1;
 
         Minecraft mc = Minecraft.getInstance();
         List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(mc, this.stack));
 
-        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue()))
+        if (CommonEIVClient.isCheatmodeActive())
             tooltip.addLast(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
 
         tooltip.addLast(Component.literal(CommonEIVClient.resolver().getModNameForItem(this.stack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
@@ -89,11 +89,11 @@ public class ItemSlot {
         if (clientPlayer == null)
             return;
 
-        if(mouseButton == 2 && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())){
+        if (mouseButton == 2 && CommonEIVClient.isCheatmodeActive()) {
             this.currentCheatmodeCount = this.stack.getMaxStackSize();
         }
 
-        if (mouseButton == 0 && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())) {
+        if (mouseButton == 0 && CommonEIVClient.isCheatmodeActive()) {
             EivNetworkManager.INSTANCE.sendPacketToServer(new ServerboundPickCheatmodeItemPayload(this.stack.copy(), this.currentCheatmodeCount));
             return;
         }

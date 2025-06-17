@@ -23,6 +23,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 import java.util.HashMap;
 
@@ -170,7 +172,7 @@ public class EivNetworkManager {
         //Cheatmode
         this.registerServerbound(ServerboundPickCheatmodeItemPayload.TYPE, ServerboundPickCheatmodeItemPayload.STREAM_CODEC, (context, payload) -> {
 
-            if (context.server().getPlayerList().isOp(context.sender().getGameProfile())) {
+            if (context.sender().hasPermissions(3)) {
                 context.sender().sendSystemMessage(
                         Component.literal("Took x").withStyle(ChatFormatting.GRAY)
                                 .append(
@@ -181,6 +183,16 @@ public class EivNetworkManager {
                 );
 
                 context.sender().addItem(payload.stack().copyWithCount(payload.amount()));
+                context.sender().serverLevel().playSound(
+                        null,
+                        context.sender().getX(),
+                        context.sender().getY(),
+                        context.sender().getZ(),
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.PLAYERS,
+                        0.2F,
+                        ((context.sender().getRandom().nextFloat() - context.sender().getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F
+                );
             }else
                 context.sender().sendSystemMessage(
                         Component.translatable("cheatmode.eiv.denied").withStyle(ChatFormatting.RED)

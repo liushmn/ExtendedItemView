@@ -9,6 +9,7 @@ import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -92,6 +93,10 @@ public class CommonEIVClient {
             LOGGER.error("Failed to save bookmarks to file", e);
         }
 
-
     }
+
+    public static boolean isCheatmodeActive() {
+        return Minecraft.getInstance().player != null && Minecraft.getInstance().player.hasPermissions(3) && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue());
+    }
+
 }

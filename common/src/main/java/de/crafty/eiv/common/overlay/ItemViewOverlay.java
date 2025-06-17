@@ -199,7 +199,7 @@ public class ItemViewOverlay {
         if (mouseX < this.itemStartX)
             return false;
 
-        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue())) {
+        if (CommonEIVClient.isCheatmodeActive()) {
             for (ItemSlot slot : this.slots) {
                 if (!slot.isHovered())
                     continue;
