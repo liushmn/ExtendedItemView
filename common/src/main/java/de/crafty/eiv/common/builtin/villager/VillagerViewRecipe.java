@@ -135,11 +135,11 @@ public class VillagerViewRecipe implements IEivViewRecipe {
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, -(font.lineHeight) * scale, 0);
-        guiGraphics.pose().scale(scale, scale, 1.0F);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(0, -(font.lineHeight) * scale);
+        guiGraphics.pose().scale(scale, scale);
         guiGraphics.drawString(font, professionComp, 0, 0, -1, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
 
         if (this.villagerLookLeft != this.prevVillagerLookLeft && this.currentTick - this.lastHeadChange <= 0.25F * 20) {
             float pastTime = this.currentTick - this.lastHeadChange + partialTicks;
@@ -155,7 +155,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         if(mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36){
             ResourceLocation typeLocation = this.villagerOffer.requiredtype().location();
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
-            guiGraphics.renderTooltip(font, typeComponent, mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(font, typeComponent, mouseX, mouseY);
         }
     }
 
@@ -165,12 +165,12 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         if (this.previewVillager == null)
             return;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(12, 34, 0);
-        InventoryScreen.renderEntityInInventory(guiGraphics, 0, 0, 15.0F, new Vector3f(), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), 0.0F, 0.0F), null, this.previewVillager);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(12, 34);
+        InventoryScreen.renderEntityInInventory(guiGraphics, 0, 0, 0, 0, 15.0F, new Vector3f(), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), 0.0F, 0.0F), null, this.previewVillager);
 
 
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
 
     }
 }

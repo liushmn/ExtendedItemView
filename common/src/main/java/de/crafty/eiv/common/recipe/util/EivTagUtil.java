@@ -3,6 +3,8 @@ package de.crafty.eiv.common.recipe.util;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.patches.ItemStackImpl;
+import de.crafty.eiv.common.patches.ItemStackPatches;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.DefaultedRegistry;
@@ -40,19 +42,20 @@ public class EivTagUtil {
 
 
     public static CompoundTag encodeItemStack(ItemStack stack) {
-        return stack.save(ServerRecipeManager.INSTANCE.getServer().registryAccess()).asCompound().orElseGet(CompoundTag::new);
+        return ((ItemStackImpl)(Object) stack).save(ServerRecipeManager.INSTANCE.getServer().registryAccess()).asCompound().orElseGet(CompoundTag::new);
     }
 
     public static ItemStack decodeItemStack(CompoundTag tag) {
-        return ItemStack.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
+        return ItemStackPatches.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
     }
 
     public static CompoundTag encodeClientSideItemStack(ItemStack stack){
-        return stack.save(Minecraft.getInstance().player.registryAccess()).asCompound().orElseGet(CompoundTag::new);
+        return ((ItemStackImpl)(Object) stack).save(Minecraft.getInstance().player.registryAccess()).asCompound().orElseGet(CompoundTag::new);
     }
 
     public static ItemStack decodeServerSideItemStack(CompoundTag tag) {
-        return ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), tag).orElse(ItemStack.EMPTY);
+
+        return ItemStackPatches.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), tag).orElse(ItemStack.EMPTY);
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {

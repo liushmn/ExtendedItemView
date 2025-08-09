@@ -26,8 +26,10 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Set;
 
 /**
  * A special renderer used for rendering the fluid-item in the world
@@ -79,6 +81,11 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         vertexConsumer.addVertex(matrix4f, 1.0F, 0, 0).setUv(u0 + width, v0).setOverlay(overlay).setLight(light).setColor(color).setNormal(0.0F, 0.0F, 1.0F);
         poseStack.popPose();
 
+    }
+
+    @Override
+    public void getExtents(Set<Vector3f> set) {
+        //TODO
     }
 
     @Override

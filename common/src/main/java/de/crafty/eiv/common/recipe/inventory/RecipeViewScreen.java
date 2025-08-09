@@ -15,11 +15,13 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -231,8 +233,8 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, this.guiTitle, this.titleLabelX, this.titleLabelY, 4210752, false);
-        guiGraphics.drawString(this.font, this.page, (this.imageWidth - font.width(this.page)) / 2, this.imageHeight - 12, 4210752, false);
+        guiGraphics.drawString(this.font, this.guiTitle, this.titleLabelX, this.titleLabelY, ARGB.opaque(4210752), false);
+        guiGraphics.drawString(this.font, this.page, (this.imageWidth - font.width(this.page)) / 2, this.imageHeight - 12, ARGB.opaque(4210752), false);
     }
 
     @Override
@@ -365,8 +367,8 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 
 
-        guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight - 3, 256, 256);
-        guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos, this.topPos + (this.imageHeight - 3), 0, 256 - 3, this.imageWidth, 3, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight - 3, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.leftPos, this.topPos + (this.imageHeight - 3), 0, 256 - 3, this.imageWidth, 3, 256, 256);
 
 
         IEivRecipeViewType viewType = this.getMenu().getViewType();
@@ -377,7 +379,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
         for (int i = 0; i < 5; i++) {
 
-            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.width / 2 - (5 * 24 + 4 * 2) / 2 + i * 24 + i * 2, this.topPos - 24 - 1, 208, 0, 24, 24, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.width / 2 - (5 * 24 + 4 * 2) / 2 + i * 24 + i * 2, this.topPos - 24 - 1, 208, 0, 24, 24, 256, 256);
         }
 
         for (int i = this.viewTypePage * 5; i < this.viewTypePage * 5 + 5 && this.viewTypeButtons.size() > i; i++) {
@@ -388,14 +390,14 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         //Render craft references
 
         for (int i = 0; i < this.getMenu().getDisplayableCraftReferences(); i++) {
-            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 25, this.topPos + 4 + i * 24 + i, 231, 48, 25, 24, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.leftPos - 25, this.topPos + 4 + i * 24 + i, 231, 48, 25, 24, 256, 256);
         }
 
         if (this.getMenu().getCurrentCraftReference() > 0)
-            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 - 1 - 4, 248, 72, 8, 4, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 - 1 - 4, 248, 72, 8, 4, 256, 256);
 
         if (this.getMenu().getCurrentCraftReference() < this.getMenu().getViewType().getCraftReferences().size() - this.getMenu().getDisplayableCraftReferences())
-            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 + (this.getMenu().getDisplayableCraftReferences()) * 25, 248, 76, 8, 4, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.leftPos - 4 - 5 - 8, this.topPos + 4 + (this.getMenu().getDisplayableCraftReferences()) * 25, 248, 76, 8, 4, 256, 256);
 
         int guiLeft = this.leftPos + this.getMenu().guiOffsetLeft();
 
@@ -403,22 +405,22 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
             int guiTop = this.topPos + this.getMenu().guiOffsetTop(i);
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(guiLeft, guiTop, 0);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(guiLeft, guiTop);
 
-            guiGraphics.blit(RenderType::guiTextured, viewType.getGuiTexture(), 0, 0, 0, 0, viewType.getDisplayWidth(), viewType.getDisplayHeight(), viewType.getDisplayWidth(), viewType.getDisplayHeight());
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, viewType.getGuiTexture(), 0, 0, 0, 0, viewType.getDisplayWidth(), viewType.getDisplayHeight(), viewType.getDisplayWidth(), viewType.getDisplayHeight());
 
             //Optional slot rendering
             this.getMenu().slots.stream().filter(slot -> this.getMenu().isOptionalSlot(slot.index) && slot.hasItem()).forEach(slot -> {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(slot.x - (guiLeft - this.leftPos) - 1, slot.y - (guiTop - this.topPos) - 1, 0);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(slot.x - (guiLeft - this.leftPos) - 1, slot.y - (guiTop - this.topPos) - 1);
                 this.getMenu().getOptionalSlotRenderer(slot.index).render(guiGraphics, mouseX - guiLeft, mouseY - guiTop, partialTicks);
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             });
 
             this.renderInvalidSlots(guiGraphics, i);
             this.getMenu().getCurrentDisplay().get(i).renderRecipe(this, guiGraphics, mouseX - guiLeft, mouseY - guiTop, partialTicks);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
 
     }
@@ -446,10 +448,10 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
             int x = invSlot.x;
             int y = invSlot.y;
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(-this.getMenu().guiOffsetLeft(), -this.getMenu().guiOffsetTop(displayId), 0);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(-this.getMenu().guiOffsetLeft(), -this.getMenu().guiOffsetTop(displayId));
             guiGraphics.fill(x, y, x + 16, y + 16, new Color(255, 0, 0, 64).getRGB());
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
 
         }
     }
@@ -479,11 +481,11 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
             if (!(mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height))
                 return;
 
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, this.viewType.getDisplayName(), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.viewType.getDisplayName(), mouseX, mouseY);
         }
 
         private void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-            guiGraphics.blit(RenderType::guiTextured, VIEW_LOCATION, this.x(), this.y(), 232, this.viewType() == this.viewScreen.getMenu().getViewType() ? 24 : 0, 24, 24, 256, 256);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VIEW_LOCATION, this.x(), this.y(), 232, this.viewType() == this.viewScreen.getMenu().getViewType() ? 24 : 0, 24, 24, 256, 256);
             guiGraphics.renderFakeItem(this.viewType().getIcon(), this.x() + 4, this.y() + 4);
 
             this.onHover(guiGraphics, mouseX, mouseY);

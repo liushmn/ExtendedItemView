@@ -27,9 +27,10 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(ClientPacketListener.class)
 public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl implements ClientGamePacketListener, TickablePacketListener {
 
-    @Shadow protected abstract ParseResults<SharedSuggestionProvider> parseCommand(String p_249982_);
+//    @Shadow protected abstract ParseResults<SharedSuggestionProvider> parseCommand(String p_249982_);
 
-    @Shadow public CommandDispatcher<SharedSuggestionProvider> commands;
+    @Shadow
+    private CommandDispatcher<SharedSuggestionProvider> commands;
 
     protected MixinClientPacketListener(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);

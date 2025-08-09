@@ -10,9 +10,11 @@ import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -65,7 +67,7 @@ public class BurningViewRecipe implements IEivViewRecipe {
 
         Font font = Minecraft.getInstance().font;
 
-        guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
-        guiGraphics.drawString(font, Component.literal(this.burnTime + " ticks"), 38, 18 / 2 - font.lineHeight / 2, 0xFF808080, false);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
+        guiGraphics.drawString(font, Component.literal(this.burnTime + " ticks"), 38, 18 / 2 - font.lineHeight / 2, ARGB.opaque(0xFF808080), false);
     }
 }

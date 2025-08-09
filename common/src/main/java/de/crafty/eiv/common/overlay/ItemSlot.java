@@ -73,7 +73,7 @@ public class ItemSlot {
         guiGraphics.renderItem(this.stack, this.x + 2, this.y + 2);
 
         if (this.isHovered()) {
-            guiGraphics.renderTooltip(mc.font, tooltip, this.stack.getTooltipImage(), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(mc.font, tooltip, this.stack.getTooltipImage(), mouseX, mouseY);
 
         }
     }

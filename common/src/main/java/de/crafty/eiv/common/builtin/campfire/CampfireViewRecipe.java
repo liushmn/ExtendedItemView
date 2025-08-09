@@ -8,6 +8,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -59,6 +60,6 @@ public class CampfireViewRecipe implements IEivViewRecipe {
         guiGraphics.renderItem(new ItemStack(Items.CAMPFIRE), 1, 20);
 
         int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
-        guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
     }
 }

@@ -7,6 +7,7 @@
   "mixins": [
     "advancements.critereon.MixinInventoryChangeTrigger",
     "network.protocol.common.custom.MixinCustomPacketPayload",
+	"patches.ItemStackMixin",
     "server.MixinMinecraftServer",
     "server.network.MixinServerGamePacketListenerImpl",
     "world.entity.npc.DyedArmorForEmeraldsAccessor",

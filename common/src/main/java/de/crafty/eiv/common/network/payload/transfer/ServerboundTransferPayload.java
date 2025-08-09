@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.network.payload.transfer;
 
+import com.mojang.serialization.JsonOps;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.client.Minecraft;
@@ -44,7 +45,7 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
 
             CompoundTag playerSlotsTag = new CompoundTag();
             usedSlots.forEach((playerSlot, stack) -> {
-                playerSlotsTag.put(String.valueOf(playerSlot), stack.save(Minecraft.getInstance().level.registryAccess()));
+                playerSlotsTag.store(String.valueOf(playerSlot), ItemStack.CODEC, stack);
             });
 
             usedPlayerSlots.put(String.valueOf(recipeSlot), playerSlotsTag);
@@ -72,7 +73,7 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
             CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot).orElseGet(CompoundTag::new);
             playerSlotsTag.keySet().forEach(playerSlot -> {
 
-                Optional<ItemStack> stack = ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), playerSlotsTag.getCompound(playerSlot).orElseGet(CompoundTag::new));
+                Optional<ItemStack> stack = playerSlotsTag.read(playerSlot, ItemStack.CODEC);
                 usedSlots.put(Integer.valueOf(playerSlot), stack.orElseGet(ItemStack.EMPTY::copy));
             });
 
