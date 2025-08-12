@@ -1,15 +1,27 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven { url 'https://mirrors.tuna.tsinghua.edu.cn/maven/central/' }
+        maven { url 'https://mirrors.tuna.tsinghua.edu.cn/gradle/' }
+        maven {
+            url 'https://lss233.littleservice.cn/repositories/minecraft/'
+        }
+        maven {
+            name = "forge"
+            url = "https://lss233.littleservice.cn/repositories/minecraft"
+        }
         maven {
             name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
+            url = 'https://repository.hanbings.io/proxy'
         }
         maven {
             name = 'MinecraftForge'
             url = 'https://maven.minecraftforge.net/'
         }
         maven { url = 'https://maven.neoforged.net/releases' }
+        maven {
+            url 'https://maven.aliyun.com/nexus/content/groups/public'
+        }
 
         mavenCentral()
     }
