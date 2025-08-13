@@ -39,5 +39,3 @@ replay_*.log
 *.hprof
 *.jfr
 /neoforge/runs
-gradle.properties
-settings.gradle
