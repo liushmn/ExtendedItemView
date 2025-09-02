@@ -154,6 +154,10 @@ public class SlotContent {
         return this.itemTag == null ? Optional.empty() : Optional.of(this.itemTag);
     }
 
+    public static SlotContent of(){
+        return new SlotContent(List.of());
+    }
+
     public static SlotContent of(Item item) {
         return new SlotContent(List.of(new ItemStack(item)));
     }

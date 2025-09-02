@@ -343,10 +343,15 @@ public class ItemViewOverlay {
 
         if (!foundRecipes.isEmpty()) {
             Screen parent = Minecraft.getInstance().screen;
-            if (parent instanceof RecipeViewScreen viewScreen)
-                parent = viewScreen.getMenu().getParentScreen();
 
-            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT), clientPlayer.getInventory(), Component.empty()));
+            ArrayList<RecipeViewScreen> viewHistory = new ArrayList<>();
+
+            if (parent instanceof RecipeViewScreen viewScreen){
+                parent = viewScreen.getMenu().getParentScreen();
+                viewHistory = viewScreen.getMenu().getViewHistory();
+            }
+
+            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
         }
 
 

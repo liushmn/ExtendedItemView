@@ -22,7 +22,13 @@
     "world.item.alchemy.PotionBrewingAccessor",
     "world.item.crafting.IngredientAccessor",
     "world.item.crafting.MixinRecipeManager",
-    "world.item.crafting.TransmuteRecipeAccessor"
+    "world.item.crafting.TransmuteRecipeAccessor",
+    "world.level.storage.loot.LootPoolAccessor",
+    "world.level.storage.loot.LootTableAccessor",
+    "world.level.storage.loot.entries.CompositeEntryBaseAccessor",
+    "world.level.storage.loot.entries.LootItemAccessor",
+    "world.level.storage.loot.entries.LootPoolSingletonContainerAccessor",
+    "world.level.storage.loot.functions.SetPotionFunctionAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

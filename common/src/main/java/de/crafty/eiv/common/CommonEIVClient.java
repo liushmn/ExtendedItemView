@@ -39,9 +39,12 @@ public class CommonEIVClient {
 
     public static final KeyMapping ADD_BOOKMARK_KEYBIND = new KeyMapping("key.eiv.bookmark", 65, "key.categories.eiv");
 
+    public static final KeyMapping GO_BACK_RECIPE = new KeyMapping("key.eiv.go_back", InputConstants.Type.MOUSE, 3, "key.categories.eiv");
+    public static final KeyMapping GO_FORWARD_RECIPE = new KeyMapping("key.eiv.go_forward", InputConstants.Type.MOUSE, 4, "key.categories.eiv");
+
     public static final KeyMapping USE_CHEATMODE = new KeyMapping("key.eiv.cheatmode", 342, "key.categories.eiv_admin");
 
-    public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND, USE_CHEATMODE);
+    public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND, GO_BACK_RECIPE, GO_FORWARD_RECIPE, USE_CHEATMODE);
 
     private static IEivClientResolver HELPER = null;
 
