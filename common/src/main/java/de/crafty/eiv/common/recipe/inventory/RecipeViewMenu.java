@@ -54,13 +54,16 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
     private RecipeViewScreen viewScreen;
     private final Screen parentScreen;
+    private final ArrayList<RecipeViewScreen> viewHistory;
 
     private int currentCraftReference;
     private final List<RecipeTransferData> transferData;
 
 
-    public RecipeViewMenu(Screen parentScreen, int containerId, Inventory inventory, List<? extends IEivViewRecipe> recipes, ItemStack origin, SlotContent.Type originType) {
+    public RecipeViewMenu(Screen parentScreen, int containerId, Inventory inventory, List<? extends IEivViewRecipe> recipes, ItemStack origin, SlotContent.Type originType, ArrayList<RecipeViewScreen> viewHistory) {
         super(CommonEIVClient.RECIPE_VIEW_MENU, containerId);
+
+        this.viewHistory = viewHistory;
 
         this.parentScreen = parentScreen;
         this.transferData = new ArrayList<>();
@@ -125,7 +128,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
     public RecipeViewMenu(int containerId, Inventory inventory) {
-        this(null, containerId, inventory, IEivViewRecipe.PLACEHOLDER, ItemStack.EMPTY, SlotContent.Type.ANY);
+        this(null, containerId, inventory, IEivViewRecipe.PLACEHOLDER, ItemStack.EMPTY, SlotContent.Type.ANY, new ArrayList<>());
     }
 
 
@@ -137,8 +140,31 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         return this.parentScreen;
     }
 
+    public ArrayList<RecipeViewScreen> getViewHistory() {
+        return this.viewHistory;
+    }
+
+    public boolean goBack() {
+        if (this.viewScreen != null && this.viewHistory.indexOf(this.viewScreen) > 0) {
+            Minecraft.getInstance().setScreen(this.viewHistory.get(this.viewHistory.indexOf(this.viewScreen) - 1));
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean goForward() {
+        if (this.viewScreen != null && this.viewHistory.size() - 1 > this.viewHistory.indexOf(this.viewScreen)) {
+            Minecraft.getInstance().setScreen(this.viewHistory.get(this.viewHistory.indexOf(this.viewScreen) + 1));
+            return true;
+        }
+
+        return false;
+    }
+
     public void setViewScreen(RecipeViewScreen viewScreen) {
         this.viewScreen = viewScreen;
+        this.viewHistory.add(viewScreen);
     }
 
     public ItemStack getOrigin() {
@@ -149,7 +175,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
         return this.additionalStackModifiers.getOrDefault(slot, AdditionalStackModifier.NONE);
     }
 
-    public boolean isOptionalSlot(int slot){
+    public boolean isOptionalSlot(int slot) {
         return this.optionalSlotRenderers.containsKey(slot);
     }
 
@@ -287,7 +313,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
                 if (slotFillContext.getAdditionalTooltips().containsKey(j))
                     this.additionalStackModifiers.put(slotId, slotFillContext.getAdditionalTooltips().get(j));
 
-                if(slotFillContext.getOptionalSlotRenderers().containsKey(j))
+                if (slotFillContext.getOptionalSlotRenderers().containsKey(j))
                     this.optionalSlotRenderers.put(slotId, slotFillContext.getOptionalSlotRenderers().get(j));
 
             }
@@ -759,8 +785,9 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         /**
          * Optional slots are only rendered if an itemstack is in there
-         * @param slotId The slot id
-         * @param slotContent The slot content
+         *
+         * @param slotId               The slot id
+         * @param slotContent          The slot content
          * @param optionalSlotRenderer The renderer used for this slot
          */
         public void bindOptionalSlot(int slotId, SlotContent slotContent, OptionalSlotRenderer optionalSlotRenderer) {
@@ -814,9 +841,10 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         /**
          * Render method for rendering an optional slot
-         * @param guiGraphics GuiGraphics
-         * @param mouseX current mouse position on x-direction (relative to the viewRecipe)
-         * @param mouseY current mouse position on y-direction (relative to the viewRecipe)
+         *
+         * @param guiGraphics  GuiGraphics
+         * @param mouseX       current mouse position on x-direction (relative to the viewRecipe)
+         * @param mouseY       current mouse position on y-direction (relative to the viewRecipe)
          * @param partialTicks partialTicks
          */
         void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);

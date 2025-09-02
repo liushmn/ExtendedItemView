@@ -2,7 +2,6 @@ package de.crafty.eiv.common.builtin;
 
 import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
-import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
 import de.crafty.eiv.common.builtin.brewing.BrewingServerRecipe;
@@ -10,6 +9,8 @@ import de.crafty.eiv.common.builtin.brewing.BrewingViewRecipe;
 import de.crafty.eiv.common.builtin.burning.BurningServerRecipe;
 import de.crafty.eiv.common.builtin.burning.BurningViewRecipe;
 import de.crafty.eiv.common.builtin.campfire.CampfireServerRecipe;
+import de.crafty.eiv.common.builtin.entity.EntityServerRecipe;
+import de.crafty.eiv.common.builtin.entity.EntityViewRecipe;
 import de.crafty.eiv.common.builtin.shaped.ShapedServerRecipe;
 import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
@@ -20,11 +21,16 @@ import de.crafty.eiv.common.builtin.tipped_arrow.TippedArrowServerRecipe;
 import de.crafty.eiv.common.builtin.transmute.TransmuteServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerViewRecipe;
-import de.crafty.eiv.common.mixin.world.entity.npc.*;
 import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.SmithingTransformRecipeAccessor;
 import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.LootPoolAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.LootTableAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.entries.CompositeEntryBaseAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.entries.LootItemAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.entries.LootPoolSingletonContainerAccessor;
+import de.crafty.eiv.common.mixin.world.level.storage.loot.functions.SetPotionFunctionAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.builtin.blasting.BlastingViewRecipe;
@@ -35,54 +41,45 @@ import de.crafty.eiv.common.builtin.smelting.SmeltingViewRecipe;
 import de.crafty.eiv.common.builtin.smithing.SmithingViewRecipe;
 import de.crafty.eiv.common.builtin.smoking.SmokingViewRecipe;
 import de.crafty.eiv.common.builtin.stonecutting.StonecutterViewRecipe;
-import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.EnchantmentTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Mth;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerTrades;
-import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.*;
-import net.minecraft.world.item.enchantment.providers.EnchantmentProvider;
-import net.minecraft.world.item.enchantment.providers.EnchantmentsByCost;
-import net.minecraft.world.item.enchantment.providers.EnchantmentsByCostWithDifficulty;
-import net.minecraft.world.item.enchantment.providers.SingleEnchantment;
-import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.level.block.entity.FuelValues;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.CompositeEntryBase;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.functions.SetPotionFunction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemKilledByPlayerCondition;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.crafty.eiv.common.CommonEIV.*;
 
 public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
     public static final ResourceLocation WIDGETS = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/eiv_widgets.png");
-    public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
 
+    //Default slot rendering
+    public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
 
     @Override
     public void onIntegrationInitialize() {
@@ -120,6 +117,64 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         });
 
         //providers
+
+        ItemView.addRecipeProvider(recipeList -> {
+
+            BuiltInRegistries.ENTITY_TYPE.forEach(entityType -> {
+                if (entityType.getDefaultLootTable().isEmpty())
+                    return;
+
+                LootTable table = ServerRecipeManager.INSTANCE.getServer().reloadableRegistries().getLootTable(entityType.getDefaultLootTable().get());
+                LootTableAccessor accessor = (LootTableAccessor) table;
+
+                List<ItemStack> loot = new ArrayList<>();
+
+                for (LootPool pool : accessor.getPools()) {
+                    LootPoolAccessor lootPoolAccessor = (LootPoolAccessor) pool;
+
+                    for (LootPoolEntryContainer container : lootPoolAccessor.entries()) {
+                        if (container instanceof LootItem lootItem) {
+                            LootItemAccessor lootItemAccessor = (LootItemAccessor) lootItem;
+                            LootPoolSingletonContainerAccessor containerAccessor = (LootPoolSingletonContainerAccessor) lootItemAccessor;
+
+                            ItemStack stack = new ItemStack(lootItemAccessor.getItem().value());
+
+                            containerAccessor.getFunctions().forEach(function -> {
+
+                                if (function instanceof SetPotionFunction setPotionFunction)
+                                    stack.set(DataComponents.POTION_CONTENTS, stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).withPotion(((SetPotionFunctionAccessor) setPotionFunction).getPotion()));
+
+                            });
+
+                            for (LootItemCondition condition : lootPoolAccessor.conditions()) {
+                                if (condition instanceof LootItemKilledByPlayerCondition)
+                                    stack.set(DataComponents.LORE, stack.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).withLineAdded(Component.translatable("view.eiv.type.entity.playerKill").withStyle(ChatFormatting.RED)));
+                            }
+
+                            loot.add(stack);
+                        }
+                        if (container instanceof CompositeEntryBase entryBase) {
+                            CompositeEntryBaseAccessor entryBaseAccessor = (CompositeEntryBaseAccessor) entryBase;
+                            entryBaseAccessor.getChildren().forEach(child -> {
+                                if (child instanceof LootItem lootItem) {
+                                    LootItemAccessor lootItemAccessor = (LootItemAccessor) lootItem;
+                                    loot.add(new ItemStack(lootItemAccessor.getItem()));
+                                }
+                            });
+                        }
+                    }
+                }
+
+                if (entityType == EntityType.WITHER)
+                    loot.add(new ItemStack(Items.NETHER_STAR));
+
+                if (!loot.isEmpty())
+                    recipeList.add(new EntityServerRecipe(entityType, loot));
+            });
+
+        });
+
+        //Burning
         ItemView.addRecipeProvider(recipeList -> {
             FuelValues fuelValues = ServerRecipeManager.INSTANCE.getServer().fuelValues();
             fuelValues.fuelItems().forEach(item -> {
@@ -128,25 +183,28 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
         });
 
-
+        //Smelting
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMELTING).forEach(recipe -> {
                 recipeList.add(new SmeltingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
+        //Blasting
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.BLASTING).forEach(recipe -> {
                 recipeList.add(new BlastingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
+        //Smoking
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMOKING).forEach(recipe -> {
                 recipeList.add(new SmokingServerRecipe(recipe.input(), recipe.result));
             });
         });
 
+        //Crafting
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.CRAFTING).forEach(recipe -> {
                 if (recipe instanceof ShapelessRecipe shapelessRecipe)
@@ -208,18 +266,21 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             });
         });
 
+        //Campfire
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.CAMPFIRE_COOKING).forEach(campfireCookingRecipe -> {
                 recipeList.add(new CampfireServerRecipe(campfireCookingRecipe.input(), campfireCookingRecipe.result));
             });
         });
 
+        //Stonecutting
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.STONECUTTING).forEach(stonecutterRecipe -> {
                 recipeList.add(new StonecutterServerRecipe(stonecutterRecipe.input(), stonecutterRecipe.result));
             });
         });
 
+        //Smithing
         ItemView.addRecipeProvider(recipeList -> {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMITHING).forEach(smithingRecipe -> {
 
@@ -232,6 +293,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             });
         });
 
+        //Brewing
         ItemView.addRecipeProvider(recipeList -> {
 
             PotionBrewing potionBrewing = ServerRecipeManager.INSTANCE.getServer().potionBrewing();
@@ -251,6 +313,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
         });
 
+        //Trading
         ItemView.addRecipeProvider(recipeList -> {
 
             VillagerTrades.TRADES.forEach((profession, byProfessionLevel) -> {
@@ -325,27 +388,8 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         ItemView.registerRecipeWrapper(VillagerServerRecipe.TYPE, unwrapped -> {
             return unwrapped.getOffers().stream().map(VillagerViewRecipe::new).toList();
         });
+        ItemView.registerRecipeWrapper(EntityServerRecipe.TYPE, unwrapped -> List.of(new EntityViewRecipe(unwrapped)));
     }
 
-
-    private void addVillagerRecipes() {
-
-        ItemView.addRecipeProvider(recipeList -> {
-
-            VillagerTrades.TRADES.forEach((profession, byProfessionLevel) -> {
-
-                byProfessionLevel.forEach((professionLevel, itemListings) -> {
-                    Arrays.stream(itemListings).toList().forEach(listing -> {
-
-                        //this.itemListingToRecipe(profession, professionLevel, null, listing, recipeList);
-
-                    });
-                });
-
-            });
-
-        });
-
-    }
 
 }

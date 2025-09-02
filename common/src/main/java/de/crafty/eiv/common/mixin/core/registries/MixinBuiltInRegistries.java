@@ -12,7 +12,7 @@ public class MixinBuiltInRegistries {
 
 
     @Inject(method = "bootStrap", at = @At("HEAD"))
-    private static void injectFluidItems(CallbackInfo ci){
+    private static void injectFluidItems(CallbackInfo ci) {
         CommonEIV.buildFluidItems();
     }
 }

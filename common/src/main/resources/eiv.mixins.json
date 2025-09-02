@@ -5,6 +5,7 @@
   "minVersion": "0.8",
   "refmap": "eiv.refmap.json",
   "mixins": [
+    "world.item.crafting.SmithingTransformRecipeAccessor",
     "advancements.critereon.MixinInventoryChangeTrigger",
     "network.protocol.common.custom.MixinCustomPacketPayload",
     "server.MixinMinecraftServer",
@@ -22,8 +23,13 @@
     "world.item.alchemy.PotionBrewingAccessor",
     "world.item.crafting.IngredientAccessor",
     "world.item.crafting.MixinRecipeManager",
-    "world.item.crafting.SmithingTransformRecipeAccessor",
-    "world.item.crafting.TransmuteRecipeAccessor"
+    "world.item.crafting.TransmuteRecipeAccessor",
+    "world.level.storage.loot.LootPoolAccessor",
+    "world.level.storage.loot.LootTableAccessor",
+    "world.level.storage.loot.entries.CompositeEntryBaseAccessor",
+    "world.level.storage.loot.entries.LootItemAccessor",
+    "world.level.storage.loot.entries.LootPoolSingletonContainerAccessor",
+    "world.level.storage.loot.functions.SetPotionFunctionAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

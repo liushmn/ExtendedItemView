@@ -77,6 +77,30 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         return Component.literal((this.getMenu().getCurrentPage() + 1) + "/" + (this.getMenu().getMaxPageIndex() + 1));
     }
 
+
+    @Override
+    public boolean mouseReleased(double d, double e, int i) {
+
+        if(CommonEIVClient.GO_BACK_RECIPE.matchesMouse(i) && this.getMenu().goBack())
+            return true;
+        if(CommonEIVClient.GO_FORWARD_RECIPE.matchesMouse(i) && this.getMenu().goForward())
+            return true;
+
+        return super.mouseReleased(d, e, i);
+    }
+
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+
+        if(CommonEIVClient.GO_BACK_RECIPE.matches(i, j) && this.getMenu().goBack())
+                return true;
+
+        if(CommonEIVClient.GO_FORWARD_RECIPE.matches(i, j) && this.getMenu().goForward())
+                return true;
+
+        return super.keyPressed(i, j, k);
+    }
+
     @Override
     protected void init() {
         super.init();
