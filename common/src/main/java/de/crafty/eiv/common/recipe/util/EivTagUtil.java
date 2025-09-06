@@ -1,7 +1,6 @@
 package de.crafty.eiv.common.recipe.util;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.client.Minecraft;
@@ -39,20 +38,22 @@ public class EivTagUtil {
     }
 
 
-    public static CompoundTag encodeItemStack(ItemStack stack) {
-        return stack.save(ServerRecipeManager.INSTANCE.getServer().registryAccess()).asCompound().orElseGet(CompoundTag::new);
+
+
+    public static ItemStack decodeItemStackOnClient(CompoundTag tag) {
+        return ItemStack.CODEC.parse(Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
     }
 
-    public static ItemStack decodeItemStack(CompoundTag tag) {
-        return ItemStack.parse(Minecraft.getInstance().player.registryAccess(), tag).orElse(ItemStack.EMPTY);
+    public static CompoundTag encodeItemStackOnClient(ItemStack stack) {
+        return ItemStack.CODEC.encode(stack, Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow().asCompound().orElseGet(CompoundTag::new);
     }
 
-    public static CompoundTag encodeClientSideItemStack(ItemStack stack){
-        return stack.save(Minecraft.getInstance().player.registryAccess()).asCompound().orElseGet(CompoundTag::new);
+    public static CompoundTag encodeItemStackOnServer(ItemStack stack) {
+        return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow().asCompound().orElseGet(CompoundTag::new);
     }
 
-    public static ItemStack decodeServerSideItemStack(CompoundTag tag) {
-        return ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), tag).orElse(ItemStack.EMPTY);
+    public static ItemStack decodeItemStackOnServer(CompoundTag tag) {
+        return ItemStack.CODEC.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {

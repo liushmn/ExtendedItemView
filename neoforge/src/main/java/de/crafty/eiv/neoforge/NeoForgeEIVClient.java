@@ -16,7 +16,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
-@EventBusSubscriber(modid = CommonEIV.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = CommonEIV.MODID, value = Dist.CLIENT)
 public class NeoForgeEIVClient {
 
     @SubscribeEvent

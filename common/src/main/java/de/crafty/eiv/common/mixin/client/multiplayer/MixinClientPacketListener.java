@@ -22,12 +22,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.concurrent.CompletableFuture;
-
 @Mixin(ClientPacketListener.class)
 public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl implements ClientGamePacketListener, TickablePacketListener {
 
-    @Shadow protected abstract ParseResults<SharedSuggestionProvider> parseCommand(String p_249982_);
 
     @Shadow public CommandDispatcher<SharedSuggestionProvider> commands;
 

@@ -27,18 +27,18 @@ public class NeoForgeBuiltinEivIntegration extends BuiltInEivIntegration {
 
                 BasicItemListingAccessor accessor = (BasicItemListingAccessor) listing;
 
-                out.put("offerStack", EivTagUtil.encodeItemStack(accessor.offer()));
-                out.put("price", EivTagUtil.encodeItemStack(accessor.price1()));
-                out.put("price2", EivTagUtil.encodeItemStack(accessor.price2()));
+                out.put("offerStack", EivTagUtil.encodeItemStackOnServer(accessor.offer()));
+                out.put("price", EivTagUtil.encodeItemStackOnServer(accessor.price1()));
+                out.put("price2", EivTagUtil.encodeItemStackOnServer(accessor.price2()));
                 out.putInt("villagerXp", accessor.villagerxp());
                 out.putInt("maxUses", accessor.maxUses());
 
             },
             (profession, professionLevel, in) -> {
 
-                ItemStack offerStack = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("offerStack"));
-                ItemStack price = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("price"));
-                ItemStack price2 = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("price2"));
+                ItemStack offerStack = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("offerStack"));
+                ItemStack price = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("price"));
+                ItemStack price2 = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("price2"));
 
                 int villagerXp = in.getIntOr("villagerXp", 0);
                 int maxUses = in.getIntOr("maxUses", 0);

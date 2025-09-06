@@ -15,10 +15,10 @@ public record ServerboundPickCheatmodeItemPayload(ItemStack stack, int amount) i
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundPickCheatmodeItemPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.COMPOUND_TAG,
-            serverboundPickCheatmodeItemPayload -> EivTagUtil.encodeClientSideItemStack(serverboundPickCheatmodeItemPayload.stack()),
+            serverboundPickCheatmodeItemPayload -> EivTagUtil.encodeItemStackOnClient(serverboundPickCheatmodeItemPayload.stack()),
             ByteBufCodecs.INT,
             ServerboundPickCheatmodeItemPayload::amount,
-            (compoundTag, amount) -> new ServerboundPickCheatmodeItemPayload(EivTagUtil.decodeServerSideItemStack(compoundTag), amount)
+            (compoundTag, amount) -> new ServerboundPickCheatmodeItemPayload(EivTagUtil.decodeItemStackOnServer(compoundTag), amount)
     );
 
     public static final Type<ServerboundPickCheatmodeItemPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "pick_cheatmode_item"));

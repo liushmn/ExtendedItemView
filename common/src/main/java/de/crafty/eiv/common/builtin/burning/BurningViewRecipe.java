@@ -10,6 +10,7 @@ import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -60,12 +61,12 @@ public class BurningViewRecipe implements IEivViewRecipe {
 
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int burnProgress = Math.round(this.ticker.getProgress() * 14);
 
         Font font = Minecraft.getInstance().font;
 
-        guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
         guiGraphics.drawString(font, Component.literal(this.burnTime + " ticks"), 38, 18 / 2 - font.lineHeight / 2, 0xFF808080, false);
     }
 }

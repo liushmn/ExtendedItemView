@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -72,10 +73,8 @@ public class ItemSlot {
 
         guiGraphics.renderItem(this.stack, this.x + 2, this.y + 2);
 
-        if (this.isHovered()) {
-            guiGraphics.renderTooltip(mc.font, tooltip, this.stack.getTooltipImage(), mouseX, mouseY);
-
-        }
+        if (this.isHovered())
+            guiGraphics.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY);
     }
 
     /**

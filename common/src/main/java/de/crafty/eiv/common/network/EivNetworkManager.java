@@ -183,7 +183,7 @@ public class EivNetworkManager {
                 );
 
                 context.sender().addItem(payload.stack().copyWithCount(payload.amount()));
-                context.sender().serverLevel().playSound(
+                context.sender().level().playSound(
                         null,
                         context.sender().getX(),
                         context.sender().getY(),

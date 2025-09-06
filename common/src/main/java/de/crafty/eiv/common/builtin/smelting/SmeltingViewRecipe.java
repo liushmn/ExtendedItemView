@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.builtin.smelting;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
@@ -9,6 +10,7 @@ import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
@@ -55,14 +57,14 @@ public class SmeltingViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
         int litProgress = Math.round(this.smeltingTicker.getProgress() * 14);
         int smeltProgress = Math.round(this.smeltingTicker.getProgress() * 24);
 
-        guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 1, 20 + (14 - litProgress), 0, 14 - litProgress, 14, litProgress, 128, 128);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 1, 20 + (14 - litProgress), 0, 14 - litProgress, 14, litProgress, 128, 128);
 
-        guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.WIDGETS, 24, 19, 14, 0, smeltProgress, 16, 128, 128);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 24, 19, 14, 0, smeltProgress, 16, 128, 128);
     }
 
 

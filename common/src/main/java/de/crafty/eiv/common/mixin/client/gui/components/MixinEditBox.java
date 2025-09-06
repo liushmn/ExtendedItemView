@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.mixin.client.gui.components;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.overlay.ItemViewOverlay;
 import net.minecraft.client.Minecraft;
@@ -30,13 +31,13 @@ public abstract class MixinEditBox extends AbstractWidget {
         super($$0, $$1, $$2, $$3, $$4);
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
-    private void renderFilterMode(GuiGraphics instance, Function<ResourceLocation, RenderType> $$0, ResourceLocation $$1, int $$2, int $$3, int $$4, int $$5){
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
+    private void renderFilterMode(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation resourceLocation, int i, int j, int k, int l){
 
 
         if(ItemViewOverlay.SEARCHBAR != null && ((EditBox) (Object) this).equals(ItemViewOverlay.SEARCHBAR) && ItemViewOverlay.INSTANCE.isItemFilterMode())
-            instance.blitSprite($$0, FILTERMODE_LOCATION, $$2, $$3, $$4, $$5);
+            instance.blitSprite(renderPipeline, FILTERMODE_LOCATION, i, j, k, l);
         else
-            instance.blitSprite($$0, $$1, $$2, $$3, $$4, $$5);
+            instance.blitSprite(renderPipeline, resourceLocation, i, j, k, l);
     }
 }

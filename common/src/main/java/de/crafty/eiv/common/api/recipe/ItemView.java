@@ -166,8 +166,8 @@ public class ItemView {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, StackSensitive> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.COMPOUND_TAG,
-                stackSensitive -> EivTagUtil.encodeItemStack(stackSensitive.stack()),
-                (compoundTag) -> new StackSensitive(EivTagUtil.decodeItemStack(compoundTag))
+                stackSensitive -> EivTagUtil.encodeItemStackOnServer(stackSensitive.stack()),
+                (compoundTag) -> new StackSensitive(EivTagUtil.decodeItemStackOnClient(compoundTag))
         );
 
         @Override

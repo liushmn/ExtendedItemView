@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -836,7 +837,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     public interface OptionalSlotRenderer {
 
         RecipeViewMenu.OptionalSlotRenderer DEFAULT = (guiGraphics, mouseX, mouseY, partialTicks) -> {
-            guiGraphics.blit(RenderType::guiTextured, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
         };
 
         /**

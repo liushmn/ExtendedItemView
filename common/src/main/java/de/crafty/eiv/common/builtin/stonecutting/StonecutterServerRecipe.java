@@ -2,8 +2,6 @@ package de.crafty.eiv.common.builtin.stonecutting;
 
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.builtin.smelting.SmeltingServerRecipe;
-import de.crafty.eiv.common.builtin.smoking.SmokingServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -37,7 +35,7 @@ public class StonecutterServerRecipe implements IEivServerRecipe {
     public void writeToTag(CompoundTag tag) {
 
         tag.put("input", EivTagUtil.writeIngredient(this.input));
-        tag.put("result", EivTagUtil.encodeItemStack(this.result));
+        tag.put("result", EivTagUtil.encodeItemStackOnServer(this.result));
 
     }
 
@@ -45,7 +43,7 @@ public class StonecutterServerRecipe implements IEivServerRecipe {
     public void loadFromTag(CompoundTag tag) {
 
         this.input = EivTagUtil.readIngredient(tag.getCompound("input").orElseGet(CompoundTag::new));
-        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result").orElseGet(CompoundTag::new));
 
     }
 

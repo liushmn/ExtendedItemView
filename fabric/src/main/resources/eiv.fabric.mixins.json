@@ -11,6 +11,7 @@
   },
   "client": [
     "KeyMappingAccessor",
-    "client.MixinKeyMapping"
+    "client.MixinKeyMapping",
+    "client.render.MixinGuiRenderer"
   ]
 }

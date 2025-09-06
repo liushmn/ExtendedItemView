@@ -3,11 +3,9 @@ package de.crafty.eiv.common.builtin.tipped_arrow;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potion;
 
 public class TippedArrowServerRecipe implements IEivServerRecipe {
 
@@ -29,14 +27,14 @@ public class TippedArrowServerRecipe implements IEivServerRecipe {
     @Override
     public void writeToTag(CompoundTag tag) {
 
-        tag.put("potionStack", EivTagUtil.encodeItemStack(this.potionStack));
+        tag.put("potionStack", EivTagUtil.encodeItemStackOnServer(this.potionStack));
 
     }
 
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.potionStack = EivTagUtil.decodeItemStack(tag.getCompound("potionStack").orElseGet(CompoundTag::new));
+        this.potionStack = EivTagUtil.decodeItemStackOnClient(tag.getCompound("potionStack").orElseGet(CompoundTag::new));
 
     }
 

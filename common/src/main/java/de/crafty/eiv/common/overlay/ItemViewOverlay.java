@@ -320,12 +320,12 @@ public class ItemViewOverlay {
 
         screen.getMenu().slots.forEach(slot -> {
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(this.currentInfo.leftPos - 1, this.currentInfo.topPos - 1, 0);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(this.currentInfo.leftPos - 1, this.currentInfo.topPos - 1);
             if (!slot.hasItem() || ItemViewOverlay.INSTANCE.getAvailableItems().stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
                 guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
 
         });
     }

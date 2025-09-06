@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.extra;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.MapCodec;
 import de.crafty.eiv.common.CommonEIV;
@@ -26,8 +27,10 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Set;
 
 /**
  * A special renderer used for rendering the fluid-item in the world
@@ -40,6 +43,7 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         this.model = model;
     }
 
+
     @Override
     public void render(ItemStack stack, ItemDisplayContext itemDisplayContext, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay, boolean bl) {
         if (!(stack.getItem() instanceof FluidItem fluidItem))
@@ -49,7 +53,6 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         Fluid fluid = fluidStack.getFluid();
 
         float renderHeight = Math.max(Math.min((float) fluidStack.getAmount() / (float) FluidStack.AMOUNT_FULL, 1.0F), 0.1F);
-
 
 
         int color = fluid == Fluids.WATER ? Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS).value().getWaterColor() : -1;
@@ -78,7 +81,10 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         vertexConsumer.addVertex(matrix4f, 1.0F, renderHeight, 0).setUv(u0 + width, v0 + height).setOverlay(overlay).setLight(light).setColor(color).setNormal(0.0F, 0.0F, 1.0F);
         vertexConsumer.addVertex(matrix4f, 1.0F, 0, 0).setUv(u0 + width, v0).setOverlay(overlay).setLight(light).setColor(color).setNormal(0.0F, 0.0F, 1.0F);
         poseStack.popPose();
+    }
 
+    @Override
+    public void getExtents(Set<Vector3f> set) {
     }
 
     @Override

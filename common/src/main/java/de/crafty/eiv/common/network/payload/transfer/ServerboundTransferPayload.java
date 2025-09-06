@@ -1,10 +1,8 @@
 package de.crafty.eiv.common.network.payload.transfer;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.recipe.ServerRecipeManager;
-import net.minecraft.client.Minecraft;
+import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
                                          HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) implements CustomPacketPayload {
@@ -44,7 +41,7 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
 
             CompoundTag playerSlotsTag = new CompoundTag();
             usedSlots.forEach((playerSlot, stack) -> {
-                playerSlotsTag.put(String.valueOf(playerSlot), stack.save(Minecraft.getInstance().level.registryAccess()));
+                playerSlotsTag.put(String.valueOf(playerSlot), EivTagUtil.encodeItemStackOnClient(stack));
             });
 
             usedPlayerSlots.put(String.valueOf(recipeSlot), playerSlotsTag);
@@ -72,8 +69,8 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
             CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot).orElseGet(CompoundTag::new);
             playerSlotsTag.keySet().forEach(playerSlot -> {
 
-                Optional<ItemStack> stack = ItemStack.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess(), playerSlotsTag.getCompound(playerSlot).orElseGet(CompoundTag::new));
-                usedSlots.put(Integer.valueOf(playerSlot), stack.orElseGet(ItemStack.EMPTY::copy));
+                ItemStack stack = EivTagUtil.decodeItemStackOnServer(playerSlotsTag.getCompound(playerSlot).orElseGet(CompoundTag::new));
+                usedSlots.put(Integer.valueOf(playerSlot), stack);
             });
 
             usedPlayerSlots.put(Integer.valueOf(recipeSlot), usedSlots);

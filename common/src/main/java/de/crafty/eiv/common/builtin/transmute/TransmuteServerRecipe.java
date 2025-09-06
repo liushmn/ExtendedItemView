@@ -1,23 +1,13 @@
 package de.crafty.eiv.common.builtin.transmute;
 
-import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
-import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
-import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.TransmuteRecipe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransmuteServerRecipe implements IEivServerRecipe {
@@ -57,7 +47,7 @@ public class TransmuteServerRecipe implements IEivServerRecipe {
 
         tag.put("materials", EivTagUtil.writeIngredient(this.material));
 
-        tag.put("results", EivTagUtil.writeList(this.results, (origin, tag1) -> EivTagUtil.encodeItemStack(origin)));
+        tag.put("results", EivTagUtil.writeList(this.results, (origin, tag1) -> EivTagUtil.encodeItemStackOnServer(origin)));
 
     }
 
@@ -67,7 +57,7 @@ public class TransmuteServerRecipe implements IEivServerRecipe {
         this.input = EivTagUtil.readIngredient(tag.getCompound("input").orElseGet(CompoundTag::new));
         this.material = EivTagUtil.readIngredient(tag.getCompound("materials").orElseGet(CompoundTag::new));
 
-        this.results = EivTagUtil.readList(tag, "results", EivTagUtil::decodeItemStack);
+        this.results = EivTagUtil.readList(tag, "results", EivTagUtil::decodeItemStackOnClient);
     }
 
     @Override

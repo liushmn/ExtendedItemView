@@ -39,14 +39,14 @@ public class EntityServerRecipe implements IEivServerRecipe {
     public void writeToTag(CompoundTag tag) {
 
         tag.putString("entity", BuiltInRegistries.ENTITY_TYPE.getKey(this.entityType).toString());
-        tag.put("stacks", EivTagUtil.writeList(this.drops, (origin, tag1) -> EivTagUtil.encodeItemStack(origin)));
+        tag.put("stacks", EivTagUtil.writeList(this.drops, (origin, tag1) -> EivTagUtil.encodeItemStackOnServer(origin)));
     }
 
     @Override
     public void loadFromTag(CompoundTag tag) {
 
         this.entityType = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(tag.getStringOr("entity", "")));
-        this.drops = EivTagUtil.readList(tag, "stacks", EivTagUtil::decodeItemStack);
+        this.drops = EivTagUtil.readList(tag, "stacks", EivTagUtil::decodeItemStackOnClient);
 
     }
 

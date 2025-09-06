@@ -40,18 +40,18 @@ public class BrewingServerRecipe implements IEivServerRecipe {
     @Override
     public void writeToTag(CompoundTag tag) {
 
-        tag.put("result", EivTagUtil.encodeItemStack(this.result));
+        tag.put("result", EivTagUtil.encodeItemStackOnServer(this.result));
         tag.put("magicIngredient", EivTagUtil.writeIngredient(this.magicIngredient));
-        tag.put("bottleIngredient", EivTagUtil.encodeItemStack(this.bottleIngredient));
+        tag.put("bottleIngredient", EivTagUtil.encodeItemStackOnServer(this.bottleIngredient));
 
     }
 
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.result = EivTagUtil.decodeItemStack(tag.getCompoundOrEmpty("result"));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("result"));
         this.magicIngredient = EivTagUtil.readIngredient(tag.getCompoundOrEmpty("magicIngredient"));
-        this.bottleIngredient = EivTagUtil.decodeItemStack(tag.getCompoundOrEmpty("bottleIngredient"));
+        this.bottleIngredient = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("bottleIngredient"));
 
     }
 

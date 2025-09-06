@@ -2,16 +2,12 @@ package de.crafty.eiv.common.builtin.shapeless;
 
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
-import de.crafty.eiv.common.builtin.shaped.ShapedServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.TransmuteRecipe;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ShapelessServerRecipe implements IEivServerRecipe {
@@ -43,14 +39,14 @@ public class ShapelessServerRecipe implements IEivServerRecipe {
     public void writeToTag(CompoundTag tag) {
 
         tag.put("ingredients", EivTagUtil.writeList(this.ingredients, (origin, tag1) -> EivTagUtil.writeIngredient(origin)));
-        tag.put("result", EivTagUtil.encodeItemStack(this.result));
+        tag.put("result", EivTagUtil.encodeItemStackOnServer(this.result));
     }
 
     @Override
     public void loadFromTag(CompoundTag tag) {
 
         this.ingredients = EivTagUtil.readList(tag, "ingredients", EivTagUtil::readIngredient);
-        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result").orElseGet(CompoundTag::new));
 
     }
 

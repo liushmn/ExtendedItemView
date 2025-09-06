@@ -115,7 +115,7 @@ public interface IEivViewRecipe {
      * @param mouseY       The current y-position of the mouse <b>relative to the position of the rendered recipe</b>
      * @param partialTicks partialTicks
      */
-    default void renderRecipe(RecipeViewScreen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    default void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
     }
 
@@ -208,4 +208,18 @@ public interface IEivViewRecipe {
         }
     }
 
+
+    /**
+     * A data object containing information about the current render dimensions of the recipe
+     * <br><br>
+     * <b>Reason</b>: Since minecraft changed things like tooltip and entity rendering,
+     * we cannot render these things within a previously moved matrix anymore
+     * @param left
+     * @param top
+     * @param width
+     * @param height
+     */
+    record RecipePosition(int left, int top, int width, int height) {
+
+    }
 }

@@ -1,23 +1,14 @@
 package de.crafty.eiv.common.builtin.shaped;
 
-import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.builtin.campfire.CampfireServerRecipe;
-import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class ShapedServerRecipe implements IEivServerRecipe {
 
@@ -63,7 +54,7 @@ public class ShapedServerRecipe implements IEivServerRecipe {
         this.ingredients.forEach((slotId, ingredient) -> {
             tag.put("ci_" + slotId, EivTagUtil.writeIngredient(ingredient));
         });
-        tag.put("result", EivTagUtil.encodeItemStack(this.result));
+        tag.put("result", EivTagUtil.encodeItemStackOnServer(this.result));
     }
 
     @Override
@@ -83,7 +74,7 @@ public class ShapedServerRecipe implements IEivServerRecipe {
         });
 
         this.ingredients = ingredients;
-        this.result = EivTagUtil.decodeItemStack(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result").orElseGet(CompoundTag::new));
     }
 
     @Override

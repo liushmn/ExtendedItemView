@@ -20,7 +20,7 @@ public class ForgeEIV {
 
         //CommonEIV.setNetworkManager(new ForgeNetworkManager());
 
-        MinecraftForge.EVENT_BUS.addListener(this::onCommandRegistry);
+        RegisterCommandsEvent.BUS.addListener(this::onCommandRegistry);
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");

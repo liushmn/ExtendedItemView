@@ -5,12 +5,17 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
+import de.crafty.eiv.common.rendering.EivGuiRenderHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.VillagerRenderState;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
@@ -112,7 +118,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         this.previewVillager.setNoAi(true);
         this.previewVillager.setYHeadRot((this.villagerLookLeft ? -1.0F : 1.0F) * 15.0F);
 
-        if(this.villagerOffer.requiredtype() != null)
+        if (this.villagerOffer.requiredtype() != null)
             this.previewVillager.setVillagerData(this.previewVillager.getVillagerData().withType(level.registryAccess().lookupOrThrow(Registries.VILLAGER_TYPE).getOrThrow(this.villagerOffer.requiredtype())));
 
     }
@@ -124,7 +130,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
         Font font = Minecraft.getInstance().font;
 
@@ -135,11 +141,11 @@ public class VillagerViewRecipe implements IEivViewRecipe {
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, -(font.lineHeight) * scale, 0);
-        guiGraphics.pose().scale(scale, scale, 1.0F);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(0, -(font.lineHeight) * scale);
+        guiGraphics.pose().scale(scale, scale);
         guiGraphics.drawString(font, professionComp, 0, 0, -1, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
 
         if (this.villagerLookLeft != this.prevVillagerLookLeft && this.currentTick - this.lastHeadChange <= 0.25F * 20) {
             float pastTime = this.currentTick - this.lastHeadChange + partialTicks;
@@ -147,30 +153,25 @@ public class VillagerViewRecipe implements IEivViewRecipe {
             this.previewVillager.setYHeadRot((this.villagerLookLeft ? -1.0F : 1.0F) * (15.0F * headRotationProgress));
         }
 
-        this.renderVillager(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderVillager(guiGraphics, recipePosition, mouseX, mouseY, partialTicks);
 
         if (this.villagerOffer.requiredtype() == null)
             return;
 
-        if(mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36){
+        if (mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36) {
             ResourceLocation typeLocation = this.villagerOffer.requiredtype().location();
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
-            guiGraphics.renderTooltip(font, typeComponent, mouseX, mouseY);
+            guiGraphics.setComponentTooltipForNextFrame(font, List.of(typeComponent), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
         }
     }
 
 
-    private void renderVillager(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    private void renderVillager(GuiGraphics guiGraphics, RecipePosition recipePosition, int mouseX, int mouseY, float partialTicks) {
 
         if (this.previewVillager == null)
             return;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(12, 34, 0);
-        InventoryScreen.renderEntityInInventory(guiGraphics, 0, 0, 15.0F, new Vector3f(), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), 0.0F, 0.0F), null, this.previewVillager);
-
-
-        guiGraphics.pose().popPose();
+        EivGuiRenderHelper.renderEntityOnScreen(guiGraphics, this.previewVillager, recipePosition.left() + 2, recipePosition.top() + 2, recipePosition.left() + 2 + 20, recipePosition.top() + 2 + 32, 15.0F, new Vector3f(0, (32.0F / 15.0F / 2.0F), 0), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), 0.0F, 0.0F), null);
 
     }
 }

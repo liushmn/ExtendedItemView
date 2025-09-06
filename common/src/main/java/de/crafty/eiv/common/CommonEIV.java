@@ -35,6 +35,7 @@ public class CommonEIV {
 
             if (fluid == Fluids.EMPTY)
                 return;
+
             if (!fluid.isSource(fluid.defaultFluidState()))
                 return;
 

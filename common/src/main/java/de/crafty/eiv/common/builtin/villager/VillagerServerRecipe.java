@@ -14,8 +14,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +37,6 @@ import net.minecraft.world.item.enchantment.providers.SingleEnchantment;
 import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,7 +134,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 (listing, out) -> {
                     EmeraldForItemsAccessor accessor = (EmeraldForItemsAccessor) listing;
 
-                    out.put("cost", EivTagUtil.encodeItemStack(accessor.getItemStack().itemStack()));
+                    out.put("cost", EivTagUtil.encodeItemStackOnServer(accessor.getItemStack().itemStack()));
                     out.putInt("emeraldCount", accessor.getEmeraldAmount());
                     out.putInt("villagerXp", accessor.getVillagerXp());
                     out.putInt("maxUses", accessor.getMaxUses());
@@ -145,7 +142,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    ItemStack cost = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("cost"));
+                    ItemStack cost = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("cost"));
                     int emeraldCount = in.getIntOr("emeraldCount", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
@@ -172,7 +169,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         offerStacks.add(accessor.itemStack().copy());
 
 
-                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
+                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
                     out.putInt("emeraldCost", accessor.emeraldCost());
                     out.putInt("villagerXp", accessor.villagerXp());
                     out.putInt("maxUses", accessor.maxUses());
@@ -180,7 +177,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 (profession, professionLevel, in) -> {
 
 
-                    List<ItemStack> offers = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStack);
+                    List<ItemStack> offers = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStackOnClient);
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
@@ -199,7 +196,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     ItemStack stewStack = new ItemStack(Items.SUSPICIOUS_STEW, 1);
                     stewStack.set(DataComponents.SUSPICIOUS_STEW_EFFECTS, accessor.effects());
 
-                    out.put("stew", EivTagUtil.encodeItemStack(stewStack));
+                    out.put("stew", EivTagUtil.encodeItemStackOnServer(stewStack));
                     out.putInt("emeraldCost", 1);
                     out.putInt("villagerXp", accessor.xp());
                     out.putInt("maxUses", 12);
@@ -207,7 +204,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    ItemStack stew = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("stew"));
+                    ItemStack stew = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("stew"));
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
@@ -271,8 +268,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         List<ItemStack> costStacks = costs.get(enchantment);
 
                         CompoundTag offerTag = new CompoundTag();
-                        offerTag.put("offerStacks", EivTagUtil.writeList(stacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
-                        offerTag.put("costStacks", EivTagUtil.writeList(costStacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
+                        offerTag.put("offerStacks", EivTagUtil.writeList(stacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
+                        offerTag.put("costStacks", EivTagUtil.writeList(costStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
                         offersTag.put(enchantment.location().toDebugFileName(), offerTag);
                     });
 
@@ -293,8 +290,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     CompoundTag offersTag = in.getCompoundOrEmpty("offers");
                     offersTag.values().stream().map(tag -> tag.asCompound().orElseGet(CompoundTag::new)).forEach(offerTag -> {
 
-                        List<ItemStack> offerStacks = EivTagUtil.readList(offerTag, "offerStacks", EivTagUtil::decodeItemStack);
-                        List<ItemStack> costStacks = EivTagUtil.readList(offerTag, "costStacks", EivTagUtil::decodeItemStack);
+                        List<ItemStack> offerStacks = EivTagUtil.readList(offerTag, "offerStacks", EivTagUtil::decodeItemStackOnClient);
+                        List<ItemStack> costStacks = EivTagUtil.readList(offerTag, "costStacks", EivTagUtil::decodeItemStackOnClient);
 
                         VillagerOffer offer = new VillagerOffer(profession, professionLevel, villagerType, offerStacks, costStacks, List.of(new ItemStack(Items.BOOK)), villagerXp, maxUses);
                         villagerOffers.add(offer);
@@ -358,7 +355,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         offerStacks.add(offerStack);
                     });
 
-                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
+                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
                     out.putString("fromItem", EivTagUtil.itemToString(accessor.fromItem()));
                     out.putInt("fromCount", accessor.fromCount());
                     out.putInt("emeraldCost", accessor.emeraldCost());
@@ -368,7 +365,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    List<ItemStack> offers = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStack);
+                    List<ItemStack> offers = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStackOnClient);
                     Item fromItem = EivTagUtil.itemFromString(in.getStringOr("fromItem", ""));
                     int fromCount = in.getIntOr("fromCount", 0);
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
@@ -435,16 +432,16 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     costStack.set(DataComponents.LORE, lore);
 
 
-                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
-                    out.put("costStack", EivTagUtil.encodeItemStack(costStack));
+                    out.put("offers", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
+                    out.put("costStack", EivTagUtil.encodeItemStackOnServer(costStack));
                     out.putInt("villagerXp", accessor.villagerXp());
                     out.putInt("maxUses", accessor.maxUses());
                 },
                 (profession, professionLevel, in) -> {
 
 
-                    List<ItemStack> offerStacks = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStack);
-                    ItemStack costStack = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("costStack"));
+                    List<ItemStack> offerStacks = EivTagUtil.readList(in, "offers", EivTagUtil::decodeItemStackOnClient);
+                    ItemStack costStack = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("costStack"));
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
@@ -466,7 +463,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
                     ItemStack offerStack = new ItemStack(accessor.getItem());
 
-                    out.put("offerStack", EivTagUtil.encodeItemStack(offerStack));
+                    out.put("offerStack", EivTagUtil.encodeItemStackOnServer(offerStack));
 
                     out.putInt("emeraldCost", accessor.getValue());
                     out.putInt("villagerXp", accessor.getVillagerXp());
@@ -475,7 +472,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    ItemStack offerStack = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("offerStack"));
+                    ItemStack offerStack = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("offerStack"));
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
@@ -521,8 +518,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     } else
                         offerStacks.add(accessor.toItem().copy());
 
-                    out.put("offerStacks", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStack(origin)));
-                    out.put("costStack", EivTagUtil.encodeItemStack(costStack));
+                    out.put("offerStacks", EivTagUtil.writeList(offerStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
+                    out.put("costStack", EivTagUtil.encodeItemStackOnServer(costStack));
                     out.putInt("emeraldCost", accessor.emeraldCost());
                     out.putInt("villagerXp", accessor.getVillagerXp());
                     out.putInt("maxUses", accessor.getMaxUses());
@@ -530,8 +527,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    List<ItemStack> offerStacks = EivTagUtil.readList(in, "offerStacks", EivTagUtil::decodeItemStack);
-                    ItemStack costStack = EivTagUtil.decodeItemStack(in.getCompoundOrEmpty("costStack"));
+                    List<ItemStack> offerStacks = EivTagUtil.readList(in, "offerStacks", EivTagUtil::decodeItemStackOnClient);
+                    ItemStack costStack = EivTagUtil.decodeItemStackOnClient(in.getCompoundOrEmpty("costStack"));
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
