@@ -288,10 +288,11 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             ServerRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMITHING).forEach(smithingRecipe -> {
 
                 if (smithingRecipe instanceof SmithingTrimRecipe trimRecipe)
-                    recipeList.add(new SmithingServerRecipe(true, trimRecipe.baseIngredient(), trimRecipe.templateIngredient().orElse(null), trimRecipe.additionIngredient().orElse(null), trimRecipe.pattern.value()));
+                    recipeList.add(new SmithingServerRecipe(true, trimRecipe.baseIngredient(), trimRecipe.templateIngredient().orElse(null), trimRecipe.additionIngredient().orElse(null), trimRecipe.pattern.value(), null));
 
-                if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe)
-                    recipeList.add(new SmithingServerRecipe(false, transformRecipe.baseIngredient(), transformRecipe.templateIngredient().orElse(null), transformRecipe.additionIngredient().orElse(null), null));
+                if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe){
+                    recipeList.add(new SmithingServerRecipe(false, transformRecipe.baseIngredient(), transformRecipe.templateIngredient().orElse(null), transformRecipe.additionIngredient().orElse(null), null, transformRecipe.result));
+                }
 
             });
         });
@@ -380,7 +381,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
             SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
 
                 SlotContent.of(unwrapped.getBase()).getValidContents().forEach(baseStack -> {
-                    recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), baseStack, templateStack, unwrapped.getPattern()));
+                    recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), baseStack, templateStack, unwrapped.getPattern(), unwrapped.getUpgradeResult()));
                 });
 
             });
