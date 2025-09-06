@@ -211,6 +211,9 @@ public class ItemViewOverlay {
 
         int fittingPerPage = this.fittingItemsPerRow * this.fittingItemsPerColumn;
 
+        if(fittingPerPage == 0)
+            return true;
+
         if (scrolledY < 0)
             this.startIndex = Math.min(this.startIndex + fittingPerPage, this.availableItems.size() - (this.availableItems.size() - (this.availableItems.size() / fittingPerPage) * fittingPerPage));
 
@@ -301,11 +304,15 @@ public class ItemViewOverlay {
 
         Font font = client.font;
 
-        int maxPageIndex = (this.availableItems.size() / (this.fittingItemsPerColumn * this.fittingItemsPerRow));
 
         guiGraphics.drawCenteredString(font, "ItemView", screen.width - this.getWidth() / 2, 6, -1);
         guiGraphics.fill(this.xStart, 0, screen.width, screen.height, new Color(0, 0, 0, 64).getRGB());
-        guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), screen.width - this.width / 2, screen.height - 2 - 20 - 10, -1);
+
+        if(this.fittingItemsPerRow * this.fittingItemsPerColumn > 0){
+            int maxPageIndex = (this.availableItems.size() / (this.fittingItemsPerColumn * this.fittingItemsPerRow));
+            guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), screen.width - this.width / 2, screen.height - 2 - 20 - 10, -1);
+        }
+
 
         for (ItemSlot slot : this.slots) {
             slot.render(guiGraphics, mouseX, mouseY, partialTicks);
