@@ -53,11 +53,17 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "init", at = @At("TAIL"))
     private void injectOverlay$0(CallbackInfo ci) {
 
-        this.addSearchbar(new ItemViewOverlay.InventoryPositionInfo(this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight));
+        ItemViewOverlay.InventoryPositionInfo info = new ItemViewOverlay.InventoryPositionInfo(this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
+
+        //Init screen dimensions before adding searchbar for the first time
+        if (ItemViewOverlay.SEARCHBAR == null)
+            ItemViewOverlay.INSTANCE.checkForScreenChange((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info);
+
+        this.addSearchbar(info);
 
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "renderContents", at = @At("TAIL"))
     private void injectOverlay$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (minecraft == null) return;
 
@@ -71,12 +77,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
         ItemViewOverlay.INSTANCE.render((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info, this.minecraft, guiGraphics, mouseX, mouseY, partialTicks);
 
-    }
-
-    @Inject(method = "render", at = @At("TAIL"))
-    private void injectItemHighlighting(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
-
-        //Render item highlighting
         ItemViewOverlay.INSTANCE.renderItemHighlighting((AbstractContainerScreen<?>) (Object) this, guiGraphics, mouseX, mouseY, partialTicks);
 
     }
@@ -84,14 +84,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Unique
     private void addSearchbar(ItemViewOverlay.InventoryPositionInfo info) {
-        int boxWidth = Math.min(100, info.screenWidth() - ItemViewOverlay.INSTANCE.getOverlayStartX() - 4);
-
-        ItemViewOverlay.SEARCHBAR = new EditBox(font, this.width - ItemViewOverlay.INSTANCE.getWidth() / 2 - boxWidth / 2, this.height - 22, boxWidth, 20, Component.literal("moin"));
-        ItemViewOverlay.SEARCHBAR.setMaxLength(32);
-        ItemViewOverlay.SEARCHBAR.setValue(ItemViewOverlay.INSTANCE.getCurrentQuery());
-        ItemViewOverlay.SEARCHBAR.setResponder(ItemViewOverlay.INSTANCE::updateQuery);
-
-        ItemViewOverlay.SEARCHBAR.visible = ItemViewOverlay.INSTANCE.isEnabled();
+        ItemViewOverlay.INSTANCE.createSearchbarElement(info);
         this.addRenderableWidget(ItemViewOverlay.SEARCHBAR);
     }
 
@@ -142,14 +135,14 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     //Optional Slots
 
     @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci){
-        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }
 
     @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci){
-        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }
 }

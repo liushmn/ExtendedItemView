@@ -338,6 +338,18 @@ public class ItemViewOverlay {
     }
 
 
+    public void createSearchbarElement(InventoryPositionInfo info){
+        int boxWidth = Math.min(100, info.screenWidth() - ItemViewOverlay.INSTANCE.getOverlayStartX() - 4);
+
+        ItemViewOverlay.SEARCHBAR = new EditBox(Minecraft.getInstance().font, info.screenWidth() - ItemViewOverlay.INSTANCE.getWidth() / 2 - boxWidth / 2, info.screenHeight() - 22, boxWidth, 20, Component.literal("moin"));
+        ItemViewOverlay.SEARCHBAR.setMaxLength(32);
+        ItemViewOverlay.SEARCHBAR.setValue(ItemViewOverlay.INSTANCE.getCurrentQuery());
+        ItemViewOverlay.SEARCHBAR.setResponder(ItemViewOverlay.INSTANCE::updateQuery);
+
+        ItemViewOverlay.SEARCHBAR.visible = ItemViewOverlay.INSTANCE.isEnabled();
+    }
+
+
     public void openRecipeView(ItemStack stack, ItemViewOpenType openType) {
         if (stack.isEmpty())
             return;
