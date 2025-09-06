@@ -13,10 +13,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO split Smithing recipes in upgrade and trim recipes
 public class SmithingViewRecipe implements IEivViewRecipe {
 
     private final SlotContent additionIngredient;
@@ -24,14 +26,15 @@ public class SmithingViewRecipe implements IEivViewRecipe {
     private final SlotContent result;
 
     private final boolean isTrimType;
+    private final TransmuteResult upgradeResult;
 
-    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, TrimPattern trimPattern) {
+    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, TrimPattern trimPattern, @Nullable TransmuteResult upgradeResult) {
         this.isTrimType = isTrimType;
 
         this.template = template;
         this.base = base;
         this.additionIngredient = additionIngredient != null ? SlotContent.of(additionIngredient) : SlotContent.of(Items.AIR);
-
+        this.upgradeResult = upgradeResult;
 
         if (Minecraft.getInstance().player == null) {
             this.result = SlotContent.of(Items.AIR);
@@ -52,7 +55,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        this.result = SlotContent.of(new TransmuteResult(this.template.getItem()).apply(this.base));
+        this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base));
     }
 
     @Override
