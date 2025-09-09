@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -41,7 +42,7 @@ public class EivTagUtil {
 
 
     public static ItemStack decodeItemStackOnClient(CompoundTag tag) {
-        return ItemStack.CODEC.parse(Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
+        return ItemStack.CODEC.parse(Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
     }
 
     public static CompoundTag encodeItemStackOnClient(ItemStack stack) {
@@ -49,6 +50,9 @@ public class EivTagUtil {
     }
 
     public static CompoundTag encodeItemStackOnServer(ItemStack stack) {
+        if (stack.is(Items.AIR)) {
+            return new CompoundTag();
+        }
         return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow().asCompound().orElseGet(CompoundTag::new);
     }
 
