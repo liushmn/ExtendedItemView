@@ -46,18 +46,18 @@ public class EivTagUtil {
     }
 
     public static CompoundTag encodeItemStackOnClient(ItemStack stack) {
-        return ItemStack.CODEC.encode(stack, Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow().asCompound().orElseGet(CompoundTag::new);
+        return ItemStack.CODEC.encode(stack, Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).result().orElse(new CompoundTag()).asCompound().orElseGet(CompoundTag::new);
     }
 
     public static CompoundTag encodeItemStackOnServer(ItemStack stack) {
         if (stack.is(Items.AIR)) {
             return new CompoundTag();
         }
-        return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow().asCompound().orElseGet(CompoundTag::new);
+        return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).result().orElse(new CompoundTag()).asCompound().orElseGet(CompoundTag::new);
     }
 
     public static ItemStack decodeItemStackOnServer(CompoundTag tag) {
-        return ItemStack.CODEC.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
+        return ItemStack.CODEC.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {
