@@ -1,0 +1,30 @@
+plugins {
+    id "io.papermc.paperweight.userdev" version "2.0.0-beta.18"
+    id "xyz.jpenilla.run-paper" version "3.0.0"
+}
+
+
+base {
+    archivesBaseName("${mod_id}-servercompat-${mod_version}+${minecraft_version}")
+}
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+}
+
+runServer {
+    minecraftVersion("${minecraft_version}")
+}
+
+processResources {
+
+    filesMatching("plugin.yml") {
+        expand project.properties
+    }
+}
