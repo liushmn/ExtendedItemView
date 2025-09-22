@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
-import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
+import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
+import de.crafty.eiv.common.overlay.OverlayManager;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.KeyMapping;
@@ -19,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import static de.crafty.eiv.common.CommonEIV.LOGGER;
 import static de.crafty.eiv.common.CommonEIV.MODID;
@@ -48,6 +49,11 @@ public class CommonEIVClient {
 
     private static IEivClientResolver HELPER = null;
 
+
+    public static void boostrap() {
+        OverlayManager.registerOverlay(ItemViewOverlay.INSTANCE);
+        OverlayManager.registerOverlay(ItemBookmarkOverlay.INSTANCE);
+    }
 
     public static void setResolver(final IEivClientResolver helper) {
         HELPER = helper;
