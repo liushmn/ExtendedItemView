@@ -34,6 +34,7 @@ public class ForgeEIVClient {
 
     @SubscribeEvent
     public static void onClientInit(FMLClientSetupEvent event) {
+        CommonEIVClient.boostrap();
         CommonEIVClient.setResolver(new ForgeEivResolver());
 
         MenuScreens.register(CommonEIVClient.RECIPE_VIEW_MENU, RecipeViewScreen::new);

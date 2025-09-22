@@ -1,6 +1,6 @@
 package de.crafty.eiv.common.api.recipe;
 
-import de.crafty.eiv.common.overlay.ItemViewOverlay;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;

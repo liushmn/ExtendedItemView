@@ -1,16 +1,16 @@
 package de.crafty.eiv.common.overlay;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.network.EivNetworkManager;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
@@ -21,6 +21,9 @@ import java.util.List;
  * Represenatation of one slot later rendered in the overlay
  */
 public class ItemSlot {
+
+    private static final ResourceLocation SLOT_HIGHLIGHT_BACK_SPRITE = ResourceLocation.withDefaultNamespace("container/slot_highlight_back");
+    private static final ResourceLocation SLOT_HIGHLIGHT_FRONT_SPRITE = ResourceLocation.withDefaultNamespace("container/slot_highlight_front");
 
     private final ItemStack stack;
     private final int x, y;
@@ -53,7 +56,7 @@ public class ItemSlot {
     /**
      * Renders the slot
      */
-    void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
         if (!this.isHovered() && this.currentCheatmodeCount > 1)
@@ -69,9 +72,11 @@ public class ItemSlot {
 
 
         if (this.isHovered())
-            guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 128).getRGB());
+            guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
+
 
         guiGraphics.renderItem(this.stack, this.x + 2, this.y + 2);
+
 
         if (this.isHovered())
             guiGraphics.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY);
@@ -80,7 +85,7 @@ public class ItemSlot {
     /**
      * Called on a mouse click in any inventory
      */
-    protected void onClicked(int mouseX, int mouseY, int mouseButton) {
+    public void onClicked(int mouseX, int mouseY, int mouseButton) {
 
 
         LocalPlayer clientPlayer = Minecraft.getInstance().player;

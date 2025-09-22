@@ -19,6 +19,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 @EventBusSubscriber(modid = CommonEIV.MODID, value = Dist.CLIENT)
 public class NeoForgeEIVClient {
 
+
     @SubscribeEvent
     public static void onMenuRegistry(RegisterEvent event) {
         event.register(Registries.MENU, menuTypeRegisterHelper -> {
@@ -38,6 +39,7 @@ public class NeoForgeEIVClient {
 
     @SubscribeEvent
     public static void onClientInit(FMLClientSetupEvent event) {
+        CommonEIVClient.boostrap();
         CommonEIVClient.setResolver(new NeoForgeEivResolver());
         CommonEIVClient.loadBookmarks();
     }
