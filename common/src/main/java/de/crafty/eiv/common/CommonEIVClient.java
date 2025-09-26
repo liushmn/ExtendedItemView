@@ -1,10 +1,9 @@
 package de.crafty.eiv.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
+import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
@@ -68,40 +67,12 @@ public class CommonEIVClient {
     }
 
 
-    public static void loadBookmarks() {
-        //Save bookmarks
-        File eivFolder = new File("config/eiv");
-        if (eivFolder.mkdirs())
-            LOGGER.info("EIV folder not present, creating...");
-
-        File bookmarks = new File("config/eiv/bookmarks.json");
-        if (bookmarks.exists()) {
-            try {
-                JsonObject contentJson = JsonParser.parseString(FileUtils.readFileToString(bookmarks, StandardCharsets.UTF_8)).getAsJsonObject();
-                ItemBookmarkOverlay.INSTANCE.loadBookmarkedItems(contentJson);
-            } catch (Exception e) {
-                LOGGER.error("Failed to load bookmarks from file, skipping...", e);
-            }
-        }
+    public static void loadConfigs() {
+        Configs.BOOKMARKS.load();
     }
 
-    public static void saveBookmarks() {
-
-        JsonObject encoded = new JsonObject();
-        ItemBookmarkOverlay.INSTANCE.saveBookmarkedItems(encoded);
-
-        File bookmarkFile = new File("config/eiv/bookmarks.json");
-
-        try {
-            if (!bookmarkFile.exists())
-                bookmarkFile.createNewFile();
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileUtils.writeStringToFile(bookmarkFile, gson.toJson(encoded));
-        } catch (Exception e) {
-            LOGGER.error("Failed to save bookmarks to file", e);
-        }
-
+    public static void saveConfigs() {
+        Configs.BOOKMARKS.save();
     }
 
     public static boolean isCheatmodeActive() {

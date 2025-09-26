@@ -22,6 +22,7 @@ public class CommonEIV {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("Extended ItemView");
 
+    public static final String CONFIG_PATH = "config/eiv/";
 
     public static EivNetworkManager networkManager(){
         return EivNetworkManager.INSTANCE;
