@@ -1,25 +1,33 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
 import de.crafty.eiv.common.CommonEIVClient;
-import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
-import de.crafty.eiv.common.overlay.ItemViewOverlay;
+import de.crafty.eiv.common.overlay.AbstractEivOverlay;
+import de.crafty.eiv.common.overlay.BlockingGuiComponent;
+import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
+import de.crafty.eiv.common.overlay.OverlayManager;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.HashMap;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen implements MenuAccess<T> {
@@ -53,61 +61,78 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "init", at = @At("TAIL"))
     private void injectOverlay$0(CallbackInfo ci) {
 
-        this.addSearchbar(new ItemViewOverlay.InventoryPositionInfo(this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight));
+        AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
+
+        OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
+            screenContext.renderables().forEach(this::removeWidget);
+            screenContext.nonRenderables().forEach(this::removeWidget);
+        });
+
+        OverlayManager.INSTANCE.checkForScreenChange(info);
+
+        OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
+            screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
+            screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
+        });
+
 
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
+
+    @Inject(method = "renderBackground", at = @At("HEAD"))
+    private void injectOverlayBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
+        OverlayManager.INSTANCE.renderAllBackground(guiGraphics, mouseX, mouseY, partialTicks);
+    }
+
+    @Inject(method = "renderContents", at = @At("TAIL"))
     private void injectOverlay$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (minecraft == null) return;
 
-        ItemViewOverlay.InventoryPositionInfo info = new ItemViewOverlay.InventoryPositionInfo(this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
-        if (ItemViewOverlay.INSTANCE.checkForScreenChange((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info)) {
-            if (ItemViewOverlay.SEARCHBAR != null)
-                this.removeWidget(ItemViewOverlay.SEARCHBAR);
+        AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
-            this.addSearchbar(info);
+        OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
+                ResourceLocation.withDefaultNamespace("container"),
+                info.leftPos(),
+                info.topPos(),
+                info.imageWidth(),
+                info.imageHeight()
+        ));
+
+        HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> old = new HashMap<>(OverlayManager.INSTANCE.screenContextMap());
+
+        if (OverlayManager.INSTANCE.checkForScreenChange(info)) {
+            old.forEach((abstractEivOverlay, screenContext) -> {
+                screenContext.renderables().forEach(this::removeWidget);
+                screenContext.nonRenderables().forEach(this::removeWidget);
+            });
+
+            OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
+                screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
+                screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
+            });
         }
 
-        ItemViewOverlay.INSTANCE.render((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, info, this.minecraft, guiGraphics, mouseX, mouseY, partialTicks);
+
+        OverlayManager.INSTANCE.renderAll(guiGraphics, mouseX, mouseY, partialTicks);
 
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void injectItemHighlighting(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
-
-        //Render item highlighting
-        ItemViewOverlay.INSTANCE.renderItemHighlighting((AbstractContainerScreen<?>) (Object) this, guiGraphics, mouseX, mouseY, partialTicks);
-
-    }
-
-
-    @Unique
-    private void addSearchbar(ItemViewOverlay.InventoryPositionInfo info) {
-        int boxWidth = Math.min(100, info.screenWidth() - ItemViewOverlay.INSTANCE.getOverlayStartX() - 4);
-
-        ItemViewOverlay.SEARCHBAR = new EditBox(font, this.width - ItemViewOverlay.INSTANCE.getWidth() / 2 - boxWidth / 2, this.height - 22, boxWidth, 20, Component.literal("moin"));
-        ItemViewOverlay.SEARCHBAR.setMaxLength(32);
-        ItemViewOverlay.SEARCHBAR.setValue(ItemViewOverlay.INSTANCE.getCurrentQuery());
-        ItemViewOverlay.SEARCHBAR.setResponder(ItemViewOverlay.INSTANCE::updateQuery);
-
-        ItemViewOverlay.SEARCHBAR.visible = ItemViewOverlay.INSTANCE.isEnabled();
-        this.addRenderableWidget(ItemViewOverlay.SEARCHBAR);
-    }
 
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$2(double mouseX, double mouseY, double scrolledX, double scrolledY, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemViewOverlay.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
+        if (OverlayManager.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
             cir.setReturnValue(true);
     }
 
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$3(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemViewOverlay.SEARCHBAR.isFocused())
-            cir.setReturnValue(super.keyPressed(i, j, k));
 
-        ItemViewOverlay.INSTANCE.keyPressed(i, j, k);
+        if (OverlayManager.INSTANCE.isOverlayWidgetFocused())
+            return;
+
+        if (!((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this instanceof CreativeModeInventoryScreen) && OverlayManager.INSTANCE.keyPressed(i, j, k))
+            cir.setReturnValue(true);
 
         if (this.hoveredSlot == null)
             return;
@@ -126,30 +151,24 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$3(double mouseX, double mouseY, int mouseButton, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemViewOverlay.SEARCHBAR.isHovered() && mouseButton == 1) {
-            ItemViewOverlay.SEARCHBAR.setValue("");
-            ItemViewOverlay.SEARCHBAR.setFocused(true);
+        if (OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton))
             cir.setReturnValue(true);
-        }
-
-        if (mouseButton == 0 && !ItemViewOverlay.SEARCHBAR.isHovered() && ItemViewOverlay.SEARCHBAR.isFocused())
-            ItemViewOverlay.SEARCHBAR.setFocused(false);
-
-        ItemViewOverlay.INSTANCE.clickMouse((int) mouseX, (int) mouseY, mouseButton);
     }
+
+
 
 
     //Optional Slots
 
     @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci){
-        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }
 
     @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci){
-        if(this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
+    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }
 }
