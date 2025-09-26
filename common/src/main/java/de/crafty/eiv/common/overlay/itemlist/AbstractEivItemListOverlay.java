@@ -3,6 +3,7 @@ package de.crafty.eiv.common.overlay.itemlist;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
+import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -14,8 +15,8 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     protected static final int ITEM_ENTRY_SIZE = 20;
 
     protected int itemStartX, itemStartY, itemEndX, itemEndY;
+    protected int startIndex;
     private int fittingPerPage;
-    private int startIndex;
 
     protected List<ItemStack> availableItems;
 
@@ -50,7 +51,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
             return true;
 
         if (scrolledY < 0)
-            this.startIndex = Math.min(this.startIndex + fittingPerPage, this.availableItems().size() - (this.availableItems().size() - (this.availableItems().size() / fittingPerPage) * fittingPerPage));
+            this.startIndex = Math.max(0, Math.min(this.startIndex + fittingPerPage, this.availableItems().size() - fittingPerPage));
 
         if (scrolledY > 0)
             this.startIndex = Math.max(0, this.startIndex - fittingPerPage);
@@ -78,22 +79,23 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     /**
      * Responsible for adding the item entries to the overlay
      */
-    protected void updateSlots() {
+    public void updateSlots() {
         this.itemSlots().clear();
-
 
         int currentStackPos = this.startIndex;
 
         for (int y = this.itemStartY; y <= this.itemEndY - ITEM_ENTRY_SIZE; y += ITEM_ENTRY_SIZE) {
             for (int x = this.itemStartX; x <= this.itemEndX - ITEM_ENTRY_SIZE; x += ITEM_ENTRY_SIZE) {
 
-                if (currentStackPos >= this.availableItems().size())
-                    break;
 
-                if (this.isPositionBlocked(x, y))
+                if (this.isPositionBlocked(x, y, ITEM_ENTRY_SIZE, ITEM_ENTRY_SIZE))
                     continue;
 
-                this.itemSlots().add(new ItemSlot(this.availableItems().get(currentStackPos), x, y));
+                if (currentStackPos < this.availableItems().size()) {
+                    this.itemSlots().add(new ItemSlot(this.availableItems().get(currentStackPos), x, y));
+
+                }
+
                 currentStackPos++;
 
             }

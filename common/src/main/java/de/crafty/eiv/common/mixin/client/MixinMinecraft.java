@@ -2,7 +2,9 @@ package de.crafty.eiv.common.mixin.client;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,4 +18,10 @@ public abstract class MixinMinecraft {
         CommonEIVClient.saveBookmarks();
     }
 
+
+
+    @Inject(method = "setScreen", at = @At("HEAD"))
+    private void clearBlockings(Screen screen, CallbackInfo ci){
+        OverlayManager.INSTANCE.allGuiBlockings().clear();
+    }
 }

@@ -174,7 +174,7 @@ public class EivNetworkManager {
 
             if (context.sender().hasPermissions(3)) {
                 context.sender().sendSystemMessage(
-                        Component.literal("Took x").withStyle(ChatFormatting.GRAY)
+                        Component.literal("Cheated x").withStyle(ChatFormatting.GRAY)
                                 .append(
                                         Component.literal(String.valueOf(payload.amount())).withStyle(ChatFormatting.GOLD)
                                 )

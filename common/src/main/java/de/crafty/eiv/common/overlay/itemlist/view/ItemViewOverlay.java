@@ -41,13 +41,10 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     private String currentQuery;
     private boolean itemFilterMode;
 
-    private int startIndex;
-
     public ItemViewOverlay() {
         super(-1, -1, -1, -1);
         this.currentQuery = "";
         this.itemFilterMode = false;
-        this.startIndex = 0;
     }
 
 
@@ -79,11 +76,9 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     private void initForScreen(AbstractContainerScreen<? extends AbstractContainerMenu> screen, InventoryPositionInfo invInfo) {
 
-        //-14 for Cleaner Appereance
-        int spaceForOverlayX = screen.width - (invInfo.leftPos() + invInfo.imageWidth());
-        spaceForOverlayX -= spaceForOverlayX > 2 * ITEM_ENTRY_SIZE + 14 ? 14 : 0;
-
-        this.width = spaceForOverlayX - ((spaceForOverlayX - 4) % ITEM_ENTRY_SIZE);
+        //-14 for cleaner appearance
+        this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14;
+        this.width = this.width - (this.width - 4) % ITEM_ENTRY_SIZE;
         this.height = screen.height;
 
         this.x = screen.width - this.width;
@@ -134,8 +129,6 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
             if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j))
                 ItemBookmarkOverlay.INSTANCE.bookmarkItem(slot.getStack());
-
-            return true;
         }
 
         return false;
@@ -169,10 +162,9 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    protected boolean charTyped(char c, int i) {
-        return this.searchbar.isFocused() && this.searchbar.charTyped(c, i);
+    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        guiGraphics.fill(this.x, 0, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
     }
-
 
     @Override
     protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -185,11 +177,10 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
         guiGraphics.drawCenteredString(font, "ItemView", invInfo.screen().width - this.getWidth() / 2, 6, -1);
-        guiGraphics.fill(this.x, 0, invInfo.screen().width, invInfo.screen().height, new Color(0, 0, 0, 64).getRGB());
 
         if (this.fittingPerPage() > 0) {
             int maxPageIndex = (this.availableItems().size() / (this.fittingPerPage()));
-            guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), invInfo.screen().width - this.width / 2, invInfo.screen().height - 2 - 20 - 10, -1);
+            guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.x + this.width - this.width / 2, invInfo.screen().height - 2 - 20 - 10, -1);
         }
 
 
@@ -212,7 +203,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
-            if (!slot.hasItem() || this.getAvailableItems().stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
+            if (!slot.hasItem() || this.availableItems.stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
                 guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
             guiGraphics.pose().popMatrix();
@@ -280,10 +271,6 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
         return this.currentQuery;
     }
 
-
-    public List<ItemStack> getAvailableItems() {
-        return this.availableItems();
-    }
 
 
     public enum ItemViewOpenType {

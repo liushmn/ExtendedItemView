@@ -1,12 +1,16 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class OverlayManager {
 
@@ -16,8 +20,7 @@ public class OverlayManager {
     private AbstractEivOverlay.InventoryPositionInfo currentInvInfo = null;
     private final HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> screenContextMap = new HashMap<>();
 
-    private List<BlockingGuiComponent> guiBlockings = new ArrayList<>();
-    private List<BlockingGuiComponent> lastGuiBlockings = new ArrayList<>();
+    private final List<BlockingGuiComponent> guiBlockings = new ArrayList<>();
 
     public boolean checkForScreenChange(AbstractEivOverlay.InventoryPositionInfo newInfo) {
         if (!newInfo.matches(this.currentInvInfo)) {
@@ -53,13 +56,13 @@ public class OverlayManager {
     public boolean keyPressed(int i, int j, int k) {
         boolean b = false;
 
-        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(i, j)){
+        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(i, j)) {
             PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.setEnabled(!abstractEivOverlay.isEnabled()));
             return true;
         }
 
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if(!overlay.isEnabled())
+            if (!overlay.isEnabled())
                 continue;
 
             if (overlay.keyPressed(i, j, k))
@@ -73,7 +76,7 @@ public class OverlayManager {
         boolean b = false;
 
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if(!overlay.isEnabled())
+            if (!overlay.isEnabled())
                 continue;
 
             if (overlay.charTyped(c, i))
@@ -86,8 +89,15 @@ public class OverlayManager {
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         boolean b = false;
 
+        this.screenContextMap.forEach((abstractEivOverlay, screenContext) -> {
+            screenContext.renderables().forEach(guiEventListener -> {
+                if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(mouseX, mouseY))
+                    guiEventListener.setFocused(false);
+            });
+        });
+
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if(!overlay.isEnabled())
+            if (!overlay.isEnabled())
                 continue;
 
             if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
@@ -103,7 +113,7 @@ public class OverlayManager {
     public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
         boolean b = false;
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if(!overlay.isEnabled())
+            if (!overlay.isEnabled())
                 continue;
 
             if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
@@ -117,34 +127,70 @@ public class OverlayManager {
     }
 
 
+    public void renderAllBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).forEach(overlay -> overlay.renderBackground(guiGraphics, mouseX, mouseY, partialTicks));
+    }
+
     public void renderAll(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).forEach(overlay -> overlay.render(guiGraphics, mouseX, mouseY, partialTicks));
 
+        if (Minecraft.getInstance().gui.getDebugOverlay().showDebugScreen())
+            this.renderDebug(guiGraphics, mouseX, mouseY, partialTicks);
+    }
 
-        //If both are empty => skip swapping
-        if (this.lastGuiBlockings.isEmpty() && this.guiBlockings.isEmpty())
-            return;
+    public void renderDebug(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
-        //Swap caches
-        this.lastGuiBlockings.clear();
-        List<BlockingGuiComponent> temp = this.lastGuiBlockings;
-        this.lastGuiBlockings = this.guiBlockings;
-        this.guiBlockings = temp;
+
+        this.guiBlockings.forEach(blockingGuiComponent -> {
+
+            Random rand = new Random(blockingGuiComponent.id().toString().chars().sum());
+            int debugColor = new Color(rand.nextInt(255 + 1), rand.nextInt(255 + 1), rand.nextInt(255 + 1)).getRGB();
+
+            guiGraphics.hLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), debugColor);
+            guiGraphics.hLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+
+            guiGraphics.vLine(blockingGuiComponent.x(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+            guiGraphics.vLine(blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+
+        });
 
     }
 
 
-    public void addGuiBlocking(BlockingGuiComponent comp) {
-        if (this.guiBlockings.stream().anyMatch(blockingGuiComponent -> blockingGuiComponent.id().equals(comp.id())))
-            return;
+    public void removeGuiBlocking(ResourceLocation id, boolean updateSlots) {
+        this.guiBlockings.removeIf(blockingGuiComponent -> blockingGuiComponent.id().equals(id));
 
+        if(updateSlots)
+            PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+    }
+
+    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateSlots){
+        this.guiBlockings.removeIf(blockingGuiComponent -> filter.test(blockingGuiComponent.id()));
+
+        if(updateSlots)
+            PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+    }
+
+    public void setGuiBlocking(BlockingGuiComponent comp) {
+        List<BlockingGuiComponent> old = new ArrayList<>(this.guiBlockings);
+        this.removeGuiBlocking(comp.id(), false);
         this.guiBlockings.add(comp);
+
+        if (!old.equals(this.guiBlockings))
+            this.updateAllSlots();
+
+    }
+
+    private void updateAllSlots(){
+        PRESENT_OVERLAYS.stream()
+                .filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay)
+                .map(abstractEivOverlay -> (AbstractEivItemListOverlay) abstractEivOverlay)
+                .forEach(AbstractEivItemListOverlay::updateSlots);
     }
 
     public List<BlockingGuiComponent> allGuiBlockings() {
         return this.guiBlockings;
     }
-
 
 
     private static final List<AbstractEivOverlay> PRESENT_OVERLAYS = new ArrayList<>();
