@@ -36,7 +36,7 @@ public class FabricEIVClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(CommonEIVClient.FLUID_ITEM_MODEL_LAYER, FluidItemModel::createFluidLayer);
 
 
-        CommonEIVClient.loadBookmarks();
+        CommonEIVClient.loadConfigs();
     }
 
     public static void excludeEivMappings() {

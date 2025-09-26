@@ -39,7 +39,7 @@ public class NeoForgeEIVClient {
     @SubscribeEvent
     public static void onClientInit(FMLClientSetupEvent event) {
         CommonEIVClient.setResolver(new NeoForgeEivResolver());
-        CommonEIVClient.loadBookmarks();
+        CommonEIVClient.loadConfigs();
     }
 
     @SubscribeEvent

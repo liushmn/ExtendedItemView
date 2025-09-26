@@ -37,7 +37,7 @@ public class ForgeEIVClient {
         CommonEIVClient.setResolver(new ForgeEivResolver());
 
         MenuScreens.register(CommonEIVClient.RECIPE_VIEW_MENU, RecipeViewScreen::new);
-        CommonEIVClient.loadBookmarks();
+        CommonEIVClient.loadConfigs();
 
     }
 

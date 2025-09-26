@@ -1,11 +1,12 @@
 package de.crafty.eiv.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
-import de.crafty.eiv.common.overlay.ItemBookmarkOverlay;
+import de.crafty.eiv.common.config.Configs;
+import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
+import de.crafty.eiv.common.overlay.OverlayManager;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.KeyMapping;
@@ -19,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import static de.crafty.eiv.common.CommonEIV.LOGGER;
 import static de.crafty.eiv.common.CommonEIV.MODID;
@@ -49,6 +49,11 @@ public class CommonEIVClient {
     private static IEivClientResolver HELPER = null;
 
 
+    public static void boostrap() {
+        OverlayManager.registerOverlay(ItemViewOverlay.INSTANCE);
+        OverlayManager.registerOverlay(ItemBookmarkOverlay.INSTANCE);
+    }
+
     public static void setResolver(final IEivClientResolver helper) {
         HELPER = helper;
         LOGGER.info("Helper has been set");
@@ -62,40 +67,12 @@ public class CommonEIVClient {
     }
 
 
-    public static void loadBookmarks() {
-        //Save bookmarks
-        File eivFolder = new File("config/eiv");
-        if (eivFolder.mkdirs())
-            LOGGER.info("EIV folder not present, creating...");
-
-        File bookmarks = new File("config/eiv/bookmarks.json");
-        if (bookmarks.exists()) {
-            try {
-                JsonObject contentJson = JsonParser.parseString(FileUtils.readFileToString(bookmarks, StandardCharsets.UTF_8)).getAsJsonObject();
-                ItemBookmarkOverlay.INSTANCE.loadBookmarkedItems(contentJson);
-            } catch (Exception e) {
-                LOGGER.error("Failed to load bookmarks from file, skipping...", e);
-            }
-        }
+    public static void loadConfigs() {
+        Configs.BOOKMARKS.load();
     }
 
-    public static void saveBookmarks() {
-
-        JsonObject encoded = new JsonObject();
-        ItemBookmarkOverlay.INSTANCE.saveBookmarkedItems(encoded);
-
-        File bookmarkFile = new File("config/eiv/bookmarks.json");
-
-        try {
-            if (!bookmarkFile.exists())
-                bookmarkFile.createNewFile();
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileUtils.writeStringToFile(bookmarkFile, gson.toJson(encoded));
-        } catch (Exception e) {
-            LOGGER.error("Failed to save bookmarks to file", e);
-        }
-
+    public static void saveConfigs() {
+        Configs.BOOKMARKS.save();
     }
 
     public static boolean isCheatmodeActive() {
