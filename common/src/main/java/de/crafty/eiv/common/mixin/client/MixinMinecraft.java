@@ -1,6 +1,5 @@
 package de.crafty.eiv.common.mixin.client;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.Minecraft;
@@ -15,7 +14,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "close", at = @At("RETURN"))
     private void saveData(CallbackInfo ci) {
-        CommonEIVClient.saveBookmarks();
+        CommonEIVClient.saveConfigs();
     }
 
 
