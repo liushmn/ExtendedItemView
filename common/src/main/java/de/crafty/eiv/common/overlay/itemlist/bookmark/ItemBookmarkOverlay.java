@@ -32,12 +32,9 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
     private static final int HEADER_HEIGHT = 20;
     private static final int FOOTER_HEIGHT = 40;
 
-    private int startIndex;
-
 
     private ItemBookmarkOverlay() {
         super (-1, -1, -1, -1);
-        this.startIndex = 0;
     }
 
 
@@ -81,36 +78,6 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         this.initForScreen(info.screen(), info);
     }
 
-
-    @Override
-    public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
-
-        if (mouseX > this.width)
-            return false;
-
-        if (CommonEIVClient.isCheatmodeActive()) {
-            for (ItemSlot slot : this.itemSlots()) {
-                if (!slot.isHovered())
-                    continue;
-
-                slot.changeCheatmodeCount((scrolledY < 0 ? -1 : 1));
-                return true;
-            }
-        }
-
-        int fittingPerPage = this.fittingPerPage();
-
-        if (scrolledY < 0)
-            this.startIndex = Math.min(this.startIndex + fittingPerPage, this.availableItems.size() - (this.availableItems.size() - ((this.availableItems().size() - 1) / fittingPerPage) * fittingPerPage));
-
-        if (scrolledY > 0)
-            this.startIndex = Math.max(0, this.startIndex - fittingPerPage);
-
-        if (scrolledY != 0)
-            this.updateSlots();
-
-        return true;
-    }
 
     @Override
     protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -158,14 +125,11 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
     public void initForScreen(AbstractContainerScreen<? extends AbstractContainerMenu> screen, InventoryPositionInfo currentInfo) {
 
-        //-14 for Cleaner Appereance
-        int spaceForOverlayX = (screen instanceof AbstractRecipeBookScreen<?> recipeBookScreen && recipeBookScreen.recipeBookComponent.isVisible()) ? recipeBookScreen.recipeBookComponent.getXOrigin() - 32 : currentInfo.leftPos();
-        spaceForOverlayX -= spaceForOverlayX > 2 * ITEM_ENTRY_SIZE + 14 ? 14 : 0;
-
         this.x = 0;
         this.y = 0;
 
-        this.width = spaceForOverlayX - ((spaceForOverlayX - 4) % ITEM_ENTRY_SIZE);
+        this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14;
+        this.width = this.width - (this.width - 4) % ITEM_ENTRY_SIZE;
         this.height = screen.height;
 
         this.itemStartX = 2;

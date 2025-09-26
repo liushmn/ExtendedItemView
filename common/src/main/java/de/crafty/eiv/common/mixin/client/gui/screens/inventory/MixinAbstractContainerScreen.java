@@ -2,6 +2,7 @@ package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
+import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
@@ -77,12 +79,24 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
+    @Inject(method = "renderBackground", at = @At("HEAD"))
+    private void injectOverlayBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
+        OverlayManager.INSTANCE.renderAllBackground(guiGraphics, mouseX, mouseY, partialTicks);
+    }
+
     @Inject(method = "renderContents", at = @At("TAIL"))
     private void injectOverlay$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (minecraft == null) return;
 
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
+        OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
+                ResourceLocation.withDefaultNamespace("container"),
+                info.leftPos(),
+                info.topPos(),
+                info.imageWidth(),
+                info.imageHeight()
+        ));
 
         HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> old = new HashMap<>(OverlayManager.INSTANCE.screenContextMap());
 
@@ -140,6 +154,8 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         if (OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton))
             cir.setReturnValue(true);
     }
+
+
 
 
     //Optional Slots

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public abstract class AbstractEivOverlay {
         this.enabled = enabled;
     }
 
-    public boolean isEnabled(){
+    public boolean isEnabled() {
         return this.enabled;
     }
 
@@ -96,6 +97,11 @@ public abstract class AbstractEivOverlay {
 
     }
 
+
+    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks){
+
+    }
+
     protected abstract void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
 
@@ -104,11 +110,13 @@ public abstract class AbstractEivOverlay {
     }
 
 
-    protected boolean isPositionBlocked(int x, int y) {
+    protected boolean isPositionBlocked(int x, int y, int width, int height) {
         List<BlockingGuiComponent> relevantComponents = OverlayManager.INSTANCE.allGuiBlockings().stream().filter(blockingGuiComponent -> this.getBlockingPredicate().isBlocking(blockingGuiComponent)).toList();
 
+
         for (BlockingGuiComponent blocking : relevantComponents) {
-            if(x >= blocking.x() && x <= blocking.x() + blocking.width() && y >= blocking.y() && y <= blocking.y() + blocking.height())
+
+            if (blocking.hasIntersectionWith(x, y, width, height))
                 return true;
         }
 
