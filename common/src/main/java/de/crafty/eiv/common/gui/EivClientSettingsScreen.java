@@ -1,0 +1,67 @@
+package de.crafty.eiv.common.gui;
+
+import de.crafty.eiv.common.config.Configs;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+
+public class EivClientSettingsScreen extends Screen {
+
+    private static final Component TITLE = Component.translatable("eiv.client_settings.title");
+
+    private final Screen lastScreen;
+
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 32, 32);
+
+    public EivClientSettingsScreen(Screen lastScreen) {
+        super(TITLE);
+
+        this.lastScreen = lastScreen;
+    }
+
+
+    @Override
+    protected void init() {
+
+        this.layout.addToHeader(new StringWidget(TITLE, this.font)).alignCenter();
+
+        LinearLayout linearLayout = this.layout.addToContents(LinearLayout.vertical());
+
+        linearLayout.addChild(
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.background.enabled"), Component.translatable("eiv.client_settings.background.disabled"))
+                        .withInitialValue(Configs.CLIENT_SETTINGS.drawBackground())
+                        .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.background"),
+                                (cycleButton, b) -> Configs.CLIENT_SETTINGS.setDrawBackground(b))
+        );
+        linearLayout.addChild(
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.resize_mode.wrap"), Component.translatable("eiv.client_settings.resize_mode.cut"))
+                        .withInitialValue(Configs.CLIENT_SETTINGS.isItemWrapMode())
+                        .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.resize_mode"),
+                                (cycleButton, b) -> Configs.CLIENT_SETTINGS.setItemWrapMode(b))
+        );
+
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).size(100, 20).build());
+
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.layout.arrangeElements();
+    }
+
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+    }
+
+
+    @Override
+    public void onClose() {
+        Configs.CLIENT_SETTINGS.save();
+        this.minecraft.setScreen(this.lastScreen);
+    }
+}

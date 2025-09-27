@@ -22,7 +22,6 @@ public abstract class AbstractEivConfig {
         return this.data;
     }
 
-    public abstract void setDefaults();
 
     protected abstract void loadData();
 
@@ -30,8 +29,6 @@ public abstract class AbstractEivConfig {
 
     public void load() {
         try {
-            this.setDefaults();
-
             File file = new File(CommonEIV.CONFIG_PATH + this.fileName + ".json");
 
             if (!file.exists()) {

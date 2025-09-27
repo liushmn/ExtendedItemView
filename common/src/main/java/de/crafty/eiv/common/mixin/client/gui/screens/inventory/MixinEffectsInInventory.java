@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,14 +38,21 @@ public abstract class MixinEffectsInInventory {
 
     @Inject(method = "renderEffects", at = @At("HEAD"))
     private void injectBlocking$0(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci){
-        OverlayManager.INSTANCE.removeGuiBlocking(resourceLocation -> {
 
-            if(!resourceLocation.getPath().startsWith("mobeffect_"))
-                return false;
+        List<ResourceLocation> effectsToRemove = new ArrayList<>();
+        for(BlockingGuiComponent guiBlock : OverlayManager.INSTANCE.allGuiBlockings()){
 
-            String descriptionId = resourceLocation.getPath().split("_")[1];
-            return this.minecraft.player.getActiveEffects().stream().noneMatch(mobEffectInstance -> mobEffectInstance.getDescriptionId().equals(descriptionId));
-        }, true);
+            if(!guiBlock.id().getPath().startsWith("mobeffect_"))
+                continue;
+
+            String descriptionId = guiBlock.id().getPath().split("_")[1];
+
+            if(this.minecraft.player.getActiveEffects().stream().noneMatch(mobEffectInstance -> mobEffectInstance.getDescriptionId().equals(descriptionId)))
+                effectsToRemove.add(guiBlock.id());
+
+        }
+
+        OverlayManager.INSTANCE.removeGuiBlocking(effectsToRemove::contains, !effectsToRemove.isEmpty());
     }
 
     @Inject(method = "renderBackgrounds", at = @At("HEAD"))

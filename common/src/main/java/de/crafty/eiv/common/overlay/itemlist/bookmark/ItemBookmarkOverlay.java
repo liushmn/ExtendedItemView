@@ -7,6 +7,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
 import de.crafty.eiv.common.overlay.OverlayManager;
@@ -45,39 +46,26 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         }
     }
 
-
-    public void saveBookmarkedItems(JsonObject json) {
-
-        JsonArray array = new JsonArray();
-        this.availableItems.forEach(stack -> {
-            array.add(ItemStack.CODEC.encode(stack, JsonOps.INSTANCE, new JsonObject()).getOrThrow().getAsJsonObject());
-        });
-
-        json.add("bookmarkedItems", array);
-    }
-
-    public void loadBookmarkedItems(JsonObject json) {
-        this.availableItems.clear();
-
-        if(!json.has("bookmarkedItems"))
-            return;
-
-        json.getAsJsonArray("bookmarkedItems").forEach(jsonE -> {
-            JsonObject jsonItem = jsonE.getAsJsonObject();
-
-            DataResult<Pair<ItemStack, JsonElement>> result = ItemStack.CODEC.decode(JsonOps.INSTANCE, jsonItem);
-            if(result.isSuccess())
-                this.availableItems.add(result.getOrThrow().getFirst());
-        });
-
-        this.updateSlots();
-    }
-
     @Override
     public void onScreenChanged(InventoryPositionInfo info) {
         this.initForScreen(info.screen(), info);
+        super.onScreenChanged(info);
+        this.updateSlots();
     }
 
+
+    @Override
+    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+
+        if(this.itemSlots().isEmpty())
+            return;
+
+        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            guiGraphics.fill(this.x, this.y, this.width, this.height, new Color(0, 0, 0, 64).getRGB());
+        else
+            guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveWidth, this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
+
+    }
 
     @Override
     protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -87,15 +75,22 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         Minecraft client = Minecraft.getInstance();
 
         Font font = client.font;
-        InventoryPositionInfo info = OverlayManager.INSTANCE.currentInfo();
 
         if(this.fittingPerPage() <= 0)
             return;
 
-        guiGraphics.drawCenteredString(font, Component.translatable("eiv.bookmarks").getString(), Math.max(this.width / 2, font.width(Component.translatable("eiv.bookmarks").getString()) / 2 + 2), 6, -1);
-        guiGraphics.fill(this.x, 0, this.width, info.screen().height, new Color(0, 0, 0, 64).getRGB());
+        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            guiGraphics.drawCenteredString(font, Component.translatable("eiv.bookmarks").getString(), Math.max(this.width / 2, font.width(Component.translatable("eiv.bookmarks").getString()) / 2 + 2), 6, -1);
+        else
+            guiGraphics.drawCenteredString(font, Component.translatable("eiv.bookmarks").getString(), Math.max(this.effectiveWidth / 2, font.width(Component.translatable("eiv.bookmarks").getString()) / 2 + 2), 6, -1);
+
         String pageString = (this.getPage() + 1) + "/" + Math.max(((this.availableItems.size() - 1) / this.fittingPerPage() + 1), this.getPage() + 1);
-        guiGraphics.drawCenteredString(font, pageString, Math.max(this.width / 2, font.width(pageString) / 2 + 2), info.screen().height - 2 - 20 - 10, -1);
+
+        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            guiGraphics.drawCenteredString(font, pageString, Math.max(this.width / 2, font.width(pageString) / 2 + 2), this.y + this.height - 2 - 20 - 10, -1);
+        else
+            guiGraphics.drawCenteredString(font, pageString, Math.max(this.effectiveWidth / 2, font.width(pageString) / 2 + 2), this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
+
 
         for (ItemSlot slot : this.itemSlots()) {
             slot.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -128,7 +123,7 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         this.x = 0;
         this.y = 0;
 
-        this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14;
+        this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14 - 2 * ITEM_ENTRY_SIZE;
         this.width = this.width - (this.width - 4) % ITEM_ENTRY_SIZE;
         this.height = screen.height;
 
@@ -138,7 +133,6 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         this.itemEndX = this.x + this.width - 2;
         this.itemEndY = this.y + this.height - FOOTER_HEIGHT;
 
-        this.updateSlots();
     }
 
 }

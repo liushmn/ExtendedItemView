@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -74,7 +75,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
             screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
             screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
         });
-
 
     }
 
@@ -149,11 +149,12 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void injectOverlay$3(double mouseX, double mouseY, int mouseButton, CallbackInfoReturnable<Boolean> cir) {
-        if (OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton))
-            cir.setReturnValue(true);
+    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"))
+    private boolean injectOverlay$3(Screen instance, double mouseX, double mouseY, int mouseButton){
+        return super.mouseClicked(mouseX, mouseY, mouseButton) | OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton);
     }
+
+
 
 
 
