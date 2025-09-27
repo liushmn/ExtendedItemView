@@ -1,7 +1,6 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
-import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,11 @@ public abstract class AbstractEivOverlay {
     private final List<ItemSlot> itemSlots = new ArrayList<>();
 
     protected int x, y, width, height;
-    private boolean enabled;
+
+    //The effective dimensions after respecting all gui blockings
+    protected int effectiveX, effectiveY, effectiveWidth, effectiveHeight;
+    protected OverlayAlignment overlayAlignment;
+    private boolean enabled, enoughSpaceToRender;
 
     protected AbstractEivOverlay(int defaultX, int defaultY, int defaultWidth, int defaultHeight) {
         this.x = defaultX;
@@ -31,7 +33,10 @@ public abstract class AbstractEivOverlay {
         this.width = defaultWidth;
         this.height = defaultHeight;
 
+        this.overlayAlignment = OverlayAlignment.HORIZONTAL;
+
         this.enabled = true;
+        this.enoughSpaceToRender = true;
     }
 
     public int getX() {
@@ -56,6 +61,10 @@ public abstract class AbstractEivOverlay {
 
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    public boolean isEnoughSpaceToRender() {
+        return this.enoughSpaceToRender;
     }
 
     protected boolean keyPressed(int i, int j, int k) {
@@ -90,7 +99,9 @@ public abstract class AbstractEivOverlay {
         return this.itemSlots;
     }
 
-    public abstract void onScreenChanged(InventoryPositionInfo info);
+    public void onScreenChanged(InventoryPositionInfo info) {
+        this.updateEffectiveDimensions(info);
+    }
 
 
     protected void placeWidgets(ScreenContext ctx) {
@@ -98,7 +109,7 @@ public abstract class AbstractEivOverlay {
     }
 
 
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks){
+    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
     }
 
@@ -121,6 +132,68 @@ public abstract class AbstractEivOverlay {
         }
 
         return false;
+    }
+
+
+    public void updateEffectiveDimensions(InventoryPositionInfo info) {
+        this.effectiveX = this.x;
+        this.effectiveY = this.y;
+
+        this.effectiveWidth = this.width;
+        this.effectiveHeight = this.height;
+
+
+        if (OverlayManager.INSTANCE.allGuiBlockings().isEmpty())
+            return;
+
+        List<BlockingGuiComponent> relevantBlockings = OverlayManager.INSTANCE.allGuiBlockings().stream().filter(blockingGuiComponent -> blockingGuiComponent.hasIntersectionWith(this.x, this.y, this.width, this.height)).toList();
+        if (relevantBlockings.isEmpty())
+            return;
+
+        //Calculating blocked square
+
+        int mostLeftBlock = -1;
+        int mostRightBlock = -1;
+        int mostTopBlock = -1;
+        int mostBottomBlock = -1;
+
+        for (BlockingGuiComponent guiBlocking : relevantBlockings) {
+
+            if (guiBlocking.x() < mostLeftBlock || mostLeftBlock < 0)
+                mostLeftBlock = guiBlocking.x();
+
+            if (guiBlocking.x() + guiBlocking.width() > mostRightBlock || mostRightBlock < 0)
+                mostRightBlock = guiBlocking.x() + guiBlocking.width();
+
+            if (guiBlocking.y() < mostTopBlock || mostTopBlock < 0)
+                mostTopBlock = guiBlocking.y();
+
+            if (guiBlocking.y() + guiBlocking.height() > mostBottomBlock || mostBottomBlock < 0)
+                mostBottomBlock = guiBlocking.y() + guiBlocking.height();
+
+        }
+
+        if (this.overlayAlignment == OverlayAlignment.HORIZONTAL) {
+
+            if (this.x <= info.screenWidth() / 2)
+                this.effectiveWidth = mostLeftBlock - this.x;
+            else {
+                this.effectiveX = mostRightBlock;
+                this.effectiveWidth = (this.x + this.width) - this.effectiveX;
+            }
+
+        }
+
+        if (this.overlayAlignment == OverlayAlignment.VERTICAL) {
+            if (this.y <= info.screenHeight() / 2)
+                this.effectiveHeight = mostTopBlock - this.y;
+            else {
+                this.effectiveY = mostBottomBlock;
+                this.effectiveHeight = (this.y + this.height) - this.effectiveY;
+            }
+        }
+
+        this.enoughSpaceToRender = !(this.effectiveX < 0 || this.effectiveY < 0 || this.effectiveWidth <= 0 || this.effectiveHeight <= 0);
     }
 
     protected interface BlockingPredicate {
@@ -167,6 +240,7 @@ public abstract class AbstractEivOverlay {
                 this.nonRenderables.add(nonRenderable);
         }
 
+
         public List<GuiEventListener> renderables() {
             return this.renderables;
         }
@@ -175,5 +249,10 @@ public abstract class AbstractEivOverlay {
             return this.nonRenderables;
         }
 
+    }
+
+
+    public enum OverlayAlignment {
+        HORIZONTAL, VERTICAL;
     }
 }

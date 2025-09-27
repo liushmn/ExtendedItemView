@@ -1,9 +1,11 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.resources.ResourceLocation;
 
@@ -49,6 +51,10 @@ public class OverlayManager {
         return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().anyMatch(GuiEventListener::isFocused) || screenContext.nonRenderables().stream().anyMatch(GuiEventListener::isFocused));
     }
 
+    public boolean isOverlayWidgetHovered(double mouseX, double mouseY) {
+        return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().anyMatch(eventListener -> eventListener.isMouseOver(mouseX, mouseY)) || screenContext.nonRenderables().stream().anyMatch(eventListener -> eventListener.isMouseOver(mouseX, mouseY)));
+    }
+
     public HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> screenContextMap() {
         return this.screenContextMap;
     }
@@ -62,7 +68,7 @@ public class OverlayManager {
         }
 
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if (!overlay.isEnabled())
+            if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
             if (overlay.keyPressed(i, j, k))
@@ -76,7 +82,7 @@ public class OverlayManager {
         boolean b = false;
 
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if (!overlay.isEnabled())
+            if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
             if (overlay.charTyped(c, i))
@@ -96,8 +102,9 @@ public class OverlayManager {
             });
         });
 
+
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if (!overlay.isEnabled())
+            if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
             if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
@@ -113,7 +120,7 @@ public class OverlayManager {
     public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
         boolean b = false;
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
-            if (!overlay.isEnabled())
+            if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
             if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
@@ -128,11 +135,12 @@ public class OverlayManager {
 
 
     public void renderAllBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).forEach(overlay -> overlay.renderBackground(guiGraphics, mouseX, mouseY, partialTicks));
+        if(Configs.CLIENT_SETTINGS.drawBackground())
+            PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.renderBackground(guiGraphics, mouseX, mouseY, partialTicks));
     }
 
     public void renderAll(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).forEach(overlay -> overlay.render(guiGraphics, mouseX, mouseY, partialTicks));
+        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.render(guiGraphics, mouseX, mouseY, partialTicks));
 
         if (Minecraft.getInstance().gui.getDebugOverlay().showDebugScreen())
             this.renderDebug(guiGraphics, mouseX, mouseY, partialTicks);
@@ -160,15 +168,22 @@ public class OverlayManager {
     public void removeGuiBlocking(ResourceLocation id, boolean updateSlots) {
         this.guiBlockings.removeIf(blockingGuiComponent -> blockingGuiComponent.id().equals(id));
 
-        if(updateSlots)
+        if (updateSlots){
+            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
             PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+        }
+
+
     }
 
-    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateSlots){
+    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateSlots) {
         this.guiBlockings.removeIf(blockingGuiComponent -> filter.test(blockingGuiComponent.id()));
 
-        if(updateSlots)
+        if (updateSlots){
+            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
             PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+        }
+
     }
 
     public void setGuiBlocking(BlockingGuiComponent comp) {
@@ -176,12 +191,15 @@ public class OverlayManager {
         this.removeGuiBlocking(comp.id(), false);
         this.guiBlockings.add(comp);
 
-        if (!old.equals(this.guiBlockings))
+        if (!new HashSet<>(old).containsAll(this.guiBlockings) && old.size() == this.guiBlockings.size()){
+            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
             this.updateAllSlots();
+        }
+
 
     }
 
-    private void updateAllSlots(){
+    private void updateAllSlots() {
         PRESENT_OVERLAYS.stream()
                 .filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay)
                 .map(abstractEivOverlay -> (AbstractEivItemListOverlay) abstractEivOverlay)
@@ -198,5 +216,6 @@ public class OverlayManager {
     public static void registerOverlay(AbstractEivOverlay overlay) {
         PRESENT_OVERLAYS.add(overlay);
     }
+
 
 }

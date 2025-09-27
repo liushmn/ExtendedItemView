@@ -68,10 +68,12 @@ public class CommonEIVClient {
 
 
     public static void loadConfigs() {
+        Configs.CLIENT_SETTINGS.load();
         Configs.BOOKMARKS.load();
     }
 
     public static void saveConfigs() {
+        Configs.CLIENT_SETTINGS.save();
         Configs.BOOKMARKS.save();
     }
 

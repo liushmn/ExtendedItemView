@@ -23,4 +23,13 @@ public record BlockingGuiComponent(ResourceLocation id, int x, int y, int width,
         return rect.intersects(compared);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof BlockingGuiComponent(ResourceLocation id1, int x1, int y1, int width1, int height1) &&
+                id1.equals(this.id)
+                && x1 == this.x
+                && y1 == this.y
+                && width1 == this.width
+                && height1 == this.height;
+    }
 }
