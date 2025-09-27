@@ -16,11 +16,6 @@ public class BookmarkConfig extends AbstractEivConfig {
     }
 
     @Override
-    public void setDefaults() {
-        this.data().add("bookmarkedItems", new JsonArray());
-    }
-
-    @Override
     protected void loadData() {
         ItemBookmarkOverlay.INSTANCE.availableItems().clear();
 

@@ -1,9 +1,13 @@
 package de.crafty.eiv.common.overlay.itemlist.view;
 
+import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
+import de.crafty.eiv.common.config.Configs;
+import de.crafty.eiv.common.gui.EivClientSettingsScreen;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
+import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
@@ -16,20 +20,26 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     public static final ItemViewOverlay INSTANCE = new ItemViewOverlay();
+    private static final ResourceLocation SETTINGS_WHEEL = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "settings_wheel");
 
     private EditBox searchbar = null;
 
@@ -64,6 +74,8 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     @Override
     public void onScreenChanged(InventoryPositionInfo info) {
         this.initForScreen(info.screen(), info);
+        super.onScreenChanged(info);
+        this.updateQuery(this.getCurrentQuery());
         this.createSearchbarElement(OverlayManager.INSTANCE.currentInfo());
     }
 
@@ -72,16 +84,34 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     protected void placeWidgets(ScreenContext ctx) {
 
         ctx.addRenderable(this.searchbar);
+
+        InventoryPositionInfo info = OverlayManager.INSTANCE.currentInfo();
+
+
+        //---- Client Settings Button ----
+        SpriteIconButton btn = SpriteIconButton.builder(
+                        Component.translatable("eiv.client_settings.btn"),
+                        button -> Minecraft.getInstance().setScreen(new EivClientSettingsScreen(info.screen())),
+                        true
+                )
+                .size(18, 18)
+                .sprite(SETTINGS_WHEEL, 14, 14)
+                .build();
+
+        btn.setPosition(0, info.screenHeight() - 18);
+
+        ctx.addRenderable(btn);
     }
 
     private void initForScreen(AbstractContainerScreen<? extends AbstractContainerMenu> screen, InventoryPositionInfo invInfo) {
 
         //-14 for cleaner appearance
-        this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14;
-        this.width = this.width - (this.width - 4) % ITEM_ENTRY_SIZE;
+        this.width = invInfo.screenWidth() - ((invInfo.screenWidth() - 176) / 2 + 176) - 14;
+        this.width -= (this.width - 4) % ITEM_ENTRY_SIZE;
+
         this.height = screen.height;
 
-        this.x = screen.width - this.width;
+        this.x = invInfo.screenWidth() - this.width;
         this.y = 0;
 
         this.itemStartX = this.x + 2;
@@ -89,8 +119,6 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
         this.itemEndX = this.x + this.width - 2;
         this.itemEndY = this.y + this.height - FOOTER_HEIGHT;
-
-        this.updateQuery(this.getCurrentQuery());
     }
 
 
@@ -163,24 +191,34 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     @Override
     protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        guiGraphics.fill(this.x, 0, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
+        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
+        else
+            guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveX + this.effectiveWidth, this.effectiveY + this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
     }
 
     @Override
     protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
         Minecraft client = Minecraft.getInstance();
-        InventoryPositionInfo invInfo = OverlayManager.INSTANCE.currentInfo();
-
-
         Font font = client.font;
 
 
-        guiGraphics.drawCenteredString(font, "ItemView", invInfo.screen().width - this.getWidth() / 2, 6, -1);
+        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            guiGraphics.drawCenteredString(font, "ItemView", this.x + this.width / 2, this.y + 6, -1);
+        else
+            guiGraphics.drawCenteredString(font, "ItemView", this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
+
 
         if (this.fittingPerPage() > 0) {
             int maxPageIndex = (this.availableItems().size() / (this.fittingPerPage()));
-            guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.x + this.width - this.width / 2, invInfo.screen().height - 2 - 20 - 10, -1);
+            if(this.startIndex % this.fittingPerPage() != 0 && this.startIndex % this.fittingPerPage() < this.availableItems().size() % this.fittingPerPage())
+                maxPageIndex++;
+
+            if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
+            else
+                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
         }
 
 
@@ -201,6 +239,9 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
         screen.getMenu().slots.forEach(slot -> {
 
+            if(!slot.isActive())
+                return;
+
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
             if (!slot.hasItem() || this.availableItems.stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
@@ -213,9 +254,11 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     public void createSearchbarElement(InventoryPositionInfo info) {
-        int boxWidth = Math.min(100, info.screenWidth() - this.x - 4);
+        boolean wrapMode = Configs.CLIENT_SETTINGS.isItemWrapMode();
 
-        int x = info.screenWidth() - this.getWidth() / 2 - boxWidth / 2;
+        int boxWidth = Math.min(100, (wrapMode ? this.width : this.effectiveWidth) - 4);
+
+        int x = wrapMode ? (this.x + this.width / 2 - boxWidth / 2) : (this.effectiveX + this.effectiveWidth / 2 - boxWidth / 2);
         int y = info.screenHeight() - 22;
 
         if (this.searchbar != null && boxWidth == this.searchbar.getWidth() && x == this.searchbar.getX() && y == this.searchbar.getY())
@@ -270,7 +313,6 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     public String getCurrentQuery() {
         return this.currentQuery;
     }
-
 
 
     public enum ItemViewOpenType {

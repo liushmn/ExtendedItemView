@@ -37,5 +37,13 @@
   "key.categories.eiv_admin": "Extended ItemView - Admin",
   "key.eiv.cheatmode": "Use Cheatmode",
 
-  "cheatmode.eiv.denied": "You do not have permission to use the cheatmode"
+  "cheatmode.eiv.denied": "You do not have permission to use the cheatmode",
+  "eiv.client_settings.title": "Client Settings",
+  "eiv.client_settings.btn": "Client Settings",
+  "eiv.client_settings.background": "Background",
+  "eiv.client_settings.background.enabled": "Draw",
+  "eiv.client_settings.background.disabled": "Hide",
+  "eiv.client_settings.resize_mode": "Resize Mode",
+  "eiv.client_settings.resize_mode.wrap": "Wrap",
+  "eiv.client_settings.resize_mode.cut": "Cut"
 }
