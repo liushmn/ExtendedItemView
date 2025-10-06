@@ -1,30 +1,18 @@
 package de.crafty.eiv.common.overlay.itemlist.bookmark;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.config.Configs;
-import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
-import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
-import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
@@ -35,7 +23,7 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
 
     private ItemBookmarkOverlay() {
-        super (-1, -1, -1, -1);
+        super(-1, -1, -1, -1);
     }
 
 
@@ -57,10 +45,10 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
     @Override
     protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 
-        if(this.itemSlots().isEmpty())
+        if (this.itemSlots().isEmpty())
             return;
 
-        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+        if (Configs.CLIENT_SETTINGS.isItemWrapMode())
             guiGraphics.fill(this.x, this.y, this.width, this.height, new Color(0, 0, 0, 64).getRGB());
         else
             guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveWidth, this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
@@ -76,17 +64,18 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
         Font font = client.font;
 
-        if(this.fittingPerPage() <= 0)
+        if (this.fittingPerPage() <= 0)
             return;
 
-        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
-            guiGraphics.drawCenteredString(font, Component.translatable("eiv.bookmarks").getString(), Math.max(this.width / 2, font.width(Component.translatable("eiv.bookmarks").getString()) / 2 + 2), 6, -1);
+        if (Configs.CLIENT_SETTINGS.isItemWrapMode())
+            this.drawScaledString(font, guiGraphics, Component.translatable("eiv.bookmarks"), this.x + this.width / 2, 6, -1);
         else
-            guiGraphics.drawCenteredString(font, Component.translatable("eiv.bookmarks").getString(), Math.max(this.effectiveWidth / 2, font.width(Component.translatable("eiv.bookmarks").getString()) / 2 + 2), 6, -1);
+            this.drawScaledString(font, guiGraphics, Component.translatable("eiv.bookmarks"), this.effectiveX + this.effectiveWidth / 2, 6, -1);
 
-        String pageString = (this.getPage() + 1) + "/" + Math.max(((this.availableItems.size() - 1) / this.fittingPerPage() + 1), this.getPage() + 1);
 
-        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+        String pageString = (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1);
+
+        if (Configs.CLIENT_SETTINGS.isItemWrapMode())
             guiGraphics.drawCenteredString(font, pageString, Math.max(this.width / 2, font.width(pageString) / 2 + 2), this.y + this.height - 2 - 20 - 10, -1);
         else
             guiGraphics.drawCenteredString(font, pageString, Math.max(this.effectiveWidth / 2, font.width(pageString) / 2 + 2), this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
@@ -96,6 +85,8 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
             slot.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
     }
+
+
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -108,6 +99,10 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
             if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j)) {
                 this.availableItems.remove(slot.getStack());
                 this.updateSlots();
+                if (this.itemSlots().isEmpty() && !this.availableItems.isEmpty()) {
+                    this.startIndex = Math.max(0, this.startIndex - this.fittingPerPage());
+                    this.updateSlots();
+                }
                 return true;
             }
 
@@ -124,7 +119,7 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
         this.y = 0;
 
         this.width = screen.width - ((screen.width - 176) / 2 + 176) - 14 - 2 * ITEM_ENTRY_SIZE;
-        this.width = this.width - (this.width - 4) % ITEM_ENTRY_SIZE;
+        this.width -= (this.width - 4) % ITEM_ENTRY_SIZE;
         this.height = screen.height;
 
         this.itemStartX = 2;

@@ -22,6 +22,7 @@ import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -61,26 +62,25 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Inject(method = "init", at = @At("TAIL"))
     private void injectOverlay$0(CallbackInfo ci) {
+        System.out.println("Overlay init");
 
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
-        OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
-            screenContext.renderables().forEach(this::removeWidget);
-            screenContext.nonRenderables().forEach(this::removeWidget);
-        });
+        OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
+                ResourceLocation.withDefaultNamespace("container"),
+                info.leftPos(),
+                info.topPos(),
+                info.imageWidth(),
+                info.imageHeight()
+        ));
 
-        OverlayManager.INSTANCE.checkForScreenChange(info);
-
-        OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
-            screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
-            screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
-        });
+        this.performUpdateCheck(info, true);
 
     }
 
 
     @Inject(method = "renderBackground", at = @At("HEAD"))
-    private void injectOverlayBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci){
+    private void injectOverlayBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         OverlayManager.INSTANCE.renderAllBackground(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
@@ -98,20 +98,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
                 info.imageHeight()
         ));
 
-        HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> old = new HashMap<>(OverlayManager.INSTANCE.screenContextMap());
-
-        if (OverlayManager.INSTANCE.checkForScreenChange(info)) {
-            old.forEach((abstractEivOverlay, screenContext) -> {
-                screenContext.renderables().forEach(this::removeWidget);
-                screenContext.nonRenderables().forEach(this::removeWidget);
-            });
-
-            OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
-                screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
-                screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
-            });
-        }
-
+        this.performUpdateCheck(info, false);
 
         OverlayManager.INSTANCE.renderAll(guiGraphics, mouseX, mouseY, partialTicks);
 
@@ -150,13 +137,9 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"))
-    private boolean injectOverlay$3(Screen instance, double mouseX, double mouseY, int mouseButton){
+    private boolean injectOverlay$3(Screen instance, double mouseX, double mouseY, int mouseButton) {
         return super.mouseClicked(mouseX, mouseY, mouseButton) | OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton);
     }
-
-
-
-
 
 
     //Optional Slots
@@ -171,5 +154,28 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
+    }
+
+
+    @Unique
+    private void performUpdateCheck(AbstractEivOverlay.InventoryPositionInfo info, boolean forceUpdate) {
+        HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> old = new HashMap<>(OverlayManager.INSTANCE.screenContextMap());
+
+        if (OverlayManager.INSTANCE.checkForScreenChange(info, forceUpdate)) {
+
+            old.forEach((abstractEivOverlay, screenContext) -> {
+                screenContext.renderables().forEach(this::removeWidget);
+                screenContext.nonRenderables().forEach(this::removeWidget);
+            });
+
+            OverlayManager.INSTANCE.onScreenChanged();
+
+            OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
+                screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
+                screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
+            });
+
+
+        }
     }
 }

@@ -3,10 +3,10 @@ package de.crafty.eiv.common.overlay.itemlist;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
-import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.ItemSlot;
-import de.crafty.eiv.common.overlay.OverlayManager;
-import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -34,6 +34,13 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
         this.availableItems = new ArrayList<>();
     }
 
+    @Override
+    public void updateEffectiveDimensions(InventoryPositionInfo info) {
+        super.updateEffectiveDimensions(info);
+
+        this.effectiveWidth -= (this.effectiveWidth - 4) % ITEM_ENTRY_SIZE;
+        this.effectiveX = this.effectiveX <= info.screenWidth() / 2 ? this.effectiveX : info.screenWidth() - this.effectiveWidth;
+    }
 
     @Override
     protected boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
@@ -53,7 +60,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
         if (fittingPerPage == 0)
             return true;
 
-        if (scrolledY < 0 && this.startIndex + fittingPerPage - 1 < this.availableItems().size())
+        if (scrolledY < 0 && this.startIndex + fittingPerPage < this.availableItems().size())
             this.startIndex = this.startIndex + fittingPerPage;
 
         if (scrolledY > 0)
@@ -83,6 +90,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
      * Responsible for adding the item entries to the overlay
      */
     public void updateSlots() {
+        System.out.println("Called");
         this.itemSlots().clear();
 
         int currentStackPos = this.startIndex;
@@ -121,6 +129,19 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
         return this.fittingPerPage;
     }
 
+
+    protected void drawScaledString(Font font, GuiGraphics guiGraphics, Component comp, int x, int y, int color) {
+
+        float scaleFactor = Math.min(1.0F, 1.0F / (font.width(comp) / ((Configs.CLIENT_SETTINGS.isItemWrapMode() ? this.width : this.effectiveWidth) - 4.0F)));
+
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(x, y);
+        guiGraphics.pose().scale(scaleFactor, scaleFactor);
+        guiGraphics.drawCenteredString(font, comp, 0, 0, color);
+        guiGraphics.pose().popMatrix();
+
+    }
+
     protected int getPage() {
         int fittingPerPage = this.fittingPerPage();
 
@@ -129,6 +150,14 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
             page++;
 
         return page;
+    }
+
+    protected int getMaxPageIndex() {
+        int maxPageIndex = ((this.availableItems().size() - 1) / (this.fittingPerPage()));
+        if (this.startIndex % this.fittingPerPage() != 0 && this.startIndex % this.fittingPerPage() < this.availableItems().size() % this.fittingPerPage())
+            maxPageIndex++;
+
+        return maxPageIndex;
     }
 
     public List<ItemStack> availableItems() {

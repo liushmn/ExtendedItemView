@@ -6,8 +6,6 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.gui.EivClientSettingsScreen;
-import de.crafty.eiv.common.overlay.AbstractEivOverlay;
-import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
@@ -20,9 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.SpriteIconButton;
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
@@ -34,7 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
@@ -205,20 +200,18 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
         if(Configs.CLIENT_SETTINGS.isItemWrapMode())
-            guiGraphics.drawCenteredString(font, "ItemView", this.x + this.width / 2, this.y + 6, -1);
+            this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.x + this.width / 2, this.y + 6, -1);
         else
-            guiGraphics.drawCenteredString(font, "ItemView", this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
+            this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
 
 
         if (this.fittingPerPage() > 0) {
-            int maxPageIndex = (this.availableItems().size() / (this.fittingPerPage()));
-            if(this.startIndex % this.fittingPerPage() != 0 && this.startIndex % this.fittingPerPage() < this.availableItems().size() % this.fittingPerPage())
-                maxPageIndex++;
+
 
             if(Configs.CLIENT_SETTINGS.isItemWrapMode())
-                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
+                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
             else
-                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (maxPageIndex + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
+                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
         }
 
 
@@ -255,7 +248,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     public void createSearchbarElement(InventoryPositionInfo info) {
         boolean wrapMode = Configs.CLIENT_SETTINGS.isItemWrapMode();
-
+        System.out.println("I should create???");
         int boxWidth = Math.min(100, (wrapMode ? this.width : this.effectiveWidth) - 4);
 
         int x = wrapMode ? (this.x + this.width / 2 - boxWidth / 2) : (this.effectiveX + this.effectiveWidth / 2 - boxWidth / 2);
