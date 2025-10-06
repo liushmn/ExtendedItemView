@@ -25,11 +25,6 @@ public abstract class MixinRecipeBookComponent {
     @Shadow
     protected abstract int getYOrigin();
 
-    @Shadow
-    private int width;
-
-    @Shadow
-    private int height;
 
     @Shadow
     private boolean visible;

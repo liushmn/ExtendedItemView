@@ -24,23 +24,28 @@ public class OverlayManager {
 
     private final List<BlockingGuiComponent> guiBlockings = new ArrayList<>();
 
-    public boolean checkForScreenChange(AbstractEivOverlay.InventoryPositionInfo newInfo) {
-        if (!newInfo.matches(this.currentInvInfo)) {
-            this.currentInvInfo = newInfo;
-
-            PRESENT_OVERLAYS.forEach(overlay -> overlay.onScreenChanged(newInfo));
-
-            PRESENT_OVERLAYS.forEach(present -> {
-                AbstractEivOverlay.ScreenContext screenContext = new AbstractEivOverlay.ScreenContext();
-                present.placeWidgets(screenContext);
-                screenContextMap.put(present, screenContext);
-            });
+    public void setCurrentInvInfo(AbstractEivOverlay.InventoryPositionInfo info) {
+        this.currentInvInfo = info;
+    }
 
 
+    public boolean checkForScreenChange(AbstractEivOverlay.InventoryPositionInfo newInfo, boolean forceUpdate) {
+        if (newInfo != null && (!newInfo.matches(this.currentInvInfo) || forceUpdate)) {
+            this.setCurrentInvInfo(newInfo);
             return true;
         }
 
         return false;
+    }
+
+    public void onScreenChanged() {
+        PRESENT_OVERLAYS.forEach(overlay -> overlay.onScreenChanged(this.currentInfo()));
+
+        PRESENT_OVERLAYS.forEach(present -> {
+            AbstractEivOverlay.ScreenContext screenContext = new AbstractEivOverlay.ScreenContext();
+            present.placeWidgets(screenContext);
+            this.screenContextMap.put(present, screenContext);
+        });
     }
 
     public AbstractEivOverlay.InventoryPositionInfo currentInfo() {
@@ -135,7 +140,7 @@ public class OverlayManager {
 
 
     public void renderAllBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        if(Configs.CLIENT_SETTINGS.drawBackground())
+        if (Configs.CLIENT_SETTINGS.drawBackground())
             PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.renderBackground(guiGraphics, mouseX, mouseY, partialTicks));
     }
 
@@ -165,23 +170,20 @@ public class OverlayManager {
     }
 
 
-    public void removeGuiBlocking(ResourceLocation id, boolean updateSlots) {
+    public void removeGuiBlocking(ResourceLocation id, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> blockingGuiComponent.id().equals(id));
 
-        if (updateSlots){
-            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
-            PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+        if (updateOverlays && this.checkForScreenChange(this.currentInfo(), true)){
+            this.onScreenChanged();
         }
-
 
     }
 
-    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateSlots) {
+    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> filter.test(blockingGuiComponent.id()));
 
-        if (updateSlots){
-            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
-            PRESENT_OVERLAYS.stream().filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay).forEach(abstractEivOverlay -> ((AbstractEivItemListOverlay) abstractEivOverlay).updateSlots());
+        if (updateOverlays && this.checkForScreenChange(this.currentInfo(), true)){
+            this.onScreenChanged();
         }
 
     }
@@ -191,20 +193,13 @@ public class OverlayManager {
         this.removeGuiBlocking(comp.id(), false);
         this.guiBlockings.add(comp);
 
-        if (!new HashSet<>(old).containsAll(this.guiBlockings) && old.size() == this.guiBlockings.size()){
-            PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.updateEffectiveDimensions(this.currentInfo()));
-            this.updateAllSlots();
+        if (!(new HashSet<>(old).containsAll(this.guiBlockings) && old.size() == this.guiBlockings.size()) && this.checkForScreenChange(this.currentInfo(), true)){
+            this.onScreenChanged();
         }
 
 
     }
 
-    private void updateAllSlots() {
-        PRESENT_OVERLAYS.stream()
-                .filter(abstractEivOverlay -> abstractEivOverlay instanceof AbstractEivItemListOverlay)
-                .map(abstractEivOverlay -> (AbstractEivItemListOverlay) abstractEivOverlay)
-                .forEach(AbstractEivItemListOverlay::updateSlots);
-    }
 
     public List<BlockingGuiComponent> allGuiBlockings() {
         return this.guiBlockings;
