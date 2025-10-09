@@ -1,6 +1,7 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.accessor.IAbstractContainerScreenAccessor;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
@@ -8,11 +9,13 @@ import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
@@ -28,8 +31,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.HashMap;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen implements MenuAccess<T> {
@@ -62,7 +63,10 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Inject(method = "init", at = @At("TAIL"))
     private void injectOverlay$0(CallbackInfo ci) {
-        System.out.println("Overlay init");
+
+        //In recipe book screens we initalize after the recipe button init
+        if ((Object) this instanceof AbstractRecipeBookScreen)
+            return;
 
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
@@ -74,7 +78,9 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
                 info.imageHeight()
         ));
 
-        this.performUpdateCheck(info, true);
+        OverlayManager.INSTANCE.checkForScreenChange(info);
+        OverlayManager.INSTANCE.updateOverlaysAndWidgets();
+        this.updateWidgets();
 
     }
 
@@ -98,7 +104,13 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
                 info.imageHeight()
         ));
 
-        this.performUpdateCheck(info, false);
+        if (OverlayManager.INSTANCE.checkForScreenChange(info))
+            OverlayManager.INSTANCE.updateOverlaysAndWidgets();
+
+        if (OverlayManager.INSTANCE.hasQueuedWidgetUpdate())
+            this.updateWidgets();
+
+
 
         OverlayManager.INSTANCE.renderAll(guiGraphics, mouseX, mouseY, partialTicks);
 
@@ -115,7 +127,11 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$3(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
 
-        if (OverlayManager.INSTANCE.isOverlayWidgetFocused())
+        if(OverlayManager.INSTANCE.isWidgetFocused())
+            cir.setReturnValue(super.keyPressed(i, j, k));
+
+
+        if (this.getFocused() != null && this.getFocused().isFocused() && this.getFocused() instanceof EditBox)
             return;
 
         if (!((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this instanceof CreativeModeInventoryScreen) && OverlayManager.INSTANCE.keyPressed(i, j, k))
@@ -158,24 +174,16 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
 
     @Unique
-    private void performUpdateCheck(AbstractEivOverlay.InventoryPositionInfo info, boolean forceUpdate) {
-        HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> old = new HashMap<>(OverlayManager.INSTANCE.screenContextMap());
+    private void updateWidgets() {
+        OverlayManager.INSTANCE.oldWidgets().forEach((this::removeWidget));
+        OverlayManager.INSTANCE.oldWidgets().clear();
 
-        if (OverlayManager.INSTANCE.checkForScreenChange(info, forceUpdate)) {
+        OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
+            screenContext.renderables().forEach(eventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) eventListener));
+            screenContext.nonRenderables().forEach(eventListener -> this.addWidget((GuiEventListener & NarratableEntry) eventListener));
+        });
 
-            old.forEach((abstractEivOverlay, screenContext) -> {
-                screenContext.renderables().forEach(this::removeWidget);
-                screenContext.nonRenderables().forEach(this::removeWidget);
-            });
+        OverlayManager.INSTANCE.setQueuedWidgetUpdate(false);
 
-            OverlayManager.INSTANCE.onScreenChanged();
-
-            OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
-                screenContext.renderables().forEach(guiEventListener -> this.addRenderableWidget((GuiEventListener & Renderable & NarratableEntry) guiEventListener));
-                screenContext.nonRenderables().forEach(guiEventListener -> this.addWidget((GuiEventListener & NarratableEntry) guiEventListener));
-            });
-
-
-        }
     }
 }
