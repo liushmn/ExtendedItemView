@@ -12,6 +12,6 @@
   "client": [
     "KeyMappingAccessor",
     "client.MixinKeyMapping",
-    "client.gui.screens.inventory.MixinAbstractContainerScreen"
+    "client.render.MixinGuiRenderer"
   ]
 }

@@ -1,12 +1,14 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.accessor.IAbstractContainerScreenAccessor;
 import de.crafty.eiv.common.config.Configs;
-import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -20,17 +22,29 @@ public class OverlayManager {
 
 
     private AbstractEivOverlay.InventoryPositionInfo currentInvInfo = null;
+
+    private final List<GuiEventListener> oldWidgets = new ArrayList<>();
     private final HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> screenContextMap = new HashMap<>();
+    private boolean queuedWidgetUpdate = false;
 
     private final List<BlockingGuiComponent> guiBlockings = new ArrayList<>();
+
+
+    public boolean hasQueuedWidgetUpdate() {
+        return this.queuedWidgetUpdate;
+    }
+
+    public void setQueuedWidgetUpdate(boolean queuedWidgetUpdate) {
+        this.queuedWidgetUpdate = queuedWidgetUpdate;
+    }
 
     public void setCurrentInvInfo(AbstractEivOverlay.InventoryPositionInfo info) {
         this.currentInvInfo = info;
     }
 
 
-    public boolean checkForScreenChange(AbstractEivOverlay.InventoryPositionInfo newInfo, boolean forceUpdate) {
-        if (newInfo != null && (!newInfo.matches(this.currentInvInfo) || forceUpdate)) {
+    public boolean checkForScreenChange(AbstractEivOverlay.InventoryPositionInfo newInfo) {
+        if (newInfo != null && (!newInfo.matches(this.currentInvInfo))) {
             this.setCurrentInvInfo(newInfo);
             return true;
         }
@@ -38,6 +52,7 @@ public class OverlayManager {
         return false;
     }
 
+    //Update all overlays and collect widgets
     public void onScreenChanged() {
         PRESENT_OVERLAYS.forEach(overlay -> overlay.onScreenChanged(this.currentInfo()));
 
@@ -46,22 +61,45 @@ public class OverlayManager {
             present.placeWidgets(screenContext);
             this.screenContextMap.put(present, screenContext);
         });
+
+    }
+
+    //Update widget lists
+    public void updateOverlaysAndWidgets() {
+        if (this.currentInfo() == null)
+            return;
+
+        this.screenContextMap.forEach((overlay, screenContext) -> {
+            screenContext.renderables().stream().filter(guiEventListener -> !oldWidgets.contains(guiEventListener)).forEach(this.oldWidgets::add);
+            screenContext.nonRenderables().stream().filter(guiEventListener -> !oldWidgets.contains(guiEventListener)).forEach(this.oldWidgets::add);
+        });
+
+        this.screenContextMap.clear();
+        OverlayManager.INSTANCE.onScreenChanged();
+
+        this.setQueuedWidgetUpdate(true);
+
     }
 
     public AbstractEivOverlay.InventoryPositionInfo currentInfo() {
         return this.currentInvInfo;
     }
 
-    public boolean isOverlayWidgetFocused() {
-        return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().anyMatch(GuiEventListener::isFocused) || screenContext.nonRenderables().stream().anyMatch(GuiEventListener::isFocused));
+    //Returns whether an editbox overlay widget is focused
+    public boolean isWidgetFocused() {
+        return this.currentInvInfo.screen().getFocused() != null && this.currentInvInfo.screen().getFocused().isFocused() && this.currentInvInfo.screen().getFocused() instanceof EditBox
+                && (this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().contains(this.currentInvInfo.screen().getFocused()))
+                || this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.nonRenderables().contains(this.currentInvInfo.screen().getFocused())));
     }
 
-    public boolean isOverlayWidgetHovered(double mouseX, double mouseY) {
-        return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().anyMatch(eventListener -> eventListener.isMouseOver(mouseX, mouseY)) || screenContext.nonRenderables().stream().anyMatch(eventListener -> eventListener.isMouseOver(mouseX, mouseY)));
-    }
 
     public HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> screenContextMap() {
         return this.screenContextMap;
+    }
+
+    //Returns the list of old widgets that should be removed on the next widget update
+    public List<GuiEventListener> oldWidgets() {
+        return this.oldWidgets;
     }
 
     public boolean keyPressed(int i, int j, int k) {
@@ -173,8 +211,8 @@ public class OverlayManager {
     public void removeGuiBlocking(ResourceLocation id, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> blockingGuiComponent.id().equals(id));
 
-        if (updateOverlays && this.checkForScreenChange(this.currentInfo(), true)){
-            this.onScreenChanged();
+        if (updateOverlays) {
+            this.updateOverlaysAndWidgets();
         }
 
     }
@@ -182,8 +220,8 @@ public class OverlayManager {
     public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> filter.test(blockingGuiComponent.id()));
 
-        if (updateOverlays && this.checkForScreenChange(this.currentInfo(), true)){
-            this.onScreenChanged();
+        if (updateOverlays) {
+            this.updateOverlaysAndWidgets();
         }
 
     }
@@ -193,8 +231,8 @@ public class OverlayManager {
         this.removeGuiBlocking(comp.id(), false);
         this.guiBlockings.add(comp);
 
-        if (!(new HashSet<>(old).containsAll(this.guiBlockings) && old.size() == this.guiBlockings.size()) && this.checkForScreenChange(this.currentInfo(), true)){
-            this.onScreenChanged();
+        if (!(new HashSet<>(old).containsAll(this.guiBlockings) && old.size() == this.guiBlockings.size())) {
+            this.updateOverlaysAndWidgets();
         }
 
 

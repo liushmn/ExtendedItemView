@@ -20,7 +20,7 @@ public class FabricEivResolver implements IEivClientResolver {
     public String getModNameForItem(Item item) {
         Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(BuiltInRegistries.ITEM.getKey(item).getNamespace());
 
-        return optional.map(modContainer -> modContainer.getMetadata().getName()).orElse(null);
+        return optional.map(modContainer -> modContainer.getMetadata().getName()).orElse("???");
     }
 
 

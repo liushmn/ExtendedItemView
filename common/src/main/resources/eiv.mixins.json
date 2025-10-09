@@ -39,6 +39,7 @@
     "client.gui.components.MixinEditBox",
     "client.gui.screens.MixinScreen",
     "client.gui.screens.inventory.MixinAbstractContainerScreen",
+    "client.gui.screens.inventory.MixinAbstractRecipeBookScreen",
     "client.gui.screens.inventory.MixinCreativeModeInventoryScreen",
     "client.gui.screens.inventory.MixinEffectsInInventory",
     "client.gui.screens.recipebook.MixinRecipeBookComponent",
