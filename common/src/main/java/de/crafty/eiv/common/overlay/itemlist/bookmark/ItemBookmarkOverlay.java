@@ -44,6 +44,8 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
     @Override
     protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        if(this.fittingPerPage() == 0)
+            return;
 
         if (this.itemSlots().isEmpty())
             return;

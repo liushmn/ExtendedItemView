@@ -186,7 +186,10 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     @Override
     protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+        if (this.fittingPerPage() == 0)
+            return;
+
+        if (Configs.CLIENT_SETTINGS.isItemWrapMode())
             guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
         else
             guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveX + this.effectiveWidth, this.effectiveY + this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
@@ -199,7 +202,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
         Font font = client.font;
 
 
-        if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+        if (Configs.CLIENT_SETTINGS.isItemWrapMode())
             this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.x + this.width / 2, this.y + 6, -1);
         else
             this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
@@ -208,7 +211,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
         if (this.fittingPerPage() > 0) {
 
 
-            if(Configs.CLIENT_SETTINGS.isItemWrapMode())
+            if (Configs.CLIENT_SETTINGS.isItemWrapMode())
                 guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
             else
                 guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
@@ -232,7 +235,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
         screen.getMenu().slots.forEach(slot -> {
 
-            if(!slot.isActive())
+            if (!slot.isActive() || !slot.isHighlightable())
                 return;
 
             guiGraphics.pose().pushPose();
@@ -248,22 +251,25 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     public void createSearchbarElement(InventoryPositionInfo info) {
         boolean wrapMode = Configs.CLIENT_SETTINGS.isItemWrapMode();
-        System.out.println("I should create???");
         int boxWidth = Math.min(100, (wrapMode ? this.width : this.effectiveWidth) - 4);
 
         int x = wrapMode ? (this.x + this.width / 2 - boxWidth / 2) : (this.effectiveX + this.effectiveWidth / 2 - boxWidth / 2);
         int y = info.screenHeight() - 22;
 
+        if(this.searchbar != null)
+            this.searchbar.setFocused(false);
+
         if (this.searchbar != null && boxWidth == this.searchbar.getWidth() && x == this.searchbar.getX() && y == this.searchbar.getY())
             return;
 
-        this.searchbar = new EditBox(Minecraft.getInstance().font, x, y, boxWidth, 20, Component.literal("eiv:searchbar"));
-        this.searchbar.setMaxLength(32);
-        this.searchbar.setValue(this.getCurrentQuery());
-        this.searchbar.setResponder(this::updateQuery);
+        EditBox newSearchbar = new EditBox(Minecraft.getInstance().font, x, y, boxWidth, 20, Component.literal("eiv:searchbar"));
+        newSearchbar.setMaxLength(32);
+        newSearchbar.setValue(this.getCurrentQuery());
+        newSearchbar.setResponder(this::updateQuery);
 
+        newSearchbar.visible = this.isEnabled();
 
-        this.searchbar.visible = this.isEnabled();
+        this.searchbar = newSearchbar;
     }
 
 

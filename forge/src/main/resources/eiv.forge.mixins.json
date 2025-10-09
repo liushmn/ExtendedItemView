@@ -10,6 +10,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.gui.screens.inventory.MixinAbstractContainerScreen"
+    "client.render.MixinGuiRenderer"
   ]
 }

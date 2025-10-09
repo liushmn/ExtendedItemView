@@ -90,7 +90,6 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
      * Responsible for adding the item entries to the overlay
      */
     public void updateSlots() {
-        System.out.println("Called");
         this.itemSlots().clear();
 
         int currentStackPos = this.startIndex;
