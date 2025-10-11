@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.network.EivNetworkManager;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -52,7 +53,7 @@ public class ItemSlot {
     /**
      * Renders the slot
      */
-    void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
         if (!this.isHovered() && this.currentCheatmodeCount > 1)
@@ -81,7 +82,7 @@ public class ItemSlot {
     /**
      * Called on a mouse click in any inventory
      */
-    protected void onClicked(int mouseX, int mouseY, int mouseButton) {
+    public void onClicked(int mouseX, int mouseY, int mouseButton) {
 
 
         LocalPlayer clientPlayer = Minecraft.getInstance().player;

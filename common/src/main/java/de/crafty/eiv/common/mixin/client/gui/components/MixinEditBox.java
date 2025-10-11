@@ -6,12 +6,15 @@ import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.function.Function;
 
 @Mixin(EditBox.class)
 public abstract class MixinEditBox extends AbstractWidget {
@@ -23,13 +26,14 @@ public abstract class MixinEditBox extends AbstractWidget {
         super($$0, $$1, $$2, $$3, $$4);
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
-    private void renderFilterMode(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation resourceLocation, int i, int j, int k, int l) {
+
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
+    private void renderFilterMode(GuiGraphics instance, Function<ResourceLocation, RenderType> $$0, ResourceLocation $$1, int $$2, int $$3, int $$4, int $$5){
 
 
-        if (this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode()) {
-            instance.blitSprite(renderPipeline, FILTERMODE_LOCATION, i, j, k, l);
-        } else
-            instance.blitSprite(renderPipeline, resourceLocation, i, j, k, l);
+        if(this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode())
+            instance.blitSprite($$0, FILTERMODE_LOCATION, $$2, $$3, $$4, $$5);
+        else
+            instance.blitSprite($$0, $$1, $$2, $$3, $$4, $$5);
     }
 }
