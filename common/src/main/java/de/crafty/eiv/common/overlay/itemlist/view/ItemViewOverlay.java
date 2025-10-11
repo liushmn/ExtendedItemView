@@ -6,6 +6,7 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.gui.EivClientSettingsScreen;
+import de.crafty.eiv.common.overlay.ItemFilters;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;

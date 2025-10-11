@@ -69,7 +69,7 @@ public class ItemSlot {
 
 
         if (this.isHovered())
-            guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 128).getRGB());
+            guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
 
         guiGraphics.renderItem(this.stack, this.x + 2, this.y + 2);
 

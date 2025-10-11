@@ -1,6 +1,5 @@
 package de.crafty.eiv.common.mixin.client.gui.components;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,7 +24,6 @@ public abstract class MixinEditBox extends AbstractWidget {
     public MixinEditBox(int $$0, int $$1, int $$2, int $$3, Component $$4) {
         super($$0, $$1, $$2, $$3, $$4);
     }
-
 
     @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
     private void renderFilterMode(GuiGraphics instance, Function<ResourceLocation, RenderType> $$0, ResourceLocation $$1, int $$2, int $$3, int $$4, int $$5){

@@ -1,28 +1,22 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
-import com.google.common.collect.Ordering;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Mixin(EffectsInInventory.class)
 public abstract class MixinEffectsInInventory {

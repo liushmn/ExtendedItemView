@@ -27,6 +27,9 @@ public class FabricEIVClient implements ClientModInitializer {
     public void onInitializeClient() {
         instance = this;
 
+
+        CommonEIVClient.boostrap();
+
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(KeyBindingHelper::registerKeyBinding);
         CommonEIVClient.setResolver(new FabricEivResolver());
 

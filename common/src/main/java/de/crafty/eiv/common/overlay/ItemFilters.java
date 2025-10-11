@@ -31,7 +31,7 @@ public class ItemFilters {
      * @param query The query
      * @return A list of matching itemstacks
      */
-    protected static List<ItemStack> defaultFilter(String query) {
+    public static List<ItemStack> defaultFilter(String query) {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
         List<ItemStack> thirdPrio = new ArrayList<>();
@@ -67,7 +67,7 @@ public class ItemFilters {
      * @param query The query
      * @return A list of matching itemstacks
      */
-    protected static List<ItemStack> modId(String query) {
+    public static List<ItemStack> modId(String query) {
 
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
@@ -98,7 +98,7 @@ public class ItemFilters {
      * @param query The query
      * @return A list of matching itemstacks
      */
-    protected static List<ItemStack> tag(String query) {
+    public static List<ItemStack> tag(String query) {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
 
