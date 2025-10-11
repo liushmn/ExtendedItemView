@@ -201,6 +201,8 @@ public class SlotContent {
     }
 
     public static SlotContent of(Ingredient ingredient) {
+        if(ingredient == null)
+            return SlotContent.of();
 
         Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
 

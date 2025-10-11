@@ -22,17 +22,17 @@ import java.util.List;
 public class SmithingViewRecipe implements IEivViewRecipe {
 
     private final SlotContent additionIngredient;
-    private final ItemStack base, template;
+    private final SlotContent base, template;
     private final SlotContent result;
 
     private final boolean isTrimType;
     private final TransmuteResult upgradeResult;
 
-    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, ItemStack base, ItemStack template, TrimPattern trimPattern, @Nullable TransmuteResult upgradeResult) {
+    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, Ingredient base, Ingredient template, TrimPattern trimPattern, @Nullable TransmuteResult upgradeResult) {
         this.isTrimType = isTrimType;
 
-        this.template = template;
-        this.base = base;
+        this.template = template != null ? SlotContent.of(template) : SlotContent.of(Items.AIR);
+        this.base = base != null ? SlotContent.of(base) : SlotContent.of(Items.AIR);
         this.additionIngredient = additionIngredient != null ? SlotContent.of(additionIngredient) : SlotContent.of(Items.AIR);
         this.upgradeResult = upgradeResult;
 
@@ -47,7 +47,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             List<ItemStack> possibleResults = new ArrayList<>();
 
             this.additionIngredient.getValidContents().forEach(addition -> {
-                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base, addition, Holder.direct(trimPattern)));
+                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base.next(), addition, Holder.direct(trimPattern)));
             });
 
             this.result = SlotContent.of(possibleResults);
@@ -55,7 +55,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base));
+        this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base.next()));
     }
 
     @Override
@@ -66,8 +66,8 @@ public class SmithingViewRecipe implements IEivViewRecipe {
     @Override
     public void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
 
-        slotFillContext.bindSlot(0, SlotContent.of(this.template));
-        slotFillContext.bindSlot(1, SlotContent.of(this.base));
+        slotFillContext.bindSlot(0, this.template);
+        slotFillContext.bindSlot(1, this.base);
         slotFillContext.bindSlot(2, this.additionIngredient);
 
         slotFillContext.bindDepedantSlot(3, this.additionIngredient::index, this.result);
@@ -75,7 +75,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
 
     @Override
     public List<SlotContent> getIngredients() {
-        return List.of(SlotContent.of(this.template), SlotContent.of(this.base), this.additionIngredient);
+        return List.of(this.template, this.base, this.additionIngredient);
     }
 
     @Override

@@ -290,7 +290,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                 if (smithingRecipe instanceof SmithingTrimRecipe trimRecipe)
                     recipeList.add(new SmithingServerRecipe(true, trimRecipe.baseIngredient(), trimRecipe.templateIngredient().orElse(null), trimRecipe.additionIngredient().orElse(null), trimRecipe.pattern.value(), null));
 
-                if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe){
+                if (smithingRecipe instanceof SmithingTransformRecipe transformRecipe) {
                     recipeList.add(new SmithingServerRecipe(false, transformRecipe.baseIngredient(), transformRecipe.templateIngredient().orElse(null), transformRecipe.additionIngredient().orElse(null), null, transformRecipe.result));
                 }
 
@@ -378,13 +378,29 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
         ItemView.registerRecipeWrapper(SmithingServerRecipe.TYPE, unwrapped -> {
             List<SmithingViewRecipe> recipes = new ArrayList<>();
 
-            SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
-
+            if (unwrapped.getBase() != null && unwrapped.getTemplate() != null) {
                 SlotContent.of(unwrapped.getBase()).getValidContents().forEach(baseStack -> {
-                    recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), baseStack, templateStack, unwrapped.getPattern(), unwrapped.getUpgradeResult()));
-                });
+                    SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
+                        recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), unwrapped.getAddition(), Ingredient.of(baseStack.getItem()), Ingredient.of(templateStack.getItem()), unwrapped.getPattern(), unwrapped.getUpgradeResult()));
+                    });
 
-            });
+                });
+            } else if (unwrapped.getBase() != null && unwrapped.getAddition() != null) {
+                SlotContent.of(unwrapped.getBase()).getValidContents().forEach(baseStack -> {
+                    SlotContent.of(unwrapped.getAddition()).getValidContents().forEach(additionStack -> {
+                        recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), Ingredient.of(additionStack.getItem()), Ingredient.of(baseStack.getItem()), unwrapped.getTemplate(), unwrapped.getPattern(), unwrapped.getUpgradeResult()));
+                    });
+
+                });
+            }else if (unwrapped.getAddition() != null && unwrapped.getTemplate() != null) {
+                SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
+                    SlotContent.of(unwrapped.getAddition()).getValidContents().forEach(additionStack -> {
+                        recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), Ingredient.of(additionStack.getItem()), unwrapped.getBase(), Ingredient.of(templateStack.getItem()), unwrapped.getPattern(), unwrapped.getUpgradeResult()));
+                    });
+
+                });
+            }
+
 
             return recipes;
         });
