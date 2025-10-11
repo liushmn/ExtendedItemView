@@ -85,26 +85,18 @@ public class OverlayManager {
     //Returns whether an editbox overlay widget is focused
     public boolean isTextWidgetFocused() {
 
-        System.out.println("Nur hier?");
         if (this.currentInvInfo.screen().getFocused() == null)
             return false;
-
-        System.out.println("Dort");
 
         if (!this.currentInvInfo.screen().getFocused().isFocused())
             return false;
 
-        System.out.println("Da");
-
         if (!(this.currentInvInfo.screen().getFocused() instanceof EditBox box))
             return false;
 
-        System.out.println("Hier");
         if (this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().filter(eventListener -> eventListener instanceof EditBox).anyMatch(eventListener -> ((EditBox) eventListener).getMessage().equals(box.getMessage()))))
             return true;
 
-
-        System.out.println("Hier hä");
         return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.nonRenderables().stream().filter(eventListener -> eventListener instanceof EditBox).anyMatch(eventListener -> ((EditBox) eventListener).getMessage().equals(box.getMessage())));
     }
 
