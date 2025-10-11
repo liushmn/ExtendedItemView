@@ -56,6 +56,9 @@ public class EivTagUtil {
     }
 
     public static CompoundTag writeIngredient(Ingredient ingredient) {
+        if(ingredient == null)
+            return new CompoundTag();
+
         Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
 
         CompoundTag tag = new CompoundTag();
@@ -70,6 +73,9 @@ public class EivTagUtil {
     }
 
     public static Ingredient readIngredient(CompoundTag tag) {
+        if(tag.isEmpty())
+            return null;
+
         if (tag.contains("tag")) {
             TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getStringOr("tag", "")));
             return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).orElse(null)));
