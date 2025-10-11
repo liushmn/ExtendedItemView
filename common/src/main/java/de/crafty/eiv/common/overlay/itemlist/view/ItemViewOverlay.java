@@ -170,6 +170,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
             this.searchbar.setFocused(false);
 
 
+
         if (this.searchbar.isHovered() && mouseButton == 0) {
 
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
@@ -256,11 +257,15 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
         int x = wrapMode ? (this.x + this.width / 2 - boxWidth / 2) : (this.effectiveX + this.effectiveWidth / 2 - boxWidth / 2);
         int y = info.screenHeight() - 22;
 
-        if(this.searchbar != null)
+
+        if(this.searchbar != null && info.screen().getFocused() instanceof EditBox box && box.getMessage().equals(Component.literal("eiv:searchbar")))
             this.searchbar.setFocused(false);
 
         if (this.searchbar != null && boxWidth == this.searchbar.getWidth() && x == this.searchbar.getX() && y == this.searchbar.getY())
             return;
+
+
+
 
         EditBox newSearchbar = new EditBox(Minecraft.getInstance().font, x, y, boxWidth, 20, Component.literal("eiv:searchbar"));
         newSearchbar.setMaxLength(32);

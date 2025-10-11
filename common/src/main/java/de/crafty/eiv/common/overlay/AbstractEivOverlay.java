@@ -210,7 +210,8 @@ public abstract class AbstractEivOverlay {
             if (info == null)
                 return false;
 
-            return info.screenWidth == this.screenWidth
+            return info.screen.equals(this.screen)
+                    && info.screenWidth == this.screenWidth
                     && info.screenHeight == this.screenHeight
                     && info.leftPos == this.leftPos
                     && info.topPos == this.topPos
