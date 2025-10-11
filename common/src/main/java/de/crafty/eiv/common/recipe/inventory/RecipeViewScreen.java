@@ -5,7 +5,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
-import de.crafty.eiv.common.overlay.ItemViewOverlay;
+import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import de.crafty.eiv.common.recipe.util.EivUtil;
 import net.minecraft.ChatFormatting;

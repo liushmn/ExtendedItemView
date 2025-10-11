@@ -235,12 +235,12 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
             if(!slot.isActive())
                 return;
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1, 0.0F);
             if (!slot.hasItem() || this.availableItems.stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
                 guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().popPose();
 
         });
     }
