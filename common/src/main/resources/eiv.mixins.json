@@ -22,7 +22,6 @@
     "world.item.alchemy.PotionBrewingAccessor",
     "world.item.crafting.IngredientAccessor",
     "world.item.crafting.MixinRecipeManager",
-    "world.item.crafting.SmithingTransformRecipeAccessor",
     "world.item.crafting.TransmuteRecipeAccessor",
     "world.level.storage.loot.LootPoolAccessor",
     "world.level.storage.loot.LootTableAccessor",
