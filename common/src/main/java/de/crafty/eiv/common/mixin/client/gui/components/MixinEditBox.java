@@ -26,12 +26,13 @@ public abstract class MixinEditBox extends AbstractWidget {
     }
 
     @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
-    private void renderFilterMode(GuiGraphics instance, Function<ResourceLocation, RenderType> $$0, ResourceLocation $$1, int $$2, int $$3, int $$4, int $$5){
+    private void renderFilterMode(GuiGraphics instance, Function<ResourceLocation, RenderType> $$0, ResourceLocation $$1, int $$2, int $$3, int $$4, int $$5) {
 
 
-        if(this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode())
+        if (this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode())
             instance.blitSprite($$0, FILTERMODE_LOCATION, $$2, $$3, $$4, $$5);
         else
             instance.blitSprite($$0, $$1, $$2, $$3, $$4, $$5);
     }
+
 }

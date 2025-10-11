@@ -3,6 +3,7 @@ package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.OverlayManager;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -31,7 +32,7 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
     @Inject(method = "init", at = @At("TAIL"))
     private void injectOverlay$0(CallbackInfo ci) {
 
-        AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
+        AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractRecipeBookScreen<T>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
         OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
                 ResourceLocation.withDefaultNamespace("container"),
@@ -43,21 +44,37 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
 
         OverlayManager.INSTANCE.checkForScreenChange(info);
         OverlayManager.INSTANCE.updateOverlaysAndWidgets();
-        this.updateWidgets();
+        this.eiv$updateWidgets();
 
     }
 
-
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$1(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if(OverlayManager.INSTANCE.isWidgetFocused())
-            cir.setReturnValue(super.keyPressed(i, j, k));
+        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
+            box.keyPressed(i, j, k);
+
+            if ((i != 256 && i != 258))
+                cir.setReturnValue(true);
+        }
+
+    }
+
+    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
+    private void injectOverlay$2(char c, int i, CallbackInfoReturnable<Boolean> cir) {
+        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(c, i))
+            cir.setReturnValue(true);
     }
 
 
     @Unique
-    private void updateWidgets() {
-        OverlayManager.INSTANCE.oldWidgets().forEach((this::removeWidget));
+    private void eiv$updateWidgets() {
+        OverlayManager.INSTANCE.oldWidgets().forEach(eventListener -> {
+
+            if (eventListener.isFocused())
+                this.setFocused(null);
+
+            this.removeWidget(eventListener);
+        });
         OverlayManager.INSTANCE.oldWidgets().clear();
 
         OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {
