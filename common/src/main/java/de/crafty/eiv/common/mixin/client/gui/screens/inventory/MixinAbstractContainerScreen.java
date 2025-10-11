@@ -1,7 +1,6 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
 import de.crafty.eiv.common.CommonEIVClient;
-import de.crafty.eiv.common.accessor.IAbstractContainerScreenAccessor;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
@@ -94,6 +93,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     private void injectOverlay$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (minecraft == null) return;
 
+
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
         OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
@@ -111,7 +111,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
             this.updateWidgets();
 
 
-
         OverlayManager.INSTANCE.renderAll(guiGraphics, mouseX, mouseY, partialTicks);
 
     }
@@ -127,12 +126,14 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$3(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
 
-        if(OverlayManager.INSTANCE.isWidgetFocused())
-            cir.setReturnValue(super.keyPressed(i, j, k));
+        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
+            box.keyPressed(i, j, k);
 
-
-        if (this.getFocused() != null && this.getFocused().isFocused() && this.getFocused() instanceof EditBox)
+            if ((i != 256 && i != 258))
+                cir.setReturnValue(true);
             return;
+        }
+
 
         if (!((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this instanceof CreativeModeInventoryScreen) && OverlayManager.INSTANCE.keyPressed(i, j, k))
             cir.setReturnValue(true);
@@ -158,6 +159,12 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
+    @Inject(method = "onClose", at = @At("HEAD"))
+    private void injectOverlay$4(CallbackInfo ci) {
+        OverlayManager.INSTANCE.oldWidgets().clear();
+        OverlayManager.INSTANCE.screenContextMap().clear();
+    }
+
     //Optional Slots
 
     @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
@@ -175,7 +182,13 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Unique
     private void updateWidgets() {
-        OverlayManager.INSTANCE.oldWidgets().forEach((this::removeWidget));
+        OverlayManager.INSTANCE.oldWidgets().forEach(eventListener -> {
+
+            if (eventListener.isFocused())
+                this.setFocused(null);
+
+            this.removeWidget(eventListener);
+        });
         OverlayManager.INSTANCE.oldWidgets().clear();
 
         OverlayManager.INSTANCE.screenContextMap().forEach((abstractEivOverlay, screenContext) -> {

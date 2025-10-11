@@ -1,14 +1,11 @@
 package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
-import de.crafty.eiv.common.accessor.IAbstractContainerScreenAccessor;
 import de.crafty.eiv.common.config.Configs;
-import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -86,10 +83,29 @@ public class OverlayManager {
     }
 
     //Returns whether an editbox overlay widget is focused
-    public boolean isWidgetFocused() {
-        return this.currentInvInfo.screen().getFocused() != null && this.currentInvInfo.screen().getFocused().isFocused() && this.currentInvInfo.screen().getFocused() instanceof EditBox
-                && (this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().contains(this.currentInvInfo.screen().getFocused()))
-                || this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.nonRenderables().contains(this.currentInvInfo.screen().getFocused())));
+    public boolean isTextWidgetFocused() {
+
+        System.out.println("Nur hier?");
+        if (this.currentInvInfo.screen().getFocused() == null)
+            return false;
+
+        System.out.println("Dort");
+
+        if (!this.currentInvInfo.screen().getFocused().isFocused())
+            return false;
+
+        System.out.println("Da");
+
+        if (!(this.currentInvInfo.screen().getFocused() instanceof EditBox box))
+            return false;
+
+        System.out.println("Hier");
+        if (this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.renderables().stream().filter(eventListener -> eventListener instanceof EditBox).anyMatch(eventListener -> ((EditBox) eventListener).getMessage().equals(box.getMessage()))))
+            return true;
+
+
+        System.out.println("Hier hä");
+        return this.screenContextMap.values().stream().anyMatch(screenContext -> screenContext.nonRenderables().stream().filter(eventListener -> eventListener instanceof EditBox).anyMatch(eventListener -> ((EditBox) eventListener).getMessage().equals(box.getMessage())));
     }
 
 
