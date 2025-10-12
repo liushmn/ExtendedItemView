@@ -7,6 +7,7 @@ import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -54,6 +55,8 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     @Shadow
     public abstract T getMenu();
+
+    @Shadow protected abstract void onStopHovering(Slot slot);
 
     protected MixinAbstractContainerScreen(Component component) {
         super(component);
@@ -159,10 +162,20 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
-    @Inject(method = "onClose", at = @At("HEAD"))
+    @Inject(method = "onClose", at = @At("HEAD"), cancellable = true)
     private void injectOverlay$4(CallbackInfo ci) {
         OverlayManager.INSTANCE.oldWidgets().clear();
         OverlayManager.INSTANCE.screenContextMap().clear();
+
+
+        if (((Object) this instanceof RecipeViewScreen viewScreen)) {
+            if (this.hoveredSlot != null) {
+                this.onStopHovering(this.hoveredSlot);
+            }
+
+            Minecraft.getInstance().setScreen(viewScreen.getMenu().getParentScreen());
+            ci.cancel();
+        }
     }
 
     //Optional Slots

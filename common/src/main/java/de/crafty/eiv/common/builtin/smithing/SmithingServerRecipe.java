@@ -77,8 +77,6 @@ public class SmithingServerRecipe implements IEivServerRecipe {
 
         if(this.upgradeResult != null)
             tag.put("upgradeResult", TransmuteResult.CODEC.encode(this.upgradeResult, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-
-        System.out.println(tag);
     }
 
     @Override

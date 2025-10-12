@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -81,9 +82,9 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     @Override
     public boolean mouseReleased(double d, double e, int i) {
 
-        if(CommonEIVClient.GO_BACK_RECIPE.matchesMouse(i) && this.getMenu().goBack())
+        if (CommonEIVClient.GO_BACK_RECIPE.matchesMouse(i) && this.getMenu().goBack())
             return true;
-        if(CommonEIVClient.GO_FORWARD_RECIPE.matchesMouse(i) && this.getMenu().goForward())
+        if (CommonEIVClient.GO_FORWARD_RECIPE.matchesMouse(i) && this.getMenu().goForward())
             return true;
 
         return super.mouseReleased(d, e, i);
@@ -92,11 +93,11 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     @Override
     public boolean keyPressed(int i, int j, int k) {
 
-        if(CommonEIVClient.GO_BACK_RECIPE.matches(i, j) && this.getMenu().goBack())
-                return true;
+        if (CommonEIVClient.GO_BACK_RECIPE.matches(i, j) && this.getMenu().goBack())
+            return true;
 
-        if(CommonEIVClient.GO_FORWARD_RECIPE.matches(i, j) && this.getMenu().goForward())
-                return true;
+        if (CommonEIVClient.GO_FORWARD_RECIPE.matches(i, j) && this.getMenu().goForward())
+            return true;
 
         return super.keyPressed(i, j, k);
     }
@@ -475,13 +476,6 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
             guiGraphics.pose().popMatrix();
 
         }
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-
-        Minecraft.getInstance().setScreen(this.getMenu().getParentScreen());
     }
 
 
