@@ -6,12 +6,15 @@ import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EditBox.class)
 public abstract class MixinEditBox extends AbstractWidget {
@@ -32,4 +35,5 @@ public abstract class MixinEditBox extends AbstractWidget {
         } else
             instance.blitSprite(renderPipeline, resourceLocation, i, j, k, l);
     }
+
 }

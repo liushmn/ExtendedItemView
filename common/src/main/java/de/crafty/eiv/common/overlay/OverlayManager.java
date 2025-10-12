@@ -148,10 +148,13 @@ public class OverlayManager {
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         boolean b = false;
 
+
         this.screenContextMap.forEach((abstractEivOverlay, screenContext) -> {
             screenContext.renderables().forEach(guiEventListener -> {
                 if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(event.x(), event.y()))
                     guiEventListener.setFocused(false);
+                if (guiEventListener.isMouseOver(event.x(), event.y()) && event.button() == 0)
+                    guiEventListener.setFocused(true);
             });
         });
 

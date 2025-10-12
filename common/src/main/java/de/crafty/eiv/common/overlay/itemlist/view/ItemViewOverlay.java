@@ -165,16 +165,12 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
         if (this.searchbar.isHovered() && event.button() == 1) {
             this.searchbar.setValue("");
+            this.searchbar.setFocused(true);
             OverlayManager.INSTANCE.currentInfo().screen().setFocused(this.searchbar);
         }
 
-        if (event.button() == 0 && !this.searchbar.isHovered() && this.searchbar.isFocused())
-            this.searchbar.setFocused(false);
-
-
 
         if (this.searchbar.isHovered() && event.button() == 0) {
-
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
                 this.itemFilterMode = !this.itemFilterMode;
                 this.lastSearchbarClick = -1;
