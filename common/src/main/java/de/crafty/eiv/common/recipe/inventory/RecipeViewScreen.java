@@ -14,6 +14,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.component.DataComponents;
@@ -80,27 +82,28 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
+    public boolean mouseReleased(MouseButtonEvent mouseButtonEvent) {
 
-        if (CommonEIVClient.GO_BACK_RECIPE.matchesMouse(i) && this.getMenu().goBack())
+        if (CommonEIVClient.GO_BACK_RECIPE.matchesMouse(mouseButtonEvent) && this.getMenu().goBack())
             return true;
-        if (CommonEIVClient.GO_FORWARD_RECIPE.matchesMouse(i) && this.getMenu().goForward())
+        if (CommonEIVClient.GO_FORWARD_RECIPE.matchesMouse(mouseButtonEvent) && this.getMenu().goForward())
             return true;
 
-        return super.mouseReleased(d, e, i);
+        return super.mouseReleased(mouseButtonEvent);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
 
-        if (CommonEIVClient.GO_BACK_RECIPE.matches(i, j) && this.getMenu().goBack())
+        if (CommonEIVClient.GO_BACK_RECIPE.matches(keyEvent) && this.getMenu().goBack())
             return true;
 
-        if (CommonEIVClient.GO_FORWARD_RECIPE.matches(i, j) && this.getMenu().goForward())
+        if (CommonEIVClient.GO_FORWARD_RECIPE.matches(keyEvent) && this.getMenu().goForward())
             return true;
 
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
+
 
     @Override
     protected void init() {
@@ -212,7 +215,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
                             RecipeTransferData transferData = this.getMenu().getTransferData().get(finalI);
 
-                            HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = RecipeViewScreen.hasShiftDown() ? transferData.getStackedData().getUsedPlayerSlots() : transferData.getUsedPlayerSlots();
+                            HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = Minecraft.getInstance().hasShiftDown() ? transferData.getStackedData().getUsedPlayerSlots() : transferData.getUsedPlayerSlots();
                             //TODO make component required in recipes
                             CommonEIV.networkManager().sendPacketToServer(new ServerboundTransferPayload(map.getTransferMap(), usedPlayerSlots));
 
@@ -323,28 +326,28 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
 
-        if (mouseButton == 1 && this.hoveredSlot != null) {
+        if (mouseButtonEvent.isRight() && this.hoveredSlot != null) {
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.INPUT);
             return true;
         }
 
-        if (mouseButton == 0 && this.hoveredSlot != null) {
+        if (mouseButtonEvent.isLeft() && this.hoveredSlot != null) {
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.RESULT);
             return true;
         }
 
-        if (mouseButton == 0) {
+        if (mouseButtonEvent.isLeft()) {
 
             for (int i = this.viewTypePage * 5; i < this.viewTypePage * 5 + 5 && this.viewTypeButtons.size() > i; i++) {
-                if (this.viewTypeButtons.get(i).onClick(mouseButton, (int) mouseX, (int) mouseY))
+                if (this.viewTypeButtons.get(i).onClick(mouseButtonEvent.button(), (int) mouseButtonEvent.x(), (int) mouseButtonEvent.y()))
                     return true;
             }
 
         }
 
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(mouseButtonEvent, bl);
     }
 
     private boolean isPrevTypeHovered(double mouseX, double mouseY) {
@@ -362,7 +365,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         if (this.minecraft == null || this.minecraft.player == null)
             return;
 
-        long timeOpen = (this.minecraft.player.clientLevel.getGameTime() - this.timestamp);
+        long timeOpen = (this.minecraft.player.level().getGameTime() - this.timestamp);
 
         if (timeOpen % 25 == 0 && timeOpen >= 25)
             this.getMenu().tickContents();

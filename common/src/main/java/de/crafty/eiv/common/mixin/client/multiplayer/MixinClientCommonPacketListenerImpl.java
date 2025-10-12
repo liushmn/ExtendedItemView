@@ -36,7 +36,7 @@ public abstract class MixinClientCommonPacketListenerImpl {
 
         CustomPacketPayload custompacketpayload = packet.payload();
         if (!(custompacketpayload instanceof DiscardedPayload)) {
-            PacketUtils.ensureRunningOnSameThread(packet, ((ClientCommonPacketListenerImpl) (Object) this), this.minecraft);
+            PacketUtils.ensureRunningOnSameThread(packet, ((ClientCommonPacketListenerImpl) (Object) this), this.minecraft.packetProcessor());
             this.handleCustomPayload(custompacketpayload);
         }
 

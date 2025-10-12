@@ -16,7 +16,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 
-@Mod.EventBusSubscriber(modid = CommonEIV.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = CommonEIV.MODID, bus = Mod.EventBusSubscriber.Bus.BOTH, value = Dist.CLIENT)
 public class ForgeEIVClient {
 
 
@@ -28,8 +28,8 @@ public class ForgeEIVClient {
     }
 
     @SubscribeEvent
-    public static void onModelLayerRegistry(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(CommonEIVClient.FLUID_ITEM_MODEL_LAYER, FluidItemModel::createFluidLayer);
+    public static void onKeyMappingRegistry(RegisterKeyMappingsEvent event) {
+        CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
     }
 
     @SubscribeEvent
@@ -43,8 +43,9 @@ public class ForgeEIVClient {
     }
 
     @SubscribeEvent
-    public static void onKeyMappingRegistry(RegisterKeyMappingsEvent event) {
-        CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
+    public static void onModelLayerRegistry(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(CommonEIVClient.FLUID_ITEM_MODEL_LAYER, FluidItemModel::createFluidLayer);
     }
+
 
 }

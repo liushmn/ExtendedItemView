@@ -41,7 +41,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        HolderLookup.Provider provider = Minecraft.getInstance().player.clientLevel.registryAccess();
+        HolderLookup.Provider provider = Minecraft.getInstance().player.level().registryAccess();
 
         if (this.isTrimType) {
             List<ItemStack> possibleResults = new ArrayList<>();

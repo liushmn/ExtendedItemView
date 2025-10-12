@@ -10,6 +10,8 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,19 +51,19 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void injectOverlay$1(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
+    private void injectOverlay$1(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
-            box.keyPressed(i, j, k);
+            box.keyPressed(keyEvent);
 
-            if ((i != 256 && i != 258))
+            if ((keyEvent.key() != 256 && keyEvent.key() != 258))
                 cir.setReturnValue(true);
         }
 
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    private void injectOverlay$2(char c, int i, CallbackInfoReturnable<Boolean> cir) {
-        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(c, i))
+    private void injectOverlay$2(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(characterEvent))
             cir.setReturnValue(true);
     }
 

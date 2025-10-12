@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -91,14 +92,14 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent event) {
+        super.keyPressed(event);
 
         for (ItemSlot slot : this.itemSlots()) {
             if (!slot.isHovered())
                 continue;
 
-            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j)) {
+            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(event)) {
                 this.availableItems.remove(slot.getStack());
                 this.updateSlots();
                 if (this.itemSlots().isEmpty() && !this.availableItems.isEmpty()) {

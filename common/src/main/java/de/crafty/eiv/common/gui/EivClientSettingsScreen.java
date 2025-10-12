@@ -29,7 +29,7 @@ public class EivClientSettingsScreen extends Screen {
     @Override
     protected void init() {
 
-        this.layout.addToHeader(new StringWidget(TITLE, this.font)).alignCenter();
+        this.layout.addToHeader(new StringWidget(TITLE, this.font));
 
         LinearLayout linearLayout = this.layout.addToContents(LinearLayout.vertical());
 

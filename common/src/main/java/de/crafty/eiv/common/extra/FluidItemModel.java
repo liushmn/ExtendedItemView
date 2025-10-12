@@ -5,11 +5,12 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.Unit;
 
 /**
  * A universal model for all fluid-items
  */
-public class FluidItemModel extends Model {
+public class FluidItemModel extends Model<Unit> {
 
 
     public FluidItemModel(ModelPart modelPart) {

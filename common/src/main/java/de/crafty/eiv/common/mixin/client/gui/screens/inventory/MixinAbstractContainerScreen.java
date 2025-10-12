@@ -18,6 +18,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -127,38 +129,40 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void injectOverlay$3(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
+    private void injectOverlay$3(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
 
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
-            box.keyPressed(i, j, k);
+            box.keyPressed(keyEvent);
 
-            if ((i != 256 && i != 258))
+            if ((keyEvent.key() != 256 && keyEvent.key() != 258))
                 cir.setReturnValue(true);
+
             return;
         }
 
 
-        if (!((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this instanceof CreativeModeInventoryScreen) && OverlayManager.INSTANCE.keyPressed(i, j, k))
+        if (!((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this instanceof CreativeModeInventoryScreen) && OverlayManager.INSTANCE.keyPressed(keyEvent))
             cir.setReturnValue(true);
 
         if (this.hoveredSlot == null)
             return;
 
-        if (CommonEIVClient.USAGE_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem())
+        if (CommonEIVClient.USAGE_KEYBIND.matches(keyEvent) && this.hoveredSlot.hasItem())
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.INPUT);
 
-        if (CommonEIVClient.RECIPE_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem())
+        if (CommonEIVClient.RECIPE_KEYBIND.matches(keyEvent) && this.hoveredSlot.hasItem())
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.RESULT);
 
-        if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j) && this.hoveredSlot.hasItem()) {
+        if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(keyEvent) && this.hoveredSlot.hasItem()) {
             ItemBookmarkOverlay.INSTANCE.bookmarkItem(this.hoveredSlot.getItem());
 
         }
     }
 
-    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"))
-    private boolean injectOverlay$3(Screen instance, double mouseX, double mouseY, int mouseButton) {
-        return super.mouseClicked(mouseX, mouseY, mouseButton) | OverlayManager.INSTANCE.mouseClicked(mouseX, mouseY, mouseButton);
+    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
+    private boolean injectOverlay$3(Screen instance, MouseButtonEvent mouseButtonEvent, boolean b){
+        return super.mouseClicked(mouseButtonEvent, b) | OverlayManager.INSTANCE.mouseClicked(mouseButtonEvent, b);
+
     }
 
 

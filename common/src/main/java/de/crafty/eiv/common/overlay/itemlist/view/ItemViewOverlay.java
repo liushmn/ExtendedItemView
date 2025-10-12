@@ -21,6 +21,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -142,15 +144,15 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    protected boolean keyPressed(int i, int j, int k) {
-        super.keyPressed(i, j, k);
+    protected boolean keyPressed(KeyEvent event) {
+        super.keyPressed(event);
 
 
         for (ItemSlot slot : this.itemSlots()) {
             if (!slot.isHovered())
                 continue;
 
-            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(i, j))
+            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(event))
                 ItemBookmarkOverlay.INSTANCE.bookmarkItem(slot.getStack());
         }
 
@@ -158,20 +160,20 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        super.mouseClicked(event, doubleClick);
 
-        if (this.searchbar.isHovered() && mouseButton == 1) {
+        if (this.searchbar.isHovered() && event.isRight()) {
             this.searchbar.setValue("");
             OverlayManager.INSTANCE.currentInfo().screen().setFocused(this.searchbar);
         }
 
-        if (mouseButton == 0 && !this.searchbar.isHovered() && this.searchbar.isFocused())
+        if (event.isLeft() && !this.searchbar.isHovered() && this.searchbar.isFocused())
             this.searchbar.setFocused(false);
 
 
 
-        if (this.searchbar.isHovered() && mouseButton == 0) {
+        if (this.searchbar.isHovered() && event.isLeft()) {
 
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
                 this.itemFilterMode = !this.itemFilterMode;
@@ -298,7 +300,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
                 viewHistory = viewScreen.getMenu().getViewHistory();
             }
 
-            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, -1, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
+            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
         }
 
 

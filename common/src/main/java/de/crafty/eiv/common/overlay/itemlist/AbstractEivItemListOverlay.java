@@ -6,6 +6,7 @@ import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -74,17 +75,17 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     }
 
     @Override
-    protected boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-
+    protected boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         for (ItemSlot itemSlot : this.itemSlots()) {
             if (itemSlot.isHovered()) {
-                itemSlot.onClicked((int) mouseX, (int) mouseY, mouseButton);
+                itemSlot.onClicked((int) event.x(), (int) event.y(), event.button());
                 return true;
             }
         }
 
         return true;
     }
+
 
     /**
      * Responsible for adding the item entries to the overlay

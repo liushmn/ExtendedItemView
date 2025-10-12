@@ -33,8 +33,8 @@ public abstract class MixinServerGamePacketListenerImpl {
                 return;
 
             if (EivNetworkManager.INSTANCE.serverPayloadHandlers().containsKey(payloadId)){
-                this.player.getServer().execute(() -> {
-                    EivNetworkManager.INSTANCE.serverPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ServerContext(this.player.getServer(), this.player), EivNetworkManager.INSTANCE.castPayload(payload));
+                this.player.level().getServer().execute(() -> {
+                    EivNetworkManager.INSTANCE.serverPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ServerContext(this.player.level().getServer(), this.player), EivNetworkManager.INSTANCE.castPayload(payload));
                 });
             }
             else

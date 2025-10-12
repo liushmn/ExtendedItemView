@@ -23,7 +23,7 @@ public class EntityViewType implements IEivRecipeViewType {
         if(!(craftReference.getItem() instanceof SpawnEggItem eggItem) || !(viewRecipe instanceof EntityViewRecipe entityViewRecipe))
             return true;
 
-        return eggItem.getType(Minecraft.getInstance().level.registryAccess(), craftReference) == entityViewRecipe.getEntityType();
+        return eggItem.getType(craftReference) == entityViewRecipe.getEntityType();
 
     };
 

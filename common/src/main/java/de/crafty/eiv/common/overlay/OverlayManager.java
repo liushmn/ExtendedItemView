@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -110,10 +112,10 @@ public class OverlayManager {
         return this.oldWidgets;
     }
 
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent event) {
         boolean b = false;
 
-        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(i, j)) {
+        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(event)) {
             PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.setEnabled(!abstractEivOverlay.isEnabled()));
             return true;
         }
@@ -122,7 +124,7 @@ public class OverlayManager {
             if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
-            if (overlay.keyPressed(i, j, k))
+            if (overlay.keyPressed(event))
                 b = true;
         }
 
@@ -143,12 +145,12 @@ public class OverlayManager {
         return b;
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         boolean b = false;
 
         this.screenContextMap.forEach((abstractEivOverlay, screenContext) -> {
             screenContext.renderables().forEach(guiEventListener -> {
-                if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(mouseX, mouseY))
+                if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(event.x(), event.y()))
                     guiEventListener.setFocused(false);
             });
         });
@@ -158,10 +160,10 @@ public class OverlayManager {
             if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
-            if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
+            if (!(event.x() >= overlay.getX() && event.x() <= overlay.getX() + overlay.getWidth() && event.y() >= overlay.getY() && event.y() <= overlay.getY() + overlay.getHeight()))
                 continue;
 
-            if (overlay.mouseClicked(mouseX, mouseY, mouseButton))
+            if (overlay.mouseClicked(event, doubleClick))
                 b = true;
         }
 
