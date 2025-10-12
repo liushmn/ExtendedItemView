@@ -21,23 +21,24 @@ public class NeoForgeEIV {
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");
-        FMLLoader.getLoadingModList().getMods().forEach(modInfo -> {
-            Optional<String> optional = modInfo.getConfigElement("eiv");
-            if (optional.isPresent()) {
-                CommonEIV.LOGGER.info("Loading integration: {}", optional.get());
-                try {
-                    Class<?> clazz = Class.forName(optional.get());
-                    IExtendedItemViewIntegration integration = ((IExtendedItemViewIntegration) clazz.getConstructor().newInstance());
-                    integration.onIntegrationInitialize();
-                    CommonEIV.LOGGER.info("Integration initialized for mod: {}", modInfo.getModId());
-                    return;
+        if (FMLLoader.getCurrentOrNull() != null)
+            FMLLoader.getCurrent().getLoadingModList().getMods().forEach(modInfo -> {
+                Optional<String> optional = modInfo.getConfigElement("eiv");
+                if (optional.isPresent()) {
+                    CommonEIV.LOGGER.info("Loading integration: {}", optional.get());
+                    try {
+                        Class<?> clazz = Class.forName(optional.get());
+                        IExtendedItemViewIntegration integration = ((IExtendedItemViewIntegration) clazz.getConstructor().newInstance());
+                        integration.onIntegrationInitialize();
+                        CommonEIV.LOGGER.info("Integration initialized for mod: {}", modInfo.getModId());
+                        return;
 
-                } catch (Exception ignored) {
+                    } catch (Exception ignored) {
+                    }
+
+                    CommonEIV.LOGGER.error("Failed to load integration: {}", optional.get());
                 }
-
-                CommonEIV.LOGGER.error("Failed to load integration: {}", optional.get());
-            }
-        });
+            });
     }
 
     private void onCommandRegistry(RegisterCommandsEvent event) {

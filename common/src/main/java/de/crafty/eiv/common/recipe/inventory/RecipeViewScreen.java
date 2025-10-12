@@ -327,18 +327,17 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
-
-        if (mouseButtonEvent.isRight() && this.hoveredSlot != null) {
+        if (mouseButtonEvent.button() == 1 && this.hoveredSlot != null) {
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.INPUT);
             return true;
         }
 
-        if (mouseButtonEvent.isLeft() && this.hoveredSlot != null) {
+        if (mouseButtonEvent.button() == 0 && this.hoveredSlot != null) {
             ItemViewOverlay.INSTANCE.openRecipeView(this.hoveredSlot.getItem(), ItemViewOverlay.ItemViewOpenType.RESULT);
             return true;
         }
 
-        if (mouseButtonEvent.isLeft()) {
+        if (mouseButtonEvent.button() == 0) {
 
             for (int i = this.viewTypePage * 5; i < this.viewTypePage * 5 + 5 && this.viewTypeButtons.size() > i; i++) {
                 if (this.viewTypeButtons.get(i).onClick(mouseButtonEvent.button(), (int) mouseButtonEvent.x(), (int) mouseButtonEvent.y()))

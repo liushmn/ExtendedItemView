@@ -163,17 +163,17 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         super.mouseClicked(event, doubleClick);
 
-        if (this.searchbar.isHovered() && event.isRight()) {
+        if (this.searchbar.isHovered() && event.button() == 1) {
             this.searchbar.setValue("");
             OverlayManager.INSTANCE.currentInfo().screen().setFocused(this.searchbar);
         }
 
-        if (event.isLeft() && !this.searchbar.isHovered() && this.searchbar.isFocused())
+        if (event.button() == 0 && !this.searchbar.isHovered() && this.searchbar.isFocused())
             this.searchbar.setFocused(false);
 
 
 
-        if (this.searchbar.isHovered() && event.isLeft()) {
+        if (this.searchbar.isHovered() && event.button() == 0) {
 
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
                 this.itemFilterMode = !this.itemFilterMode;
@@ -300,7 +300,9 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
                 viewHistory = viewScreen.getMenu().getViewHistory();
             }
 
-            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, 0, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
+            int containerId = parent instanceof AbstractContainerScreen<? extends AbstractContainerMenu> containerScreen ? containerScreen.getMenu().containerId : 0;
+
+            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, containerId, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
         }
 
 

@@ -15,7 +15,10 @@ public class NeoForgeEivResolver implements IEivClientResolver {
 
     @Override
     public String getModNameForItem(Item item) {
-        return FMLLoader.getLoadingModList().getMods().stream().filter(modInfo -> modInfo.getModId().equals(BuiltInRegistries.ITEM.getKey(item).getNamespace())).findFirst().get().getDisplayName();
+        if(FMLLoader.getCurrentOrNull() == null)
+            return "???";
+
+        return FMLLoader.getCurrent().getLoadingModList().getMods().stream().filter(modInfo -> modInfo.getModId().equals(BuiltInRegistries.ITEM.getKey(item).getNamespace())).findFirst().get().getDisplayName();
     }
 
     @Override
