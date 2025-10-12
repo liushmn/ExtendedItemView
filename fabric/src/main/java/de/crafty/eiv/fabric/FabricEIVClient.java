@@ -1,22 +1,17 @@
 package de.crafty.eiv.fabric;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
-import de.crafty.eiv.fabric.mixin.KeyMappingAccessor;
 import de.crafty.eiv.fabric.resolver.FabricEivResolver;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.Map;
 
 public class FabricEIVClient implements ClientModInitializer {
 
@@ -41,18 +36,6 @@ public class FabricEIVClient implements ClientModInitializer {
         CommonEIVClient.loadConfigs();
     }
 
-    public static void excludeEivMappings() {
-        Map<InputConstants.Key, KeyMapping> map = KeyMappingAccessor.getKeyMap();
-        map.clear();
-
-        for (KeyMapping keyMapping : KeyMappingAccessor.getAllKeyMap().values()) {
-            if (map.containsKey(keyMapping.key) && CommonEIVClient.EIV_KEY_MAPPINGS.contains(keyMapping)) {
-                continue;
-            }
-
-            map.put(keyMapping.key, keyMapping);
-        }
-    }
 
     public static FabricEIVClient getInstance() {
         return instance;

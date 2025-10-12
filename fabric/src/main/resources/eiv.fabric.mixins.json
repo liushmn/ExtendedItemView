@@ -10,8 +10,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "KeyMappingAccessor",
-    "client.MixinKeyMapping",
     "client.render.MixinGuiRenderer"
   ]
 }
