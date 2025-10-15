@@ -371,9 +371,10 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         LocalPlayer player = minecraft.player;
 
-        NonNullList<ItemStack> playerInvCache = NonNullList.withSize(player.getInventory().getNonEquipmentItems().size(), ItemStack.EMPTY);
-        for (int slot = 0; slot < playerInvCache.size(); slot++)
-            playerInvCache.set(slot, player.getInventory().getItem(slot).copy());
+        NonNullList<ItemStack> stackSupply = NonNullList.withSize(player.getInventory().getContainerSize(), ItemStack.EMPTY);
+        for (int slot = 0; slot < stackSupply.size(); slot++) {
+            stackSupply.set(slot, player.getInventory().getItem(slot).copy());
+        }
 
 
         RecipeTransferData.Builder dataBuilder = new RecipeTransferData.Builder();
@@ -398,7 +399,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             content.getValidContents().forEach(stack -> {
                 StackValidator stackValidator = context.getStackValidators().getOrDefault(slot, null);
 
-                if (playerInvCache.stream().anyMatch(stack1 -> stack1.is(stack.getItem())) && (stackValidator == null || stackValidator.validate(stack)))
+                if (stackSupply.stream().anyMatch(stack1 -> stack1.is(stack.getItem())) && (stackValidator == null || stackValidator.validate(stack)))
                     availableItems.add(stack);
             });
 
@@ -413,7 +414,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
 
         HashMap<Integer, HashMap<Integer, ItemStack>> bestMatch = new HashMap<>();
-        this.check(slots, 0, validAndAvailableContent, new HashMap<>(), bestMatch, playerInvCache);
+        this.check(slots, 0, validAndAvailableContent, new HashMap<>(), bestMatch, stackSupply);
         bestMatch.forEach(dataBuilder::findContent);
 
         RecipeTransferData transferData = dataBuilder.build();
@@ -460,7 +461,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
                     ItemStack requiredStack = requiredStacks.get(recipeSlot);
 
-                    HashMap<Integer, ItemStack> found = this.invCheckAndFind(playerInvCache, requiredStack, true);
+                    HashMap<Integer, ItemStack> found = this.invCheckAndFind(stackSupply, requiredStack, true);
                     if (found.isEmpty()) {
                         checking = false;
                         break;
@@ -525,7 +526,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
 
-    private void check(List<Integer> slots, int currentSlotIndex, HashMap<Integer, List<ItemStack>> validAndAvailableContent, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots, HashMap<Integer, HashMap<Integer, ItemStack>> bestMatch, NonNullList<ItemStack> playerInvCache) {
+    private void check(List<Integer> slots, int currentSlotIndex, HashMap<Integer, List<ItemStack>> validAndAvailableContent, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots, HashMap<Integer, HashMap<Integer, ItemStack>> bestMatch, NonNullList<ItemStack> stackSupply) {
 
         if (currentSlotIndex >= slots.size() || bestMatch.size() == slots.size())
             return;
@@ -534,33 +535,33 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         for (ItemStack requiredStack : validStacks) {
 
-            HashMap<Integer, ItemStack> found = this.invCheckAndFind(playerInvCache, requiredStack, false);
+            HashMap<Integer, ItemStack> found = this.invCheckAndFind(stackSupply, requiredStack, false);
 
             if (!found.isEmpty()) {
                 usedPlayerSlots.put(slots.get(currentSlotIndex), found);
                 if (usedPlayerSlots.size() > bestMatch.size())
                     bestMatch.putAll(usedPlayerSlots);
 
-                this.check(slots, currentSlotIndex + 1, validAndAvailableContent, usedPlayerSlots, bestMatch, playerInvCache);
+                this.check(slots, currentSlotIndex + 1, validAndAvailableContent, usedPlayerSlots, bestMatch, stackSupply);
             }
         }
-        this.check(slots, currentSlotIndex + 1, validAndAvailableContent, usedPlayerSlots, bestMatch, playerInvCache);
+        this.check(slots, currentSlotIndex + 1, validAndAvailableContent, usedPlayerSlots, bestMatch, stackSupply);
 
     }
 
-    private HashMap<Integer, ItemStack> invCheckAndFind(NonNullList<ItemStack> playerInvCache, ItemStack requiredStack, boolean checkComponents) {
+    private HashMap<Integer, ItemStack> invCheckAndFind(NonNullList<ItemStack> stackSupply, ItemStack requiredStack, boolean checkComponents) {
 
         HashMap<Integer, ItemStack> usedPlayerSlots = new HashMap<>();
         int requiredAmount = requiredStack.getCount();
 
         ItemStack firstFound = ItemStack.EMPTY;
 
-        for (int playerSlot = 0; playerSlot < playerInvCache.size(); playerSlot++) {
+        for (int playerSlot = 0; playerSlot < stackSupply.size(); playerSlot++) {
 
             if (requiredAmount <= 0)
                 break;
 
-            ItemStack playerStack = playerInvCache.get(playerSlot);
+            ItemStack playerStack = stackSupply.get(playerSlot);
             ItemStack foundStack = playerStack.copy();
 
             if (!(checkComponents ? ItemStack.isSameItemSameComponents(playerStack, requiredStack) : ItemStack.isSameItem(playerStack, requiredStack)))
@@ -577,29 +578,38 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
             playerStack.setCount(playerStack.getCount() - (prevReq - requiredAmount));
             if (playerStack.getCount() <= 0)
-                playerInvCache.set(playerSlot, ItemStack.EMPTY);
+                stackSupply.set(playerSlot, ItemStack.EMPTY);
 
             foundStack.setCount(prevReq - requiredAmount);
-            usedPlayerSlots.put(playerSlot, foundStack);
+
+            OptionalInt menuSlotId = player.containerMenu.findSlot(player.getInventory(), playerSlot);
+
+            if (menuSlotId.isPresent())
+                usedPlayerSlots.put(menuSlotId.getAsInt(), foundStack);
+            else {
+                //Just for safety, we do not want to lose any player items
+                this.returnToCache(usedPlayerSlots, stackSupply);
+                return new HashMap<>();
+            }
 
         }
 
         if (requiredAmount == 0)
             return usedPlayerSlots;
         else {
-            this.returnToCache(usedPlayerSlots, playerInvCache);
+            this.returnToCache(usedPlayerSlots, stackSupply);
 
             return new HashMap<>();
         }
     }
 
-    private void returnToCache(HashMap<Integer, ItemStack> usedPlayerSlots, NonNullList<ItemStack> playerInvCache) {
+    private void returnToCache(HashMap<Integer, ItemStack> usedPlayerSlots, NonNullList<ItemStack> stackSupply) {
         usedPlayerSlots.forEach((playerSlot, stack) -> {
 
-            if (playerInvCache.get(playerSlot).isEmpty())
-                playerInvCache.set(playerSlot, stack);
+            if (stackSupply.get(playerSlot).isEmpty())
+                stackSupply.set(playerSlot, stack);
             else
-                playerInvCache.get(playerSlot).setCount(playerInvCache.get(playerSlot).getCount() + stack.getCount());
+                stackSupply.get(playerSlot).setCount(stackSupply.get(playerSlot).getCount() + stack.getCount());
 
         });
     }

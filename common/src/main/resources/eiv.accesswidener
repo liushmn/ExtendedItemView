@@ -32,3 +32,5 @@ accessible field net/minecraft/client/KeyMapping MAP Ljava/util/Map;
 
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
+
+accessible method net/minecraft/world/inventory/AbstractContainerMenu clearContainer (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/Container;)V

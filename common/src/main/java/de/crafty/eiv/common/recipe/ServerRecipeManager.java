@@ -15,7 +15,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.*;
@@ -186,24 +189,71 @@ public class ServerRecipeManager {
     }
 
 
+    /**
+     * @param player          The player
+     * @param transferMap     The transfer map
+     * @param usedPlayerSlots The player slots
+     * @return Returns whether the current crafting container recipe is the same as the recipe quick-crafted by the player
+     */
+    private boolean hasSameRecipeInsideContainer(ServerPlayer player, HashMap<Integer, Integer> transferMap, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) {
+
+        System.out.println(transferMap);
+        for (int recipeSlotId : transferMap.keySet()) {
+            int destSlotId = transferMap.get(recipeSlotId);
+
+            Slot destSlot = player.containerMenu.getSlot(destSlotId);
+
+            ItemStack destStack = destSlot.getItem();
+            ItemStack requiredStack = usedPlayerSlots.getOrDefault(recipeSlotId, new HashMap<>()).values().stream().findFirst().orElse(ItemStack.EMPTY);
+
+            System.out.println(destStack + "/" + requiredStack);
+
+            if (!destStack.isEmpty() && (destStack.getCount() >= destStack.getMaxStackSize() || !ItemStack.isSameItemSameComponents(destStack, requiredStack)))
+                return false;
+
+        }
+
+        return true;
+    }
+
+
     //Transfer
     public void performRecipeTransfer(ServerPlayer player, HashMap<Integer, Integer> transferMap, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) {
 
-        transferMap.forEach((recipeSlot, destSlot) -> {
+        List<ItemStack> stacks = new ArrayList<>();
+
+        //Only accepts filled crafting containers when there is the same recipe inside
+        //Otherwise: Clear the content to avoid conflicts
+        if (!this.hasSameRecipeInsideContainer(player, transferMap, usedPlayerSlots)) {
+            player.containerMenu.slots.forEach(slot -> {
+                if (!slot.getItem().isEmpty() && transferMap.containsValue(slot.index))
+                    stacks.add(slot.remove(slot.getItem().getCount()));
+            });
+        }
+
+
+        //Actual item transfer
+        transferMap.forEach((recipeSlot, destSlotId) -> {
 
             HashMap<Integer, ItemStack> usedSlots = usedPlayerSlots.getOrDefault(recipeSlot, new HashMap<>());
+            Slot destSlot = player.containerMenu.getSlot(destSlotId);
 
             usedSlots.forEach((playerSlot, stack) -> {
-                ItemStack currentInDest = player.containerMenu.getSlot(destSlot).getItem();
+                ItemStack currentInDest = destSlot.getItem();
 
-                if (currentInDest.isEmpty())
-                    player.containerMenu.getSlot(destSlot).set(player.getInventory().removeItem(playerSlot, stack.getCount()));
-                else
-                    player.containerMenu.getSlot(destSlot).set(currentInDest.copyWithCount(currentInDest.getCount() + player.getInventory().removeItem(playerSlot, stack.getCount()).getCount()));
+                if (currentInDest.isEmpty()) {
+                    destSlot.set(player.containerMenu.getSlot(playerSlot).remove(stack.getCount()));
+                } else {
+                    destSlot.set(currentInDest.copyWithCount(currentInDest.getCount() + player.containerMenu.getSlot(playerSlot).remove(Math.min(stack.getCount(), currentInDest.getMaxStackSize() - currentInDest.getCount())).getCount()));
+                }
 
             });
 
+
         });
+
+        //Add cached items back to inventory
+        stacks.forEach(player::addItem);
 
     }
 
