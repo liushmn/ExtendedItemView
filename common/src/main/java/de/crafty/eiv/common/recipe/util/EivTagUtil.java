@@ -20,6 +20,7 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Helper class for network encoding based on CompoundTags
@@ -34,7 +35,7 @@ public class EivTagUtil {
     }
 
     private static <T> List<T> reconstructRegistryList(CompoundTag srcTag, String key, DefaultedRegistry<T> registry) {
-        return srcTag.getListOrEmpty(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).toList();
+        return srcTag.getListOrEmpty(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).filter(Objects::nonNull).toList();
     }
 
 
@@ -68,7 +69,7 @@ public class EivTagUtil {
             return tag;
         }
 
-        tag.put("items", EivTagUtil.createItemList(ingredient.items().map(Holder::value).toList()));
+        tag.put("items", EivTagUtil.createItemList(ingredient.items().filter(Holder::isBound).map(Holder::value).toList()));
         return tag;
     }
 
@@ -79,7 +80,10 @@ public class EivTagUtil {
 
         if (tag.contains("tag")) {
             TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getStringOr("tag", "")));
-            return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).orElse(null)));
+            if (BuiltInRegistries.ITEM.get(tagKey).isEmpty())
+                return null;
+
+            return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).get()));
         }
 
         List<Holder<Item>> itemList = EivTagUtil.reconstructItemList(tag, "items").stream().map(Holder::direct).toList();
@@ -136,7 +140,10 @@ public class EivTagUtil {
     }
 
     private static <T> T stringToRegistry(String string, DefaultedRegistry<T> registry) {
-        return registry.getValue(ResourceLocation.parse(string));
+        if (string.isEmpty())
+            return null;
+
+        return registry.getOptional(ResourceLocation.tryParse(string)).orElse(null);
     }
 
     public static String itemToString(Item item) {
