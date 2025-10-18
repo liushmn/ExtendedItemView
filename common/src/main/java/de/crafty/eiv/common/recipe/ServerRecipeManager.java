@@ -197,7 +197,6 @@ public class ServerRecipeManager {
      */
     private boolean hasSameRecipeInsideContainer(ServerPlayer player, HashMap<Integer, Integer> transferMap, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) {
 
-        System.out.println(transferMap);
         for (int recipeSlotId : transferMap.keySet()) {
             int destSlotId = transferMap.get(recipeSlotId);
 
@@ -205,8 +204,6 @@ public class ServerRecipeManager {
 
             ItemStack destStack = destSlot.getItem();
             ItemStack requiredStack = usedPlayerSlots.getOrDefault(recipeSlotId, new HashMap<>()).values().stream().findFirst().orElse(ItemStack.EMPTY);
-
-            System.out.println(destStack + "/" + requiredStack);
 
             if (!destStack.isEmpty() && (destStack.getCount() >= destStack.getMaxStackSize() || !ItemStack.isSameItemSameComponents(destStack, requiredStack)))
                 return false;
