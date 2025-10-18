@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinBuiltInRegistries {
 
 
-    @Inject(method = "bootStrap", at = @At("HEAD"))
+    @Inject(method = "bootStrap", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/registries/BuiltInRegistries;createContents()V", shift = At.Shift.AFTER))
     private static void injectFluidItems(CallbackInfo ci) {
         CommonEIV.buildFluidItems();
     }
