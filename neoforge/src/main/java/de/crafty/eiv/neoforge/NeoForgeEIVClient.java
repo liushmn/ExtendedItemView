@@ -49,4 +49,5 @@ public class NeoForgeEIVClient {
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
     }
 
+
 }

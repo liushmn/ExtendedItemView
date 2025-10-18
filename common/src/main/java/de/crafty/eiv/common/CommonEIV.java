@@ -37,6 +37,11 @@ public class CommonEIV {
             if (fluid == Fluids.EMPTY)
                 return;
 
+            if(BuiltInRegistries.ITEM.containsKey(BuiltInRegistries.FLUID.getKey(fluid))){
+                fluidItemMap.put(fluid, BuiltInRegistries.ITEM.getValue(BuiltInRegistries.FLUID.getKey(fluid)));
+                return;
+            }
+
             if (!fluid.isSource(fluid.defaultFluidState()))
                 return;
 
@@ -49,6 +54,7 @@ public class CommonEIV {
                                     .fluid(fluid)
                                     .setItemId(ResourceKey.create(Registries.ITEM, itemLocation))
                     ));
+
             fluidItemMap.put(fluid, item);
         });
 

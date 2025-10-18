@@ -64,6 +64,7 @@ public class EivTagUtil {
         Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = set.unwrap();
         CompoundTag tag = new CompoundTag();
 
+
         if (ingredientContent.left().isPresent()) {
             tag.putString("tag", ingredientContent.left().get().location().toString());
             return tag;
@@ -90,7 +91,7 @@ public class EivTagUtil {
         }
 
         List<Holder<Item>> itemList = EivTagUtil.reconstructItemList(tag, "items").stream().map(Holder::direct).toList();
-        return Ingredient.of(HolderSet.direct(itemList));
+        return !itemList.isEmpty() ? Ingredient.of(HolderSet.direct(itemList)) : null;
     }
 
     //----------------- Item, Block, Fluid -----------------
