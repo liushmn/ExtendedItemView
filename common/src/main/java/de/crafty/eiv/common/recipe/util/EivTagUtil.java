@@ -59,9 +59,9 @@ public class EivTagUtil {
         if (ingredient == null)
             return new CompoundTag();
 
+        HolderSet<Item> set = ((IngredientAccessor) (Object) ingredient).getValues();
 
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
-
+        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = set.unwrap();
         CompoundTag tag = new CompoundTag();
 
         if (ingredientContent.left().isPresent()) {
@@ -69,7 +69,10 @@ public class EivTagUtil {
             return tag;
         }
 
-        tag.put("items", EivTagUtil.createItemList(ingredient.items().filter(Holder::isBound).map(Holder::value).toList()));
+        if(ingredientContent.right().isEmpty())
+            return new CompoundTag();
+
+        tag.put("items", EivTagUtil.createItemList(ingredientContent.right().get().stream().filter(Holder::isBound).map(Holder::value).toList()));
         return tag;
     }
 
