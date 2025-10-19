@@ -54,15 +54,5 @@ public class ForgeEIVClient {
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(event::register);
     }
 
-    @SubscribeEvent
-    public static void onFluidItemRegistry(RegisterEvent event){
-        if(!event.getRegistryKey().location().equals(Registries.ITEM.location()))
-            return;
-
-        event.register(Registries.ITEM, itemRegisterHelper -> {
-
-        });
-    }
-
 
 }
