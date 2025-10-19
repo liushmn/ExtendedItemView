@@ -12,6 +12,7 @@
   "client": [
     "KeyMappingAccessor",
     "client.MixinKeyMapping",
-    "client.render.MixinGuiRenderer"
+    "client.render.MixinGuiRenderer",
+    "core.registries.MixinBuiltInRegistries"
   ]
 }

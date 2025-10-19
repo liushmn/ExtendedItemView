@@ -28,37 +28,4 @@ public class CommonEIV {
         return EivNetworkManager.INSTANCE;
     }
 
-    public static void buildFluidItems() {
-        //Add FluidItems
-        HashMap<Fluid, Item> fluidItemMap = new HashMap<>();
-
-        BuiltInRegistries.FLUID.forEach(fluid -> {
-
-            if (fluid == Fluids.EMPTY)
-                return;
-
-            if(BuiltInRegistries.ITEM.containsKey(BuiltInRegistries.FLUID.getKey(fluid))){
-                fluidItemMap.put(fluid, BuiltInRegistries.ITEM.getValue(BuiltInRegistries.FLUID.getKey(fluid)));
-                return;
-            }
-
-            if (!fluid.isSource(fluid.defaultFluidState()))
-                return;
-
-            ResourceLocation itemLocation = BuiltInRegistries.FLUID.getKey(fluid);
-            Item item = Registry.register(
-                    BuiltInRegistries.ITEM,
-                    itemLocation,
-                    new FluidItem(fluid.defaultFluidState().createLegacyBlock().getBlock(),
-                            new FluidItem.FluidItemProperties()
-                                    .fluid(fluid)
-                                    .setItemId(ResourceKey.create(Registries.ITEM, itemLocation))
-                    ));
-
-            fluidItemMap.put(fluid, item);
-        });
-
-        ItemViewRecipes.INSTANCE.setFluidItemMap(fluidItemMap);
-    }
-
 }
