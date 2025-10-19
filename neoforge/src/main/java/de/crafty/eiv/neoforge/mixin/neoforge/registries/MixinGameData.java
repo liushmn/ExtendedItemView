@@ -13,7 +13,6 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.neoforge.registries.GameData;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;

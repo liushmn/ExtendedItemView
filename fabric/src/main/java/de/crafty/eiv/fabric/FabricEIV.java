@@ -30,7 +30,6 @@ public class FabricEIV implements ModInitializer {
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> EivCommand.register(commandDispatcher));
 
         FabricLoader.getInstance().invokeEntrypoints("eiv", IExtendedItemViewIntegration.class, IExtendedItemViewIntegration::onIntegrationInitialize);
-
     }
 
 
