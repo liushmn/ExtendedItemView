@@ -2,9 +2,21 @@ package de.crafty.eiv.fabric;
 
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
+import de.crafty.eiv.common.recipe.ItemViewRecipes;
+import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+
+import java.util.HashMap;
 
 import static de.crafty.eiv.common.CommonEIV.*;
 
@@ -19,6 +31,41 @@ public class FabricEIV implements ModInitializer {
 
         FabricLoader.getInstance().invokeEntrypoints("eiv", IExtendedItemViewIntegration.class, IExtendedItemViewIntegration::onIntegrationInitialize);
 
+    }
+
+
+    public static void buildFluidItems() {
+
+        //Add FluidItems
+        HashMap<Fluid, Item> fluidItemMap = new HashMap<>();
+
+        BuiltInRegistries.FLUID.forEach(fluid -> {
+
+            if (fluid == Fluids.EMPTY)
+                return;
+
+            if(BuiltInRegistries.ITEM.containsKey(BuiltInRegistries.FLUID.getKey(fluid))){
+                fluidItemMap.put(fluid, BuiltInRegistries.ITEM.getValue(BuiltInRegistries.FLUID.getKey(fluid)));
+                return;
+            }
+
+            if (!fluid.isSource(fluid.defaultFluidState()))
+                return;
+
+            ResourceLocation itemLocation = BuiltInRegistries.FLUID.getKey(fluid);
+            Item item = Registry.register(
+                    BuiltInRegistries.ITEM,
+                    itemLocation,
+                    new FluidItem(fluid.defaultFluidState().createLegacyBlock().getBlock(),
+                            new FluidItem.FluidItemProperties()
+                                    .fluid(fluid)
+                                    .setItemId(ResourceKey.create(Registries.ITEM, itemLocation))
+                    ));
+
+            fluidItemMap.put(fluid, item);
+        });
+
+        ItemViewRecipes.INSTANCE.setFluidItemMap(fluidItemMap);
     }
 
 }

@@ -47,7 +47,6 @@
     "client.multiplayer.MixinClientPacketListener",
     "client.renderer.entity.state.MixinEntityRenderState",
     "client.renderer.item.MixinSpecialModelWrapper",
-    "client.renderer.special.MixinSpecialModelRenderers",
-    "core.registries.MixinBuiltInRegistries"
+    "client.renderer.special.MixinSpecialModelRenderers"
   ]
 }
