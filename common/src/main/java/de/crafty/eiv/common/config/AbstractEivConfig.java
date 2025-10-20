@@ -53,7 +53,11 @@ public abstract class AbstractEivConfig {
         try {
 
             this.saveData();
+            File configDirectory = new File(CommonEIV.CONFIG_PATH);
             File saveFile = new File(CommonEIV.CONFIG_PATH + this.fileName + ".json");
+
+            if(configDirectory.mkdirs())
+                CommonEIV.LOGGER.info("Couldn't find config directory, creating new one...");
 
 
             if (saveFile.createNewFile())
