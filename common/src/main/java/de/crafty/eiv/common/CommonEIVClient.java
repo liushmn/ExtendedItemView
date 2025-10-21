@@ -56,14 +56,14 @@ public class CommonEIVClient {
 
     public static void setResolver(final IEivClientResolver helper) {
         HELPER = helper;
-        LOGGER.info("Helper has been set");
+        LOGGER.info("ClientResolver has been set");
     }
 
     public static IEivClientResolver resolver() {
         if (HELPER != null)
             return HELPER;
 
-        throw new IllegalStateException("Helper not set");
+        throw new IllegalStateException("ClientResolver not set");
     }
 
 

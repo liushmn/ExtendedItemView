@@ -33,6 +33,9 @@ import java.util.HashMap;
  */
 public class EivNetworkManager {
 
+    /**
+     * The NetworkManager instance of EIV
+     */
     public static final EivNetworkManager INSTANCE = new EivNetworkManager().registerPayloads();
 
     private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> clientbound;
@@ -52,29 +55,58 @@ public class EivNetworkManager {
         this.serverPayloadHandlers = new HashMap<>();
     }
 
+    /**
+     * Registers a new clientbound packet type
+     *
+     * @param type          The packet type
+     * @param codec         The codec for the packet
+     * @param clientHandler The client payload handler
+     */
     private <B extends FriendlyByteBuf, T extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<T> type, StreamCodec<B, T> codec, PayloadHandler<ClientContext, T> clientHandler) {
         this.clientbound.put(type.id(), new CustomPacketPayload.TypeAndCodec<>(type, codec));
         this.clientPayloadHandlers.put(type.id(), clientHandler);
     }
 
+    /**
+     * Registers a new serverbound packet type
+     * @param type The packet type
+     * @param codec The codec for the packet
+     * @param serverHandler The server payload handler
+     */
     private <B extends FriendlyByteBuf, T extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<T> type, StreamCodec<B, T> codec, PayloadHandler<ServerContext, T> serverHandler) {
         this.serverbound.put(type.id(), new CustomPacketPayload.TypeAndCodec<>(type, codec));
         this.serverPayloadHandlers.put(type.id(), serverHandler);
     }
 
 
+    /**
+     * @return ALl clientbound packets
+     */
     public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getClientbound() {
         return this.clientbound;
     }
 
+    /**
+     * @return All serverbound packets
+     */
     public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getServerbound() {
         return this.serverbound;
     }
 
+    /**
+     * Returns all registered payload handlers for clientbound packets
+     *
+     * @return
+     */
     public HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers() {
         return this.clientPayloadHandlers;
     }
 
+    /**
+     * Returns all registered payload handlers for serverbound packets
+     *
+     * @return
+     */
     public HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers() {
         return this.serverPayloadHandlers;
     }
@@ -193,7 +225,7 @@ public class EivNetworkManager {
                         0.2F,
                         ((context.sender().getRandom().nextFloat() - context.sender().getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F
                 );
-            }else
+            } else
                 context.sender().sendSystemMessage(
                         Component.translatable("cheatmode.eiv.denied").withStyle(ChatFormatting.RED)
                 );
@@ -210,12 +242,29 @@ public class EivNetworkManager {
     public interface Context {
     }
 
+    /**
+     * Network context containing relevant information for client packet handling
+     *
+     * @param client The client instance
+     */
     public record ClientContext(Minecraft client) implements Context {
     }
 
+    /**
+     * Network context containing relevant information for server packet handling
+     *
+     * @param server The server instance
+     * @param sender The player who sent the packet
+     */
     public record ServerContext(MinecraftServer server, ServerPlayer sender) implements Context {
     }
 
+    /**
+     * Functional interface containing the packet handling logic
+     *
+     * @param <S> The context (Either ClientContext or ServerContext)
+     * @param <T> The payload type
+     */
     public interface PayloadHandler<S extends Context, T extends CustomPacketPayload> {
 
         void handle(S context, T payload);

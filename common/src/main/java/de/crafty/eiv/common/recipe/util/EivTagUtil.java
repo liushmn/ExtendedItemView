@@ -39,22 +39,47 @@ public class EivTagUtil {
     }
 
 
+    /**
+     * Decodes an ItemStack on the client side
+     * @param tag The tag to decode
+     * @return The decoded stack
+     */
     public static ItemStack decodeItemStackOnClient(CompoundTag tag) {
         return ItemStack.CODEC.parse(Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
     }
 
+    /**
+     * Encodes an ItemStack on the client side
+     * @param stack The stack to encode
+     * @return The encoded stack as CompoundTag
+     */
     public static CompoundTag encodeItemStackOnClient(ItemStack stack) {
         return ItemStack.CODEC.encode(stack, Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).mapOrElse(tag -> tag.asCompound().orElseGet(CompoundTag::new), tagError -> new CompoundTag());
     }
 
+    /**
+     * Encodes an ItemStack on the server side
+     * @param stack The stack to encode
+     * @return The encoded stack as CompoundTag
+     */
     public static CompoundTag encodeItemStackOnServer(ItemStack stack) {
         return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).mapOrElse(tag -> tag.asCompound().orElseGet(CompoundTag::new), tagError -> new CompoundTag());
     }
 
+    /**
+     * Decodes an ItemStack on the server side
+     * @param tag The tag to decode
+     * @return The decoded stack
+     */
     public static ItemStack decodeItemStackOnServer(CompoundTag tag) {
         return ItemStack.CODEC.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
     }
 
+    /**
+     * Encodes an Ingredient
+     * @param ingredient The ingredient to encode
+     * @return The encoded ingredient as CompoundTag
+     */
     public static CompoundTag writeIngredient(Ingredient ingredient) {
         if (ingredient == null)
             return new CompoundTag();
@@ -77,6 +102,11 @@ public class EivTagUtil {
         return tag;
     }
 
+    /**
+     * Decodes an Ingredient
+     * @param tag The tag to decode
+     * @return The decoded ingredient
+     */
     public static Ingredient readIngredient(CompoundTag tag) {
         if (tag.isEmpty())
             return null;
@@ -94,30 +124,65 @@ public class EivTagUtil {
         return !itemList.isEmpty() ? Ingredient.of(HolderSet.direct(itemList)) : null;
     }
 
+
+
     //----------------- Item, Block, Fluid -----------------
 
+    /**
+     * Pre defined method for encoding item lists
+     * @param items The items to encode
+     * @return The encoded item list as ListTag
+     */
     public static ListTag createItemList(List<Item> items) {
         return createRegistryList(items, BuiltInRegistries.ITEM);
     }
 
 
+    /**
+     * Pre defined method for decoding item lists
+     * @param srcTag The parent tag containing the list
+     * @param key They key referring to the list
+     * @return The decoded item list
+     */
     public static List<Item> reconstructItemList(CompoundTag srcTag, String key) {
         return reconstructRegistryList(srcTag, key, BuiltInRegistries.ITEM);
     }
 
-    public static ListTag createBlockList(List<Block> items) {
-        return createRegistryList(items, BuiltInRegistries.BLOCK);
+    /**
+     * Pre defined method for encoding block lists
+     * @param blocks The blocks to encode
+     * @return The encoded block list as ListTag
+     */
+    public static ListTag createBlockList(List<Block> blocks) {
+        return createRegistryList(blocks, BuiltInRegistries.BLOCK);
     }
 
+    /**
+     * Pre defined method for decoding block lists
+     * @param srcTag The parent tag containing the list
+     * @param key They key referring to the list
+     * @return The decoded block list
+     */
     public static List<Block> reconstructBlockList(CompoundTag srcTag, String key) {
         return reconstructRegistryList(srcTag, key, BuiltInRegistries.BLOCK);
     }
 
-    public static ListTag createFluidList(List<Fluid> items) {
-        return createRegistryList(items, BuiltInRegistries.FLUID);
+    /**
+     * Pre defined method for encoding fluid lists
+     * @param fluids The fluids to encode
+     * @return The encoded fluid list as ListTag
+     */
+    public static ListTag createFluidList(List<Fluid> fluids) {
+        return createRegistryList(fluids, BuiltInRegistries.FLUID);
     }
 
 
+    /**
+     * Pre defined method for decoding fluid lists
+     * @param srcTag The parent tag containing the list
+     * @param key They key referring to the list
+     * @return The decoded fluid list
+     */
     public static List<Fluid> reconstructFluidList(CompoundTag srcTag, String key) {
         return reconstructRegistryList(srcTag, key, BuiltInRegistries.FLUID);
     }
@@ -125,12 +190,27 @@ public class EivTagUtil {
     //----------------- Custom Objects -----------------
 
 
+    /**
+     * Encodes a list of objects
+     * @param list The list to encode
+     * @param builder A CompoundBuilder defining the encoding method for a single object
+     * @return The encoded list as CompoundTag
+     * @param <T> The type of the list
+     */
     public static <T> ListTag writeList(List<T> list, CompoundBuilder<T> builder) {
         ListTag tagList = new ListTag();
         list.stream().map(t -> builder.buildSingle(t, new CompoundTag())).forEach(tagList::add);
         return tagList;
     }
 
+    /**
+     * Decodes a list of objects
+     * @param srcTag The parent tag containing the list
+     * @param key They key referring to the list
+     * @param builder A CompoundReconstructor defining the decoding method for a single object
+     * @return The decoded list
+     * @param <T> The type of the list
+     */
     public static <T> List<T> readList(CompoundTag srcTag, String key, CompoundReconstructor<T> builder) {
         return srcTag.getListOrEmpty(key).stream().map(Tag::asCompound).map(compoundTag -> builder.reconstructSingle(compoundTag.orElseGet(CompoundTag::new))).toList();
     }
@@ -150,26 +230,53 @@ public class EivTagUtil {
         return registry.getOptional(ResourceLocation.tryParse(string)).orElse(null);
     }
 
+    /**
+     * @param item The Item
+     * @return The resource location of the given item as a string
+     */
     public static String itemToString(Item item) {
         return registryToString(item, BuiltInRegistries.ITEM);
     }
 
+    /**
+     * @param s The resource location as a string
+     * @return The item corresponding to the given resource location
+     */
     public static Item itemFromString(String s) {
         return stringToRegistry(s, BuiltInRegistries.ITEM);
     }
 
+    /**
+     * @param block The Block
+     * @return The resource location of the given block as a string
+     */
     public static String blockToString(Block block) {
         return registryToString(block, BuiltInRegistries.BLOCK);
     }
 
+    /**
+     *
+     * @param s The resource location as a string
+     * @return The block corresponding to the given resource location
+     */
     public static Block blockFromString(String s) {
         return stringToRegistry(s, BuiltInRegistries.BLOCK);
     }
 
+    /**
+     *
+     * @param fluid The Fluid
+     * @return The resource location of the given fluid as a string
+     */
     public static String fluidToString(Fluid fluid) {
         return registryToString(fluid, BuiltInRegistries.FLUID);
     }
 
+    /**
+     *
+     * @param s The resource location as a string
+     * @return The fluid corresponding to the given resource location
+     */
     public static Fluid fluidFromString(String s) {
         return stringToRegistry(s, BuiltInRegistries.FLUID);
     }
@@ -177,12 +284,20 @@ public class EivTagUtil {
     //----------------- Custom object builder/reconstructor -----------------
 
 
+    /**
+     * Functional interface defining the encoding method for a single object
+     * @param <T> The type of the object
+     */
     public interface CompoundBuilder<T> {
 
         CompoundTag buildSingle(T origin, CompoundTag tag);
 
     }
 
+    /**
+     * Functional interface defining the decoding method for a single object
+     * @param <T> The type of the object
+     */
     public interface CompoundReconstructor<T> {
 
         T reconstructSingle(CompoundTag tag);

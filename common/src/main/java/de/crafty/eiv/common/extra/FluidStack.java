@@ -14,32 +14,36 @@ import net.minecraft.world.level.material.Fluids;
 /**
  * A representation of a fluid-item including its fluid type and stored fluid amount
  */
-public class FluidStack {
+public record FluidStack(Fluid fluid, int amount) {
 
     public static final int AMOUNT_FULL = 1000;
     public static final FluidStack EMPTY = new FluidStack(Fluids.EMPTY, 0);
 
-    private final Fluid fluid;
-    private final int amount;
-
     public FluidStack(final Fluid fluid) {
-        this.fluid = fluid;
-        this.amount = FluidStack.AMOUNT_FULL;
+        this(fluid, FluidStack.AMOUNT_FULL);
     }
 
-    public FluidStack(final Fluid fluid, int amount) {
-        this.fluid = fluid;
-        this.amount = amount;
-    }
-
-    public Fluid getFluid() {
+    /**
+     * The fluid this stack holds
+     */
+    @Override
+    public Fluid fluid() {
         return this.fluid;
     }
 
-    public int getAmount() {
+    /**
+     * @return The amount of fluid this stack holds
+     */
+    @Override
+    public int amount() {
         return this.amount;
     }
 
+    /**
+     * Creates a FluidStack from an ItemStack
+     * @param stack
+     * @return
+     */
     public static FluidStack fromItemStack(ItemStack stack) {
         if (!(stack.getItem() instanceof FluidItem fluidItem))
             return FluidStack.EMPTY;
@@ -52,6 +56,9 @@ public class FluidStack {
         return new FluidStack(fluidItem.getFluid(), amount);
     }
 
+    /**
+     * Creates an ItemStack from this FluidStack
+     */
     public ItemStack createItemStack() {
         Item item = ItemViewRecipes.INSTANCE.itemForFluid(this.fluid);
         if (item == Items.AIR)
