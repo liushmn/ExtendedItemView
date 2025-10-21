@@ -27,14 +27,14 @@
   "key.eiv.toggle_overlay": "Toggle Overlay",
   "eiv.bookmarks": "Bookmarks",
 
-  "key.categories.eiv": "Extended ItemView",
+  "key.categories.eiv.eiv": "Extended ItemView",
   "key.eiv.bookmark": "Add Bookmark",
   "key.eiv.usage": "Show Usage",
   "key.eiv.recipe": "Show Recipes",
   "key.eiv.go_back": "Go Back",
   "key.eiv.go_forward": "Go Forward",
 
-  "key.categories.eiv_admin": "Extended ItemView - Admin",
+  "key.categories.eiv.eiv_admin": "Extended ItemView - Admin",
   "key.eiv.cheatmode": "Use Cheatmode",
 
   "cheatmode.eiv.denied": "You do not have permission to use the cheatmode",
