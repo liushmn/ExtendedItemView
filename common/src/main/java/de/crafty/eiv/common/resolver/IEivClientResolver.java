@@ -11,6 +11,9 @@ import net.minecraft.world.level.material.Fluid;
 import java.util.Map;
 
 
+/**
+ * Resolvers are used to handle modloader dependent information like mod names or UV infos
+ */
 public interface IEivClientResolver {
 
     String getModNameForItem(Item item);

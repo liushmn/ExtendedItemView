@@ -44,9 +44,9 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
             return;
 
         FluidStack fluidStack = FluidStack.fromItemStack(stack);
-        Fluid fluid = fluidStack.getFluid();
+        Fluid fluid = fluidStack.fluid();
 
-        float renderHeight = Math.max(Math.min((float) fluidStack.getAmount() / (float) FluidStack.AMOUNT_FULL, 1.0F), 0.1F);
+        float renderHeight = Math.max(Math.min((float) fluidStack.amount() / (float) FluidStack.AMOUNT_FULL, 1.0F), 0.1F);
 
 
         int color = fluid == Fluids.WATER ? Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS).value().getWaterColor() : -1;
