@@ -26,7 +26,7 @@ public interface IEivServerRecipe {
 
     /**
      *
-     * @return The server recipe's type registered by <b>EivRecipeTye.register();</b>
+     * @return The server recipe's type registered by <b>EivRecipeType.register();</b>
      */
     EivRecipeType<? extends IEivServerRecipe> getRecipeType();
 }

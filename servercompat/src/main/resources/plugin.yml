@@ -1,6 +1,9 @@
 name: ExtendedItemView
 author: ${mod_authors}
 version: ${mod_version}
-main: de.crafty.eiv.servercompat.ServerEIV
+main: de.crafty.eiv.servercompat.EivPlugin
 
 api-version: '1.21'
+
+#required for recipe collection
+load: POSTWORLD

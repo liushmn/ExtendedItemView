@@ -1,6 +1,8 @@
 package de.crafty.eiv.common.network;
 
+import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
+import de.crafty.eiv.common.network.payload.compat.ClientboundCompatPayload;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
 import de.crafty.eiv.common.network.payload.recipe.*;
 import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
@@ -146,7 +148,7 @@ public class EivNetworkManager {
     public EivNetworkManager registerPayloads() {
 
         this.registerServerbound(ServerboundRequestEivUpdate.TYPE, ServerboundRequestEivUpdate.STREAM_CODEC, (context, payload) -> {
-            ServerRecipeManager.INSTANCE.informAboutStackSensitives();
+            ServerRecipeManager.INSTANCE.updateStackSensitives(context.sender());
             ServerRecipeManager.INSTANCE.informAboutRecipes(context.sender());
         });
 
@@ -231,6 +233,8 @@ public class EivNetworkManager {
                 );
 
         });
+
+        this.registerClientbound(ClientboundCompatPayload.TYPE, ClientboundCompatPayload.STREAM_CODEC, EivPayloadConverter::convertFromCompat);
 
         return this;
     }

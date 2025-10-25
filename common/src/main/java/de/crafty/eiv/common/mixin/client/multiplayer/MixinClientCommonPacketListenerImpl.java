@@ -30,6 +30,11 @@ public abstract class MixinClientCommonPacketListenerImpl {
 
     @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true)
     private void onEivPayloadReceived(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
+        if(packet.payload() instanceof BrandPayload(String brand) && brand.startsWith(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "compat").toString())){
+            CommonEIV.LOGGER.info("Received Compat packet!!!");
+            ci.cancel();
+            return;
+        }
 
         if (!EivNetworkManager.INSTANCE.getClientbound().containsKey(packet.payload().type().id()))
             return;
