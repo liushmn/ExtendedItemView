@@ -24,7 +24,6 @@ public class EivPlugin extends JavaPlugin {
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, MESSAGE_CHANNEL);
 
         CompatRecipeManager.INSTANCE.registerIntegration(this, new BuiltinEivCompatIntegration());
-        CompatRecipeManager.INSTANCE.loadIntegrations();
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new ServerReloadListener(), this);

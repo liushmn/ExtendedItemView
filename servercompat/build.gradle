@@ -5,7 +5,7 @@ plugins {
 
 
 base {
-    archivesName = "${mod_id}-servercompat-${mod_version}+${minecraft_version}"
+    archivesName = "${mod_id}-compat-${mod_version}-${plugin_version}+${minecraft_version}"
 }
 
 
