@@ -22,6 +22,10 @@ runServer {
     minecraftVersion("${minecraft_version}")
 }
 
+build {
+    dependsOn(reobfJar)
+}
+
 processResources {
 
     filesMatching("plugin.yml") {

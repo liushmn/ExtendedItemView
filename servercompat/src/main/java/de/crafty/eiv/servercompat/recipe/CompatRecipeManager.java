@@ -16,6 +16,7 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -24,7 +25,7 @@ public class CompatRecipeManager {
 
     public static final CompatRecipeManager INSTANCE = new CompatRecipeManager();
 
-    private final HashMap<JavaPlugin, IEivCompatIntegration> PRESENT_INTEGRATIONS = new HashMap<>();
+    private final HashMap<Plugin, IEivCompatIntegration> PRESENT_INTEGRATIONS = new HashMap<>();
     private static final HashMap<EivCompatRecipeType<?>, List<CompatRecipeEntry>> PRESENT_RECIPES = new LinkedHashMap<>();
 
 
@@ -33,10 +34,13 @@ public class CompatRecipeManager {
     }
 
 
-    public void registerIntegration(JavaPlugin plugin, IEivCompatIntegration integration) {
+    public void registerIntegration(Plugin plugin, IEivCompatIntegration integration) {
         PRESENT_INTEGRATIONS.put(plugin, integration);
     }
 
+    public int getIntegrationCount() {
+        return PRESENT_INTEGRATIONS.size();
+    }
 
     public void loadIntegrations() {
 
@@ -49,6 +53,7 @@ public class CompatRecipeManager {
 
         CompatItemView.clearProviders();
         PRESENT_INTEGRATIONS.values().forEach(IEivCompatIntegration::onInitialize);
+        Data.log("All integrations have been loaded.");
         this.reload();
     }
 

@@ -5,5 +5,4 @@ main: de.crafty.eiv.servercompat.EivPlugin
 
 api-version: '1.21'
 
-#required for recipe collection
-load: POSTWORLD
+eiv-compat: "de.crafty.eiv.servercompat.builtin.BuiltinEivCompatIntegration"
