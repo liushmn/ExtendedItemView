@@ -59,8 +59,8 @@ public class MixinGameData {
 
 
     @Redirect(method = "postRegisterEvents", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/ModLoader;postEventWrapContainerInModOrder(Lnet/minecraftforge/fml/event/IModBusEvent;)V"))
-    private static <T extends IModBusEvent> void injectFluidItems(ModLoader instance, T e) {
-        instance.postEventWrapContainerInModOrder(e);
+    private static <T extends IModBusEvent> void injectFluidItems(T e) {
+        ModLoader.postEventWrapContainerInModOrder(e);
 
         RegisterEvent event = (RegisterEvent) e;
 

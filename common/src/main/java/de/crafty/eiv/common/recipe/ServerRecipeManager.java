@@ -15,10 +15,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.*;
@@ -70,7 +68,7 @@ public class ServerRecipeManager {
         ItemView.getStackSensitive().clear();
         ItemView.getReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
 
-        this.informAboutStackSensitives();
+        this.broadcastStackSensitives();
 
         this.reloadRecipes();
         this.broadcastAllRecipes();
@@ -78,49 +76,31 @@ public class ServerRecipeManager {
     }
 
 
-    public void informAboutStackSensitives() {
+    public void broadcastStackSensitives() {
 
         if (this.server == null)
             return;
 
+        CommonEIV.LOGGER.info("Broadcasting Stack-Sensitives...");
+        CommonEIV.LOGGER.info("Informing {} players about {} stack-sensitives", this.server.getPlayerList().getPlayers().size(), ItemView.getStackSensitive().size());
+        this.server.getPlayerList().getPlayers().forEach(this::updateStackSensitives);
+
+
+    }
+
+    public void updateStackSensitives(ServerPlayer player) {
         List<ItemView.StackSensitive> collected = new ArrayList<>();
         ItemView.getStackSensitive().forEach((item, stackSensitives) -> {
             collected.addAll(stackSensitives);
         });
 
-        CommonEIV.LOGGER.info("Broadcasting Stack-Sensitives...");
-        CommonEIV.LOGGER.info("Updating {} players...", this.server.getPlayerList().getPlayers().size());
-        this.server.getPlayerList().getPlayers().forEach(player -> {
-            CommonEIV.networkManager().sendPacket(player, new ClientboundStartStackSensitivesPayload(collected.size()));
-            collected.forEach(stackSensitive -> {
-                CommonEIV.networkManager().sendPacket(player, new ClientboundStackSensitivePayload(stackSensitive));
-            });
-            CommonEIV.networkManager().sendPacket(player, new ClientboundFinishStackSensitivesPayload());
+        CommonEIV.networkManager().sendPacket(player, new ClientboundStartStackSensitivesPayload(collected.size()));
+        collected.forEach(stackSensitive -> {
+            CommonEIV.networkManager().sendPacket(player, new ClientboundStackSensitivePayload(stackSensitive));
         });
-
-
+        CommonEIV.networkManager().sendPacket(player, new ClientboundFinishStackSensitivesPayload());
     }
 
-    public void reloadRecipes() {
-        PRESENT_RECIPES.clear();
-
-        List<IEivServerRecipe> serverRecipes = new ArrayList<>();
-        ItemViewRecipes.INSTANCE.getRecipeProviders().forEach(serverModRecipeProvider -> {
-            List<IEivServerRecipe> recipes = new ArrayList<>();
-            serverModRecipeProvider.provide(recipes);
-            serverRecipes.addAll(recipes);
-        });
-
-        serverRecipes.forEach(iEivServerModRecipe -> {
-
-            ResourceLocation typeId = iEivServerModRecipe.getRecipeType().getId();
-            List<ServerRecipeEntry> list = PRESENT_RECIPES.getOrDefault(iEivServerModRecipe.getRecipeType(), new ArrayList<>());
-            list.add(new ServerRecipeEntry(ResourceLocation.fromNamespaceAndPath(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
-            PRESENT_RECIPES.put(iEivServerModRecipe.getRecipeType(), list);
-        });
-    }
-
-    //TODO make broadcast by type
     public void broadcastAllRecipes() {
         if (this.server == null) {
             return;
@@ -150,6 +130,25 @@ public class ServerRecipeManager {
 
     }
 
+    public void reloadRecipes() {
+        PRESENT_RECIPES.clear();
+
+        List<IEivServerRecipe> serverRecipes = new ArrayList<>();
+        ItemViewRecipes.INSTANCE.getRecipeProviders().forEach(serverModRecipeProvider -> {
+            List<IEivServerRecipe> recipes = new ArrayList<>();
+            serverModRecipeProvider.provide(recipes);
+            serverRecipes.addAll(recipes);
+        });
+
+        serverRecipes.forEach(iEivServerModRecipe -> {
+
+            ResourceLocation typeId = iEivServerModRecipe.getRecipeType().getId();
+            List<ServerRecipeEntry> list = PRESENT_RECIPES.getOrDefault(iEivServerModRecipe.getRecipeType(), new ArrayList<>());
+            list.add(new ServerRecipeEntry(ResourceLocation.fromNamespaceAndPath(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
+            PRESENT_RECIPES.put(iEivServerModRecipe.getRecipeType(), list);
+        });
+    }
+
 
     public record ServerRecipeEntry(ResourceLocation modRecipeId, IEivServerRecipe recipe) {
 
@@ -174,7 +173,7 @@ public class ServerRecipeManager {
             return tag;
         }
 
-        private static IEivServerRecipe fromTag(CompoundTag tag) {
+        public static IEivServerRecipe fromTag(CompoundTag tag) {
             if (!tag.contains("recipeType"))
                 return null;
 

@@ -33,7 +33,7 @@ public class EivCommand {
      * on a server reload (via ReloadCallback)
      */
     private static int reloadStackSensitives(CommandContext<CommandSourceStack> context){
-        ServerRecipeManager.INSTANCE.informAboutStackSensitives();
+        ServerRecipeManager.INSTANCE.broadcastStackSensitives();
         context.getSource().sendSuccess(() -> Component.translatable("commands.eiv.reloadedStackSensitives"), true);
         return 1;
     }
