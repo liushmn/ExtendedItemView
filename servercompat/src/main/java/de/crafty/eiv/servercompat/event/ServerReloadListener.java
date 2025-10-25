@@ -11,10 +11,10 @@ public class ServerReloadListener implements Listener {
     @EventHandler
     public void onResourceReload(ServerLoadEvent event) {
 
-        if(event.getType() == ServerLoadEvent.LoadType.STARTUP)
-            return;
-
-        CompatRecipeManager.INSTANCE.reload();
+        if(event.getType() == ServerLoadEvent.LoadType.RELOAD)
+            CompatRecipeManager.INSTANCE.reload();
+        else
+            CompatRecipeManager.INSTANCE.loadIntegrations();
 
     }
 }

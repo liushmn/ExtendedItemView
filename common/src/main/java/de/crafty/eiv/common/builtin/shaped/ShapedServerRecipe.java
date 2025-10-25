@@ -60,8 +60,6 @@ public class ShapedServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        System.out.println("Loading: " + tag);
-
         this.width = tag.getIntOr("width", 0);
         this.height = tag.getIntOr("height", 0);
 

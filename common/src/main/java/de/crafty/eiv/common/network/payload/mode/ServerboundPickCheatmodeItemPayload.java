@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public record ServerboundPickCheatmodeItemPayload(ItemStack stack, int amount) implements CustomPacketPayload {
+public record  ServerboundPickCheatmodeItemPayload(ItemStack stack, int amount) implements CustomPacketPayload {
 
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundPickCheatmodeItemPayload> STREAM_CODEC = StreamCodec.composite(
