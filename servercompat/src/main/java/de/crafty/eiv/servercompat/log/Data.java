@@ -9,14 +9,14 @@ public class Data {
 
 
     public static void log(String info){
-        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a7a" + info);
+        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a7a" + info + "\u00a7r");
     }
 
     public static void warn(String warn){
-        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a7c" + warn);
+        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a7c" + warn + "\u00a7r");
     }
 
     public static void error(String error){
-        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a74" + error);
+        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "\u00a74" + error + "\u00a7r");
     }
 }
