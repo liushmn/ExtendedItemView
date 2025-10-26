@@ -116,14 +116,14 @@ public class ClientRecipeManager {
 
         public void setUpdateStartTimestamp() {
             if (Minecraft.getInstance().level != null)
-                this.updateStartTimestamp = Minecraft.getInstance().level.getGameTime();
+                this.updateStartTimestamp = System.currentTimeMillis() / 50;
         }
 
         public boolean networkTimeout() {
             if (Minecraft.getInstance().level == null)
                 return true;
 
-            return Minecraft.getInstance().level.getGameTime() - this.updateStartTimestamp > this.networkTimeout;
+            return System.currentTimeMillis() / 50 - this.updateStartTimestamp > this.networkTimeout;
         }
 
         public void setStatusStep(String statusStep) {
