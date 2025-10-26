@@ -4,10 +4,7 @@ plugins {
 }
 
 
-base {
-    archivesName = "${mod_id}-compat-${mod_version}-${plugin_version}+${minecraft_version}"
-}
-
+base.archivesName.set("${mod_id}-paper-${mod_version}-${plugin_version}+${minecraft_version}")
 
 repositories {
     mavenCentral()
@@ -32,3 +29,5 @@ processResources {
         expand project.properties
     }
 }
+
+

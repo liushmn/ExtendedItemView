@@ -44,12 +44,10 @@ public class CompatRecipeManager {
 
     public void loadIntegrations() {
 
-        StringBuilder logBuilder = new StringBuilder(String.format("Loading %s EIV-Compat integration(s)...", PRESENT_INTEGRATIONS.size()));
+        Data.log(String.format("Loading %s EIV-Compat integration(s)...", PRESENT_INTEGRATIONS.size()));
         PRESENT_INTEGRATIONS.forEach((plugin, integration) -> {
-            logBuilder.append(String.format("\n - %s", plugin.getName()));
+            Data.log(String.format(" - %s", plugin.getName()));
         });
-
-        Data.log(logBuilder.toString());
 
         CompatItemView.clearProviders();
         PRESENT_INTEGRATIONS.values().forEach(IEivCompatIntegration::onInitialize);

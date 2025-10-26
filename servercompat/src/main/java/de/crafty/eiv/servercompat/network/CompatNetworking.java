@@ -1,15 +1,8 @@
 package de.crafty.eiv.servercompat.network;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import de.crafty.eiv.servercompat.EivPlugin;
 import de.crafty.eiv.servercompat.network.payload.IEivCompatPacketPayload;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.BrandPayload;
-import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.resources.ResourceLocation;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.nio.charset.StandardCharsets;
@@ -28,7 +21,7 @@ public class CompatNetworking {
         payload.write(payloadData);
         tag.put("payloadData", payloadData);
 
-        ((CraftPlayer) player).getHandle().connection.send(new ClientboundCustomPayloadPacket(new DiscardedPayload(ResourceLocation.parse(EivPlugin.MESSAGE_CHANNEL), tag.toString().getBytes(StandardCharsets.UTF_8))));
+        player.sendPluginMessage(EivPlugin.getInstance(), EivPlugin.MESSAGE_CHANNEL, tag.toString().getBytes(StandardCharsets.UTF_8));
 
     }
 
