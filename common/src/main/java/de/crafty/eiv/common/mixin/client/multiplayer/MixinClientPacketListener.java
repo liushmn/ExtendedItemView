@@ -3,6 +3,7 @@ package de.crafty.eiv.common.mixin.client.multiplayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.network.EivNetworkManager;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import net.minecraft.client.Minecraft;
@@ -40,6 +41,7 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
     @Inject(method = "handleLogin", at = @At("RETURN"))
     private void requestRecipes(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
         ClientRecipeManager.INSTANCE.requestServerEivData();
+        ItemView.getClientReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
     }
 
 

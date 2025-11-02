@@ -1,10 +1,12 @@
 package de.crafty.eiv.common.network;
 
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
 import de.crafty.eiv.common.network.payload.compat.ClientboundCompatPayload;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
 import de.crafty.eiv.common.network.payload.recipe.*;
+import de.crafty.eiv.common.network.payload.reload.ClientboundServerReloadPayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
@@ -152,6 +154,9 @@ public class EivNetworkManager {
             ServerRecipeManager.INSTANCE.informAboutRecipes(context.sender());
         });
 
+        this.registerClientbound(ClientboundServerReloadPayload.TYPE, ClientboundServerReloadPayload.STREAM_CODEC, (context, payload) -> {
+            ItemView.getClientReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
+        });
 
         //Stack-Sensitives
         this.registerClientbound(ClientboundStartStackSensitivesPayload.TYPE, ClientboundStartStackSensitivesPayload.STREAM_CODEC, (context, payload) -> {

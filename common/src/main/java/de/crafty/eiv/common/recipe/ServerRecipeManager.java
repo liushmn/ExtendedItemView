@@ -4,7 +4,9 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.ItemView;
+import de.crafty.eiv.common.network.EivNetworkManager;
 import de.crafty.eiv.common.network.payload.recipe.*;
+import de.crafty.eiv.common.network.payload.reload.ClientboundServerReloadPayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
 import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
@@ -67,6 +69,9 @@ public class ServerRecipeManager {
 
         ItemView.getStackSensitive().clear();
         ItemView.getReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
+        this.server.getPlayerList().getPlayers().forEach(player -> {
+            EivNetworkManager.INSTANCE.sendPacket(player, new ClientboundServerReloadPayload());
+        });
 
         this.broadcastStackSensitives();
 
@@ -167,9 +172,14 @@ public class ServerRecipeManager {
         private CompoundTag createFullTag() {
             CompoundTag tag = new CompoundTag();
             tag.putString("recipeType", this.recipe().getRecipeType().getId().toString());
-            CompoundTag dataTag = new CompoundTag();
-            this.recipe().writeToTag(dataTag);
-            tag.put("recipeData", dataTag);
+            try {
+                CompoundTag dataTag = new CompoundTag();
+                this.recipe().writeToTag(dataTag);
+                tag.put("recipeData", dataTag);
+            }catch (Exception e) {
+                CommonEIV.LOGGER.error("Failed to encode recipe {}: {}, please contact the mod author", this.modRecipeId(), e.getMessage());
+            }
+
             return tag;
         }
 

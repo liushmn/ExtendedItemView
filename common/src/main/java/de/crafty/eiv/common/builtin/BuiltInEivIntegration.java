@@ -48,6 +48,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerTrades;
@@ -58,6 +59,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -80,11 +82,19 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
     //Default slot rendering
     public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
 
+    private static final TagKey<Item> EXCLUDED_ITEMS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
+    private static final TagKey<Block> EXCLUDED_BLOCKS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
+
     @Override
     public void onIntegrationInitialize() {
 
 
-        ItemView.excludeItem(Items.AIR);
+        ItemView.addClientReloadCallback(() -> {
+
+            BuiltInRegistries.BLOCK.get(EXCLUDED_BLOCKS).ifPresent(blocks -> blocks.stream().filter(Holder::isBound).filter(Holder::isBound).map(Holder::value).forEach(block -> ItemView.excludeItem(block.asItem())));
+            BuiltInRegistries.ITEM.get(EXCLUDED_ITEMS).ifPresent(items -> items.stream().filter(Holder::isBound).filter(Holder::isBound).map(Holder::value).forEach(ItemView::excludeItem));
+
+        });
 
         ItemView.addReloadCallback(() -> {
 
@@ -392,7 +402,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
                     });
 
                 });
-            }else if (unwrapped.getAddition() != null && unwrapped.getTemplate() != null) {
+            } else if (unwrapped.getAddition() != null && unwrapped.getTemplate() != null) {
                 SlotContent.of(unwrapped.getTemplate()).getValidContents().forEach(templateStack -> {
                     SlotContent.of(unwrapped.getAddition()).getValidContents().forEach(additionStack -> {
                         recipes.add(new SmithingViewRecipe(unwrapped.isTrim(), Ingredient.of(additionStack.getItem()), unwrapped.getBase(), Ingredient.of(templateStack.getItem()), unwrapped.getPattern(), unwrapped.getUpgradeResult()));

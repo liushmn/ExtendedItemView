@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.recipe;
 
+import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
@@ -105,7 +106,15 @@ public class ClientRecipeCache {
 
 
         for (ServerRecipeManager.ServerRecipeEntry modEntry : this.serverEntryMap.get(type)) {
-            List<? extends IEivViewRecipe> wrappedRecipes = wrapper.wrap(modEntry.asWrapped());
+            List<? extends IEivViewRecipe> wrappedRecipes;
+
+            try {
+                wrappedRecipes = wrapper.wrap(modEntry.asWrapped());
+            }catch (Exception e) {
+                CommonEIV.LOGGER.error("Failed to wrap recipe entry {}: {}, skipping it...", modEntry.modRecipeId(), e.getMessage());
+                continue;
+            }
+
             if (wrappedRecipes.isEmpty())
                 continue;
 

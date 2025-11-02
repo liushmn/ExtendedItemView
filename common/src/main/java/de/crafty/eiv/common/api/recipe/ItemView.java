@@ -39,6 +39,15 @@ public class ItemView {
 
 
     /**
+     * A list of Callbacks used for mods to hook into a server reload (from the client side)
+     * <br>
+     * <br>
+     * Client side functionality depending on tags should be handled here
+     */
+    private static final List<ReloadCallback> CLIENT_RELOAD_CALLBACKS = new ArrayList<>();
+
+
+    /**
      * ServerRecipeProviders offer a recipeList where mods can easily add their own server recipes
      *
      * @param provider The recipe provider
@@ -146,10 +155,29 @@ public class ItemView {
     }
 
     /**
+     * Mods can add a ReloadCallback to hook into a server reload (from the client side)
+     * <br>
+     * <br>
+     * They should register their excluded items here
+     * @param callback
+     */
+    public static void addClientReloadCallback(ReloadCallback callback) {
+        CLIENT_RELOAD_CALLBACKS.add(callback);
+    }
+
+    /**
      * @return A list of currently present reload callbacks
      */
     public static List<ReloadCallback> getReloadCallbacks() {
         return RELOAD_CALLBACKS;
+    }
+
+    /**
+     *
+     * @return A list of currently present client reload callbacks
+     */
+    public static List<ReloadCallback> getClientReloadCallbacks() {
+        return CLIENT_RELOAD_CALLBACKS;
     }
 
     public interface ReloadCallback {
