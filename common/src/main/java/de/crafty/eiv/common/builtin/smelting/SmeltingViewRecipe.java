@@ -11,8 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class SmeltingViewRecipe implements IEivViewRecipe {
         this.input = SlotContent.of(recipe.getInput());
         this.result = SlotContent.of(recipe.getResult());
 
-        this.smeltingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("smelting_tick"), 200);
+        this.smeltingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("smelting_tick"), 200);
     }
 
     @Override

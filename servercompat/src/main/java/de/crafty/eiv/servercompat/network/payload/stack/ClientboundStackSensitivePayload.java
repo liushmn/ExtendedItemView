@@ -5,14 +5,14 @@ import de.crafty.eiv.servercompat.api.CompatItemView;
 import de.crafty.eiv.servercompat.network.payload.IEivCompatPacketPayload;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record ClientboundStackSensitivePayload(CompatItemView.StackSensitive stackSensitive) implements IEivCompatPacketPayload {
 
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "stack_sensitive");
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "stack_sensitive");
     }
 
     @Override

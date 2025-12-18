@@ -2,12 +2,12 @@ package de.crafty.eiv.servercompat.network.payload;
 
 import com.google.common.io.ByteArrayDataOutput;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface IEivCompatPacketPayload {
 
 
-    ResourceLocation getId();
+    Identifier getId();
 
     void write(CompoundTag tag);
 

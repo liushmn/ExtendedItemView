@@ -7,7 +7,7 @@ import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import de.crafty.eiv.neoforge.mixin.neoforge.common.BasicItemListingAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ public class NeoForgeBuiltinEivIntegration extends BuiltInEivIntegration {
 
 
     public static final VillagerServerRecipe.VillagerOfferType<BasicItemListing> NEOFORGE_BASIC = VillagerServerRecipe.VillagerOfferType.register(
-            ResourceLocation.fromNamespaceAndPath("neoforge", "basic"),
+            Identifier.fromNamespaceAndPath("neoforge", "basic"),
             BasicItemListing.class,
             (listing, out) -> {
 
@@ -43,7 +43,7 @@ public class NeoForgeBuiltinEivIntegration extends BuiltInEivIntegration {
                 int villagerXp = in.getIntOr("villagerXp", 0);
                 int maxUses = in.getIntOr("maxUses", 0);
 
-                ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                 return List.of(new VillagerServerRecipe.VillagerOffer(profession, professionLevel, villagerType, List.of(offerStack), List.of(price), List.of(price2), villagerXp, maxUses));
             }

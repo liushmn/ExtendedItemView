@@ -5,13 +5,13 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public record ClientboundFinishStackSensitivesPayload() implements CustomPacketPayload {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundFinishStackSensitivesPayload> STREAM_CODEC = CustomPacketPayload.codec(ClientboundFinishStackSensitivesPayload::write, ClientboundFinishStackSensitivesPayload::new);
-    public static final Type<ClientboundFinishStackSensitivesPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "finish_stack_sensitive"));
+    public static final Type<ClientboundFinishStackSensitivesPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "finish_stack_sensitive"));
 
     public ClientboundFinishStackSensitivesPayload(FriendlyByteBuf friendlyByteBuf) {
         this();

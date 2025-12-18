@@ -17,7 +17,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,11 +47,11 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void onEivPayloadReceived(CustomPacketPayload payload, CallbackInfo ci) {
-        ResourceLocation payloadId = payload.type().id();
+        Identifier payloadId = payload.type().id();
 
-        EivNetworkManager.INSTANCE.getClientbound().forEach((resourceLocation, typeAndCodec) -> {
+        EivNetworkManager.INSTANCE.getClientbound().forEach((Identifier, typeAndCodec) -> {
 
-            if (!payloadId.equals(resourceLocation))
+            if (!payloadId.equals(Identifier))
                 return;
 
             if (EivNetworkManager.INSTANCE.clientPayloadHandlers().containsKey(payloadId)) {

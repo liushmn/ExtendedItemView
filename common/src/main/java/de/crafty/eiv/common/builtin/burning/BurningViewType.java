@@ -4,7 +4,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -31,8 +31,8 @@ public class BurningViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
+    public Identifier getGuiTexture() {
+        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
     }
 
     @Override
@@ -46,8 +46,8 @@ public class BurningViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("furnace_burning");
+    public Identifier getId() {
+        return Identifier.withDefaultNamespace("furnace_burning");
     }
 
     @Override

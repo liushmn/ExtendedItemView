@@ -114,8 +114,8 @@ public class YourCustomViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath("yourmodid", "path/to/your/texture"); //Your type's gui texture
+    public Identifier getGuiTexture() {
+        return Identifier.fromNamespaceAndPath("yourmodid", "path/to/your/texture"); //Your type's gui texture
     }
 
     @Override
@@ -134,8 +134,8 @@ public class YourCustomViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath("yourmodid", "your_type_id"); //A unique id for your viewtype
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath("yourmodid", "your_type_id"); //A unique id for your viewtype
     }
 
     @Override
@@ -244,7 +244,7 @@ public class YourServerRecipe implements IEivServerRecipe {
 
     //Create a server recipe type (the id does not have to match your client side viewtype id)
     public static final ModRecipeType<YourServerRecipe> TYPE = ModRecipeType.register(
-            ResourceLocation.fromNamespaceAndPath("yourmodid", "your_recipe_id"),
+            Identifier.fromNamespaceAndPath("yourmodid", "your_recipe_id"),
             () -> new YourServerRecipe()
     );
 

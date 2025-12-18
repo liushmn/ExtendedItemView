@@ -34,14 +34,12 @@ public class EivClientSettingsScreen extends Screen {
         LinearLayout linearLayout = this.layout.addToContents(LinearLayout.vertical());
 
         linearLayout.addChild(
-                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.background.enabled"), Component.translatable("eiv.client_settings.background.disabled"))
-                        .withInitialValue(Configs.CLIENT_SETTINGS.drawBackground())
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.background.enabled"), Component.translatable("eiv.client_settings.background.disabled"), Configs.CLIENT_SETTINGS.drawBackground())
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.background"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setDrawBackground(b))
         );
         linearLayout.addChild(
-                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.resize_mode.wrap"), Component.translatable("eiv.client_settings.resize_mode.cut"))
-                        .withInitialValue(Configs.CLIENT_SETTINGS.isItemWrapMode())
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.resize_mode.wrap"), Component.translatable("eiv.client_settings.resize_mode.cut"), Configs.CLIENT_SETTINGS.isItemWrapMode())
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.resize_mode"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setItemWrapMode(b))
         );

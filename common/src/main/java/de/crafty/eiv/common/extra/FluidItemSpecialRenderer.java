@@ -6,8 +6,8 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.Registries;
@@ -19,9 +19,11 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.awt.*;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * A special renderer used for rendering the fluid-item in the world
@@ -70,7 +72,7 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         poseStack.scale(1.0F, 1.0F, 1.0F);
         float finalHeight = height;
         int finalColor = color;
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderType.entityTranslucent(sprite.atlasLocation()), (pose, vertexConsumer) -> {
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()), (pose, vertexConsumer) -> {
             vertexConsumer.addVertex(pose.pose(), 1.0F, 0, 0).setUv(u0 + width, v0).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
             vertexConsumer.addVertex(pose.pose(), 1.0F, renderHeight, 0).setUv(u0 + width, v0 + finalHeight).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
             vertexConsumer.addVertex(pose.pose(), 0, renderHeight, 0).setUv(u0, v0 + finalHeight).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
@@ -81,7 +83,8 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
     }
 
     @Override
-    public void getExtents(Set<Vector3f> set) {
+    public void getExtents(Consumer<Vector3fc> consumer) {
+
     }
 
     @Override

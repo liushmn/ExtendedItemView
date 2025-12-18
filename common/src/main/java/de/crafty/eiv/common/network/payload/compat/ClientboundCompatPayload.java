@@ -10,7 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
@@ -35,7 +35,7 @@ public record ClientboundCompatPayload(CompoundTag data) implements CustomPacket
             }
     );
 
-    public static final CustomPacketPayload.Type<ClientboundCompatPayload> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "compat"));
+    public static final CustomPacketPayload.Type<ClientboundCompatPayload> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "compat"));
 
 
     @Override

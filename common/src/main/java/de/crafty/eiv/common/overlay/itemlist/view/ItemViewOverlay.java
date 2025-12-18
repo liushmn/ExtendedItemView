@@ -25,7 +25,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
@@ -36,7 +36,7 @@ import java.util.List;
 public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     public static final ItemViewOverlay INSTANCE = new ItemViewOverlay();
-    private static final ResourceLocation SETTINGS_WHEEL = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "settings_wheel");
+    private static final Identifier SETTINGS_WHEEL = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "settings_wheel");
 
     private EditBox searchbar = null;
 

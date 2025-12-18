@@ -7,7 +7,7 @@ import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.TransmuteResult;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SmithingServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<SmithingServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("smithing"),
+            Identifier.withDefaultNamespace("smithing"),
             () -> new SmithingServerRecipe(false, null, null, null, null, null)
     );
 

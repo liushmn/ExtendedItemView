@@ -5,7 +5,7 @@ import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public record ClientboundTypeUpdatePayload(ServerRecipeManager.ServerRecipeEntry entry) implements CustomPacketPayload {
@@ -16,7 +16,7 @@ public record ClientboundTypeUpdatePayload(ServerRecipeManager.ServerRecipeEntry
             ClientboundTypeUpdatePayload::new
     );
 
-    public static final Type<ClientboundTypeUpdatePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_update"));
+    public static final Type<ClientboundTypeUpdatePayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "recipe_update"));
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {

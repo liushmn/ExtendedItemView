@@ -11,7 +11,7 @@ import de.crafty.eiv.servercompat.network.payload.stack.ClientboundFinishStackSe
 import de.crafty.eiv.servercompat.network.payload.stack.ClientboundStackSensitivePayload;
 import de.crafty.eiv.servercompat.network.payload.stack.ClientboundStartStackSensitivesPayload;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
@@ -129,9 +129,9 @@ public class CompatRecipeManager {
 
         serverRecipes.forEach(iEivServerModRecipe -> {
 
-            ResourceLocation typeId = iEivServerModRecipe.getRecipeType().getId();
+            Identifier typeId = iEivServerModRecipe.getRecipeType().getId();
             List<CompatRecipeEntry> list = PRESENT_RECIPES.getOrDefault(iEivServerModRecipe.getRecipeType(), new ArrayList<>());
-            list.add(new CompatRecipeEntry(ResourceLocation.fromNamespaceAndPath(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
+            list.add(new CompatRecipeEntry(Identifier.fromNamespaceAndPath(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
             PRESENT_RECIPES.put(iEivServerModRecipe.getRecipeType(), list);
         });
     }
@@ -143,7 +143,7 @@ public class CompatRecipeManager {
      * @param modRecipeId  The unique id of the recipe
      * @param compatRecipe The recipe instance
      */
-    public record CompatRecipeEntry(ResourceLocation modRecipeId, IEivCompatServerRecipe compatRecipe) {
+    public record CompatRecipeEntry(Identifier modRecipeId, IEivCompatServerRecipe compatRecipe) {
 
         public CompoundTag createFullTagWithId() {
 

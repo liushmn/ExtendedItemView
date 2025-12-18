@@ -2,7 +2,7 @@ package de.crafty.eiv.common.api.recipe;
 
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -32,7 +32,7 @@ public interface IEivRecipeViewType {
         }
 
         @Override
-        public ResourceLocation getGuiTexture() {
+        public Identifier getGuiTexture() {
             return null;
         }
 
@@ -46,7 +46,7 @@ public interface IEivRecipeViewType {
         }
 
         @Override
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return null;
         }
 
@@ -77,7 +77,7 @@ public interface IEivRecipeViewType {
      *
      * @return The path to the recipe type's gui texture
      */
-    ResourceLocation getGuiTexture();
+    Identifier getGuiTexture();
 
     /**
      *
@@ -96,7 +96,7 @@ public interface IEivRecipeViewType {
      *
      * @return A unique id of the recipe's type
      */
-    ResourceLocation getId();
+    Identifier getId();
 
 
     /**

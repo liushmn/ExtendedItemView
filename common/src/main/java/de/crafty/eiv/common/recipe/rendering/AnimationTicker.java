@@ -1,20 +1,20 @@
 package de.crafty.eiv.common.recipe.rendering;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class AnimationTicker {
 
     private final int duration;
     private int tick;
-    private final ResourceLocation id;
+    private final Identifier id;
 
 
-    private AnimationTicker(ResourceLocation id, int duration) {
+    private AnimationTicker(Identifier id, int duration) {
         this.duration = duration;
         this.id = id;
     }
 
-    public ResourceLocation id() {
+    public Identifier id() {
         return this.id;
     }
 
@@ -69,7 +69,7 @@ public class AnimationTicker {
      * @param id The id for this ticker (use the same id for same durations)
      * @param duration The time this ticker needs to finish one loop (in ticks)
      */
-    public static AnimationTicker create(ResourceLocation id, int duration) {
+    public static AnimationTicker create(Identifier id, int duration) {
         return new AnimationTicker(id, duration);
     }
 }

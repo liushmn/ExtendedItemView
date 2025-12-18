@@ -6,7 +6,7 @@ import de.crafty.eiv.common.network.payload.recipe.ClientboundFinishUpdatesPaylo
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public record ClientboundStackSensitivePayload(ItemView.StackSensitive stackSensitive) implements CustomPacketPayload {
@@ -18,7 +18,7 @@ public record ClientboundStackSensitivePayload(ItemView.StackSensitive stackSens
             ClientboundStackSensitivePayload::new
     );
 
-    public static final Type<ClientboundStackSensitivePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "stack_sensitive"));
+    public static final Type<ClientboundStackSensitivePayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "stack_sensitive"));
 
 
     @Override

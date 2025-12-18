@@ -4,7 +4,7 @@ import de.crafty.eiv.servercompat.api.recipe.EivCompatRecipeType;
 import de.crafty.eiv.servercompat.api.recipe.IEivCompatServerRecipe;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 
@@ -14,7 +14,7 @@ public class CompatShapelessRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatShapelessRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("shapeless_crafting")
+            Identifier.withDefaultNamespace("shapeless_crafting")
     );
 
     private List<RecipeChoice> choices;
