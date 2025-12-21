@@ -39,7 +39,7 @@ public class MixinGameData {
     @Inject(method = "loadPersistentDataToStagingRegistry", at = @At("HEAD"))
     private static void excludeFluidItems(RegistryManager pool, RegistryManager _to, Map<Identifier, IdMappingEvent.IdRemapping> remaps, Object2IntMap<Identifier> missing, Identifier name, ForgeRegistry.Snapshot snap, CallbackInfo ci) {
 
-        if (!name.equals(Registries.ITEM.location()))
+        if (!name.equals(Registries.ITEM.identifier()))
             return;
 
         BuiltInRegistries.FLUID.forEach(fluid -> {
@@ -64,7 +64,7 @@ public class MixinGameData {
 
         RegisterEvent event = (RegisterEvent) e;
 
-        if (!event.getRegistryKey().location().equals(Registries.ITEM.location()))
+        if (!event.getRegistryKey().identifier().equals(Registries.ITEM.identifier()))
             return;
 
         HashMap<Fluid, Item> fluidItemMap = new HashMap<>();

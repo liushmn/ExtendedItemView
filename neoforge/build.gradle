@@ -1,9 +1,9 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version '7.0.185'
+    id 'net.neoforged.gradle.userdev' version '7.1.12'
 }
 
 base {
-    archivesBaseName("${mod_id}-neoforge-${mod_version}+${minecraft_version}")
+    archivesName = "${mod_id}-neoforge-${mod_version}+${minecraft_version}"
 }
 
 

@@ -34,7 +34,7 @@ public class MixinGameData {
         ModLoader.postEventWrapContainerInModOrder(e);
 
         RegisterEvent event = (RegisterEvent) e;
-        if(!event.getRegistryKey().location().equals(Registries.ITEM.location()))
+        if(!event.getRegistryKey().identifier().equals(Registries.ITEM.identifier()))
             return;
 
         HashMap<Fluid, Item> fluidItemMap = new HashMap<>();

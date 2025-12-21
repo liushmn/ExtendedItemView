@@ -27,7 +27,7 @@ public class MixinRegistryManager {
     @Inject(method = "applySnapshot(Ljava/util/Map;Z)Ljava/util/Set;", at = @At("HEAD"))
     private static void test(Map<Identifier, RegistrySnapshot> snapshots, boolean isLocalWorld, CallbackInfoReturnable<Set<ResourceKey<?>>> cir) {
         snapshots.forEach((location, snapshot) -> {
-            if (!location.equals(Registries.ITEM.location()))
+            if (!location.equals(Registries.ITEM.identifier()))
                 return;
 
             BuiltInRegistries.FLUID.forEach(fluid -> {
