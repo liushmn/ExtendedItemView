@@ -47,5 +47,6 @@
   "eiv.client_settings.resize_mode.wrap": "Огорнений",
   "eiv.client_settings.resize_mode.cut": "Обрізаний",
 
-  "modmenu.descriptionTranslation.eiv": "Мод, що спрощує ваще життя показуючи рецепти."
+  "modmenu.descriptionTranslation.eiv": "Мод, що спрощує ваще життя показуючи рецепти.",
+  "fml.menu.mods.info.description.eiv": "Мод, що спрощує ваще життя показуючи рецепти."
 }
