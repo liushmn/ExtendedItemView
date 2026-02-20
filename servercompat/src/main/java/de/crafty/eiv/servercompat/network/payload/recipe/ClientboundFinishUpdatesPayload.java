@@ -3,14 +3,14 @@ package de.crafty.eiv.servercompat.network.payload.recipe;
 import de.crafty.eiv.servercompat.EivPlugin;
 import de.crafty.eiv.servercompat.network.payload.IEivCompatPacketPayload;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record ClientboundFinishUpdatesPayload() implements IEivCompatPacketPayload {
 
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "finish_updates");
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "finish_updates");
     }
 
     @Override

@@ -4,7 +4,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -14,7 +14,7 @@ public class SmeltingViewType implements IEivRecipeViewType {
 
     public static final SmeltingViewType INSTANCE = new SmeltingViewType();
 
-    private static final ResourceLocation SMELTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smelting.png");
+    private static final Identifier SMELTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smelting.png");
 
     @Override
     public Component getDisplayName() {
@@ -22,8 +22,8 @@ public class SmeltingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("furnace_smelting");
+    public Identifier getId() {
+        return Identifier.withDefaultNamespace("furnace_smelting");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SmeltingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
+    public Identifier getGuiTexture() {
         return SMELTING_LOCATION;
     }
 

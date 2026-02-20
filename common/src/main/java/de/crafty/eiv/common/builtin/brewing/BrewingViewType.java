@@ -4,7 +4,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,8 +31,8 @@ public class BrewingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/brewing.png");
+    public Identifier getGuiTexture() {
+        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/brewing.png");
     }
 
     @Override
@@ -55,8 +55,8 @@ public class BrewingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("brewing");
+    public Identifier getId() {
+        return Identifier.withDefaultNamespace("brewing");
     }
 
     @Override

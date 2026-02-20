@@ -8,7 +8,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -139,7 +139,7 @@ public class EivCompatTagUtil {
         if (string.isEmpty())
             return null;
 
-        return registry.getOptional(ResourceLocation.tryParse(string)).orElse(null);
+        return registry.getOptional(Identifier.tryParse(string)).orElse(null);
     }
 
     /**

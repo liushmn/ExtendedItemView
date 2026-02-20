@@ -24,9 +24,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionSet;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
@@ -42,14 +44,14 @@ public class EivNetworkManager {
      */
     public static final EivNetworkManager INSTANCE = new EivNetworkManager().registerPayloads();
 
-    private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> clientbound;
-    private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> serverbound;
+    private final HashMap<Identifier, CustomPacketPayload.TypeAndCodec<?, ?>> clientbound;
+    private final HashMap<Identifier, CustomPacketPayload.TypeAndCodec<?, ?>> serverbound;
 
     /**
      * Payload handlers are used for packet processing on the client and server side
      */
-    private final HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers;
-    private final HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers;
+    private final HashMap<Identifier, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers;
+    private final HashMap<Identifier, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers;
 
     private EivNetworkManager() {
         this.clientbound = new HashMap<>();
@@ -86,14 +88,14 @@ public class EivNetworkManager {
     /**
      * @return ALl clientbound packets
      */
-    public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getClientbound() {
+    public HashMap<Identifier, CustomPacketPayload.TypeAndCodec<?, ?>> getClientbound() {
         return this.clientbound;
     }
 
     /**
      * @return All serverbound packets
      */
-    public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getServerbound() {
+    public HashMap<Identifier, CustomPacketPayload.TypeAndCodec<?, ?>> getServerbound() {
         return this.serverbound;
     }
 
@@ -102,7 +104,7 @@ public class EivNetworkManager {
      *
      * @return
      */
-    public HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers() {
+    public HashMap<Identifier, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers() {
         return this.clientPayloadHandlers;
     }
 
@@ -111,7 +113,7 @@ public class EivNetworkManager {
      *
      * @return
      */
-    public HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers() {
+    public HashMap<Identifier, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers() {
         return this.serverPayloadHandlers;
     }
 
@@ -211,7 +213,7 @@ public class EivNetworkManager {
         //Cheatmode
         this.registerServerbound(ServerboundPickCheatmodeItemPayload.TYPE, ServerboundPickCheatmodeItemPayload.STREAM_CODEC, (context, payload) -> {
 
-            if (context.sender().hasPermissions(3)) {
+            if (context.sender().permissions().hasPermission(Permissions.COMMANDS_ADMIN)) {
                 context.sender().sendSystemMessage(
                         Component.literal("Cheated x").withStyle(ChatFormatting.GRAY)
                                 .append(

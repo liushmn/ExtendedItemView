@@ -1,7 +1,7 @@
 package de.crafty.eiv.neoforge.mixin.neoforge.client.network;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.RegistrySnapshot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface RegistrySnapshotAccessor {
 
     @Accessor("ids")
-    Int2ObjectSortedMap<ResourceLocation> accessIds();
+    Int2ObjectSortedMap<Identifier> accessIds();
 
 }

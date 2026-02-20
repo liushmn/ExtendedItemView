@@ -4,7 +4,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -14,7 +14,7 @@ public class SmithingViewType implements IEivRecipeViewType {
 
     protected static final SmithingViewType INSTANCE = new SmithingViewType();
 
-    private static final ResourceLocation SMITHING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smithing.png");
+    private static final Identifier SMITHING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smithing.png");
 
     @Override
     public Component getDisplayName() {
@@ -22,8 +22,8 @@ public class SmithingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("smithing");
+    public Identifier getId() {
+        return Identifier.withDefaultNamespace("smithing");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class SmithingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
+    public Identifier getGuiTexture() {
         return SMITHING_LOCATION;
     }
 

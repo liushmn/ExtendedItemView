@@ -4,7 +4,7 @@ import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public class TransmuteServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<TransmuteServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("transmutation_crafting"),
+            Identifier.withDefaultNamespace("transmutation_crafting"),
             () -> new TransmuteServerRecipe(null, null, List.of())
 
     );

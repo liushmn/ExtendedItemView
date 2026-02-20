@@ -24,7 +24,6 @@ public class EivGuiRenderHelper {
         IEivWrappedRenderState wrappedState = (IEivWrappedRenderState) entityRenderState;
         wrappedState.extendedItemView$enableMultiRendering();
 
-        entityRenderState.hitboxesRenderState = null;
         entityRenderState.lightCoords = LightTexture.FULL_BRIGHT;
         guiGraphics.submitEntityRenderState(entityRenderState, scale, translation, rotation, cameraAngleOverride, x0, y0, x1, y1);
     }

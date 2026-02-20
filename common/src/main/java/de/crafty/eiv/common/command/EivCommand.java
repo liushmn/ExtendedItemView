@@ -6,6 +6,8 @@ import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionSet;
+import net.minecraft.server.permissions.Permissions;
 
 public class EivCommand {
 
@@ -41,7 +43,7 @@ public class EivCommand {
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
         commandDispatcher.register(
                 Commands.literal("eiv")
-                        .requires(commandSourceStack -> commandSourceStack.hasPermission(3))
+                        .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
                         .then(Commands.literal("reloadRecipes").executes(EivCommand::reloadRecipes))
                         .then(Commands.literal("reloadStackSensitives").executes(EivCommand::reloadStackSensitives))
         );

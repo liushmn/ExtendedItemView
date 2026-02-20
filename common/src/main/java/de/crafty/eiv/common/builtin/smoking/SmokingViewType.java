@@ -3,7 +3,7 @@ package de.crafty.eiv.common.builtin.smoking;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.builtin.smelting.SmeltingViewType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -13,7 +13,7 @@ public class SmokingViewType extends SmeltingViewType {
 
     public static final SmokingViewType INSTANCE = new SmokingViewType();
 
-    private static final ResourceLocation BLASTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smoking.png");
+    private static final Identifier BLASTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smoking.png");
 
     @Override
     public Component getDisplayName() {
@@ -21,7 +21,7 @@ public class SmokingViewType extends SmeltingViewType {
     }
 
     @Override
-    public ResourceLocation getGuiTexture() {
+    public Identifier getGuiTexture() {
         return BLASTING_LOCATION;
     }
 
@@ -31,8 +31,8 @@ public class SmokingViewType extends SmeltingViewType {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "furnace_smoking");
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "furnace_smoking");
     }
 
     @Override

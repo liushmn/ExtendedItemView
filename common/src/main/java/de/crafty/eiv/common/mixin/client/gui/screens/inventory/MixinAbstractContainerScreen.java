@@ -21,7 +21,7 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
@@ -75,7 +75,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
         OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                ResourceLocation.withDefaultNamespace("container"),
+                Identifier.withDefaultNamespace("container"),
                 info.leftPos(),
                 info.topPos(),
                 info.imageWidth(),
@@ -102,7 +102,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractContainerScreen<? extends AbstractContainerMenu>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
 
         OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                ResourceLocation.withDefaultNamespace("container"),
+                Identifier.withDefaultNamespace("container"),
                 info.leftPos(),
                 info.topPos(),
                 info.imageWidth(),

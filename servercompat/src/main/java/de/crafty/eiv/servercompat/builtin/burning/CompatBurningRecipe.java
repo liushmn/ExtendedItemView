@@ -4,13 +4,13 @@ import de.crafty.eiv.servercompat.api.recipe.EivCompatRecipeType;
 import de.crafty.eiv.servercompat.api.recipe.IEivCompatServerRecipe;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 public class CompatBurningRecipe implements IEivCompatServerRecipe {
 
     public static final EivCompatRecipeType<CompatBurningRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("burning")
+            Identifier.withDefaultNamespace("burning")
     );
 
     private Item fuel;

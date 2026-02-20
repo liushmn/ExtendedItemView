@@ -1,7 +1,5 @@
 package de.crafty.eiv.common.builtin.brewing;
 
-import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
@@ -11,13 +9,7 @@ import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -40,7 +32,7 @@ public class BrewingViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(brewingServerRecipe.getResult());
         this.magicIngredient = SlotContent.of(brewingServerRecipe.getMagicIngredient());
 
-        this.brewProgressTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("brew_progress_tick"), 400);
+        this.brewProgressTicker = AnimationTicker.create(Identifier.withDefaultNamespace("brew_progress_tick"), 400);
     }
 
     @Override

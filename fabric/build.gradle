@@ -3,7 +3,7 @@ plugins {
 }
 
 base {
-    archivesBaseName("${mod_id}-fabric-${mod_version}+${minecraft_version}")
+    archivesName = "${mod_id}-fabric-${mod_version}+${minecraft_version}"
 }
 
 repositories {
@@ -23,7 +23,7 @@ dependencies {
 
 loom {
 
-    accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
+    accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.classtweaker"))
 
     mixin {
         defaultRefmapName.set("${mod_id}.refmap.json")

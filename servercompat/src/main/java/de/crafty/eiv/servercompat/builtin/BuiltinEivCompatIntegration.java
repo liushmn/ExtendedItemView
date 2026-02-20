@@ -17,26 +17,22 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.TransmuteResult;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.block.entity.FuelValues;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.inventory.CraftRecipe;
 import org.bukkit.craftbukkit.inventory.trim.CraftTrimPattern;
-import org.bukkit.entity.Villager;
 import org.bukkit.inventory.*;
 
 import java.util.HashMap;
@@ -218,7 +214,7 @@ public class BuiltinEivCompatIntegration implements IEivCompatIntegration {
             Bukkit.getServer().recipeIterator().forEachRemaining(recipe -> {
 
                 if(recipe instanceof SmithingTrimRecipe trimRecipe)
-                    recipeList.add(new CompatSmithingRecipe(true, trimRecipe.getBase(), trimRecipe.getTemplate(), trimRecipe.getAddition(), CraftTrimPattern.bukkitToMinecraft(trimRecipe.getTrimPattern()), null));
+                    recipeList.add(new CompatSmithingRecipe(true, trimRecipe.getBase(), trimRecipe.getTemplate(), trimRecipe.getAddition(), CraftTrimPattern.bukkitToMinecraftHolder(trimRecipe.getTrimPattern()).value(), null));
 
                 if(recipe instanceof SmithingTransformRecipe transformRecipe)
                     recipeList.add(new CompatSmithingRecipe(false, transformRecipe.getBase(), transformRecipe.getTemplate(), transformRecipe.getAddition(), null, new TransmuteResult(CraftItemStack.asNMSCopy(transformRecipe.getResult()).getItem())));

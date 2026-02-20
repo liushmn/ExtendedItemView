@@ -11,10 +11,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class BurningViewRecipe implements IEivViewRecipe {
         this.fuel = SlotContent.of(recipe.getFuel());
         this.burnTime = recipe.getBurnTime();
 
-        this.ticker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("burning_tick_" + this.burnTime), this.burnTime);
+        this.ticker = AnimationTicker.create(Identifier.withDefaultNamespace("burning_tick_" + this.burnTime), this.burnTime);
 
     }
 

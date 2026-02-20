@@ -10,23 +10,17 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.VillagerRenderState;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerType;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerType;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -135,8 +129,8 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         Font font = Minecraft.getInstance().font;
 
         ResourceKey<VillagerProfession> profession = this.villagerOffer.profession();
-        String namespace = profession.location().getNamespace();
-        String path = profession.location().getPath();
+        String namespace = profession.identifier().getNamespace();
+        String path = profession.identifier().getPath();
         float scale = 0.75F;
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
@@ -159,7 +153,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
             return;
 
         if (mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36) {
-            ResourceLocation typeLocation = this.villagerOffer.requiredtype().location();
+            Identifier typeLocation = this.villagerOffer.requiredtype().identifier();
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
             guiGraphics.setComponentTooltipForNextFrame(font, List.of(typeComponent), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
         }
