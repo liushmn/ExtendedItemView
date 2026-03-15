@@ -3,6 +3,7 @@ package de.crafty.eiv.common.builtin.villager;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -24,21 +25,24 @@ public class VillagerViewType implements IEivRecipeViewType {
 
     protected static final VillagerViewType INSTANCE = new VillagerViewType();
 
+    private static final Identifier VILLAGER_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/villager.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/villager.png");
+
     private static final ReferenceCondition REFERENCE_CONDITION = (stack, viewRecipe) -> {
-        if(!(stack.getItem() instanceof BlockItem blockItem))
+        if (!(stack.getItem() instanceof BlockItem blockItem))
             return true;
 
         Optional<Holder<PoiType>> optional = PoiTypes.forState(blockItem.getBlock().defaultBlockState());
-        if(optional.isEmpty())
+        if (optional.isEmpty())
             return true;
 
         Holder<PoiType> holder = optional.get();
-        if(!(viewRecipe instanceof VillagerViewRecipe villagerViewRecipe) || Minecraft.getInstance().level == null)
+        if (!(viewRecipe instanceof VillagerViewRecipe villagerViewRecipe) || Minecraft.getInstance().level == null)
             return true;
 
         VillagerProfession profession = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.VILLAGER_PROFESSION).getValue(villagerViewRecipe.villagerOffer.profession());
 
-        if(profession == null)
+        if (profession == null)
             return true;
 
         return profession.heldJobSite().test(holder);
@@ -61,7 +65,7 @@ public class VillagerViewType implements IEivRecipeViewType {
 
     @Override
     public Identifier getGuiTexture() {
-        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/villager.png");
+        return VILLAGER_LOCATION;
     }
 
     @Override
@@ -112,5 +116,27 @@ public class VillagerViewType implements IEivRecipeViewType {
     @Override
     public ReferenceCondition getCraftReferenceCondition() {
         return REFERENCE_CONDITION;
+    }
+
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 146, 56);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+        //Currency
+        slotDefinition.addSlot(0, 38, 12 + 14);
+        slotDefinition.addSlot(1, 64, 12 + 14);
+
+        //offer
+        slotDefinition.addSlot(2, 122, 13 + 14);
     }
 }

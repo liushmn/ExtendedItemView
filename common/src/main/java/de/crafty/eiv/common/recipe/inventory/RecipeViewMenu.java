@@ -243,6 +243,11 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             this.updateByViewType();
     }
 
+    public void setViewType(IEivRecipeViewType viewType) {
+        if(this.viewTypeOrder.contains(viewType))
+            this.setViewType(this.viewTypeOrder.indexOf(viewType));
+    }
+
     public boolean hasNextRecipe() {
         return this.currentPage < this.maxPageIndex;
     }
@@ -671,23 +676,23 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
     protected void tickContents() {
+        if (Minecraft.getInstance().hasShiftDown())
+            return;
 
         for (int i = 0; i < this.currentDisplay.size(); i++) {
             IEivViewRecipe recipe = this.currentDisplay.get(i);
 
-            SlotFillContext slotFillContext = new SlotFillContext();
-            recipe.bindSlots(slotFillContext);
+             recipe.tickContents();
+
+             SlotFillContext ctx = new SlotFillContext();
+             recipe.bindSlots(ctx);
 
             for (int j = 0; j < this.getViewType().getSlotCount(); j++) {
-
-                //Exclude DependencySlots
-                if (!slotFillContext.contentDependencies.containsKey(j))
-                    this.viewContainer.setItem(j + (i * this.getViewType().getSlotCount()), slotFillContext.contentBySlot(j).next());
+                this.viewContainer.setItem(j + (i * this.getViewType().getSlotCount()), ctx.contentBySlot(j).getByIndex(ctx.contentBySlot(j).index()));
             }
 
         }
 
-        this.updateDependencies();
     }
 
     protected void updateDependencies() {
@@ -774,7 +779,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
 
         private final HashMap<Integer, OptionalSlotRenderer> optionalSlotRenderers;
 
-        protected SlotFillContext() {
+        public SlotFillContext() {
             this.contents = new HashMap<>();
             this.contentDependencies = new HashMap<>();
 
@@ -788,7 +793,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             this.contents.put(slotId, slotContent);
         }
 
-        public void bindDepedantSlot(int slotId, Supplier<Integer> dependantIndex, SlotContent slotContent) {
+        public void bindDependantSlot(int slotId, Supplier<Integer> dependantIndex, SlotContent slotContent) {
             this.contents.put(slotId, slotContent);
             this.contentDependencies.put(slotId, dependantIndex);
         }
@@ -809,6 +814,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             return this.contentDependencies;
         }
 
+
         public void addAdditionalStackModifier(int slotId, AdditionalStackModifier tooltipProvider) {
             this.additionalTooltips.put(slotId, tooltipProvider);
         }
@@ -825,7 +831,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             return this.optionalSlotRenderers;
         }
 
-        protected SlotContent contentBySlot(int slotId) {
+        public SlotContent contentBySlot(int slotId) {
             return this.contents.getOrDefault(slotId, SlotContent.of(List.of()));
         }
 

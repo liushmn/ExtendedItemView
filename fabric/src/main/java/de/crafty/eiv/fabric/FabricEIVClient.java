@@ -2,6 +2,7 @@ package de.crafty.eiv.fabric;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.fabric.resolver.FabricEivResolver;

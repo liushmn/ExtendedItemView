@@ -3,6 +3,7 @@ package de.crafty.eiv.common.builtin.smoking;
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -26,6 +27,12 @@ public class SmokingViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(smokingRecipe.getResult());
 
         this.smokingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("smoking_ticker"), 100);
+    }
+
+    private SmokingViewRecipe(SlotContent input, SlotContent result, AnimationTicker ticker) {
+        this.input = input;
+        this.result = result;
+        this.smokingTicker = ticker;
     }
 
 
@@ -81,5 +88,22 @@ public class SmokingViewRecipe implements IEivViewRecipe {
 
         transferMap.linkSlots(0, 0);
 
+    }
+
+
+    @Override
+    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        int litProgress = Math.round(this.smokingTicker.getProgress() * 14);
+        int smeltProgress = Math.round(this.smokingTicker.getProgress() * 24);
+
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 4, 23 + (14 - litProgress), 0, 14 - litProgress, 14, litProgress, 128, 128);
+
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 27, 22, 14, 0, smeltProgress, 16, 128, 128);
+    }
+
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        return new SmokingViewRecipe(this.input.copy(), this.result.copy(), this.smokingTicker.copy());
     }
 }

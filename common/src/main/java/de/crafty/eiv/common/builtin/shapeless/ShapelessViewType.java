@@ -17,4 +17,6 @@ public class ShapelessViewType extends CraftingViewType {
     public Identifier getId() {
         return Identifier.withDefaultNamespace("crafting_shapeless");
     }
+
+
 }

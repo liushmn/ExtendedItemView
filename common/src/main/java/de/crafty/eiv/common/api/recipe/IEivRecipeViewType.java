@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.api.recipe;
 
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -126,6 +127,21 @@ public interface IEivRecipeViewType {
     }
 
 
+    default boolean supportsRecipeShare() {
+        return false;
+    }
+
+    default ShareButtonPosition getShareButtonLocation() {
+        return new ShareButtonPosition(-16, this.getDisplayHeight());
+    }
+
+    default ChatRecipeBackground getChatRecipeBackground() {
+        return null;
+    }
+
+    default void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+    }
 
 
     interface ReferenceCondition {
@@ -137,6 +153,14 @@ public interface IEivRecipeViewType {
          * @return Whether the craft-reference can redirect to the viewRecipe
          */
         boolean matches(ItemStack craftReference, IEivViewRecipe viewRecipe);
+
+    }
+
+    record ShareButtonPosition(int x, int y) {
+
+    }
+
+    record ChatRecipeBackground(Identifier texture, int x, int y, int width, int height) {
 
     }
 }

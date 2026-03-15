@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.campfire;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,7 @@ public class CampfireViewType implements IEivRecipeViewType {
     protected static final CampfireViewType INSTANCE = new CampfireViewType();
 
     private static final Identifier CAMPFIRE_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/campfire.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/campfire.png");
 
     @Override
     public Component getDisplayName() {
@@ -66,4 +68,27 @@ public class CampfireViewType implements IEivRecipeViewType {
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.CAMPFIRE));
     }
+
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 80, 42);
+    }
+
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+        //Ingredient
+        slotDefinition.addSlot(0, 4, 4);
+
+        //Cooked result
+        slotDefinition.addSlot(1, 60, 4);
+    }
+
 }

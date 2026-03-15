@@ -2,6 +2,7 @@ package de.crafty.eiv.common.overlay.itemlist.view;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.config.Configs;
@@ -28,6 +29,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -256,13 +258,11 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
         int y = info.screenHeight() - 22;
 
 
-        if(this.searchbar != null && info.screen().getFocused() instanceof EditBox box && box.getMessage().equals(Component.literal("eiv:searchbar")))
+        if (this.searchbar != null && info.screen().getFocused() instanceof EditBox box && box.getMessage().equals(Component.literal("eiv:searchbar")))
             this.searchbar.setFocused(false);
 
         if (this.searchbar != null && boxWidth == this.searchbar.getWidth() && x == this.searchbar.getX() && y == this.searchbar.getY())
             return;
-
-
 
 
         EditBox newSearchbar = new EditBox(Minecraft.getInstance().font, x, y, boxWidth, 20, Component.literal("eiv:searchbar"));
@@ -277,6 +277,10 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     public void openRecipeView(ItemStack stack, ItemViewOpenType openType) {
+        this.openRecipeView(stack, openType, null);
+    }
+
+    public void openRecipeView(ItemStack stack, ItemViewOpenType openType, @Nullable IEivRecipeViewType type) {
         if (stack.isEmpty())
             return;
 
@@ -298,7 +302,12 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
             int containerId = parent instanceof AbstractContainerScreen<? extends AbstractContainerMenu> containerScreen ? containerScreen.getMenu().containerId : 0;
 
-            Minecraft.getInstance().setScreen(new RecipeViewScreen(new RecipeViewMenu(parent, containerId, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty()));
+            RecipeViewScreen screen = new RecipeViewScreen(new RecipeViewMenu(parent, containerId, clientPlayer.getInventory(), foundRecipes, stack, openType == ItemViewOpenType.RESULT ? SlotContent.Type.RESULT : SlotContent.Type.INGREDIENT, viewHistory), clientPlayer.getInventory(), Component.empty());
+
+            Minecraft.getInstance().setScreen(screen);
+
+            if (type != null)
+                screen.getMenu().setViewType(type);
         }
 
 

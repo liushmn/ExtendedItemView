@@ -134,12 +134,20 @@ public class ItemView {
         ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.INPUT);
     }
 
+    public static void openForStackIngredient(ItemStack stack, IEivRecipeViewType viewType) {
+        ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.INPUT, viewType);
+    }
+
     /**
      * Opens a recipe view for the client-player containing all recipes that own the specified stack as a result
      * @param stack The result stack
      */
     public static void openForStackResult(ItemStack stack) {
         ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.RESULT);
+    }
+
+    public static void openForStackResult(ItemStack stack, IEivRecipeViewType viewType){
+        ItemViewOverlay.INSTANCE.openRecipeView(stack, ItemViewOverlay.ItemViewOpenType.RESULT, viewType);
     }
 
     /**

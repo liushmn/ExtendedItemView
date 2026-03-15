@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
+import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
@@ -7,6 +8,7 @@ import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -20,10 +22,14 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,6 +39,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.List;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen implements MenuAccess<T> {
@@ -58,7 +66,8 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Shadow
     public abstract T getMenu();
 
-    @Shadow protected abstract void onStopHovering(Slot slot);
+    @Shadow
+    protected abstract void onStopHovering(Slot slot);
 
     protected MixinAbstractContainerScreen(Component component) {
         super(component);
@@ -160,7 +169,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
-    private boolean injectOverlay$3(Screen instance, MouseButtonEvent mouseButtonEvent, boolean b){
+    private boolean injectOverlay$3(Screen instance, MouseButtonEvent mouseButtonEvent, boolean b) {
         return super.mouseClicked(mouseButtonEvent, b) | OverlayManager.INSTANCE.mouseClicked(mouseButtonEvent, b);
 
     }
@@ -216,4 +225,6 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         OverlayManager.INSTANCE.setQueuedWidgetUpdate(false);
 
     }
+
+
 }

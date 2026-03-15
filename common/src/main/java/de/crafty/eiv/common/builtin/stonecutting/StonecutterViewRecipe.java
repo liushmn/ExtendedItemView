@@ -19,6 +19,11 @@ public class StonecutterViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(stonecutterRecipe.getResult());
     }
 
+    private StonecutterViewRecipe(SlotContent input, SlotContent result) {
+        this.input =  input;
+        this.result = result;
+    }
+
     @Override
     public IEivRecipeViewType getViewType() {
         return StonecutterViewType.INSTANCE;
@@ -55,5 +60,11 @@ public class StonecutterViewRecipe implements IEivViewRecipe {
 
         transferMap.linkSlots(0, 0);
 
+    }
+
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        return new StonecutterViewRecipe(this.input.copy(), this.result.copy());
     }
 }

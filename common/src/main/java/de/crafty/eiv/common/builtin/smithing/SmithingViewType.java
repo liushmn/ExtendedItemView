@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.smithing;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,7 @@ public class SmithingViewType implements IEivRecipeViewType {
     protected static final SmithingViewType INSTANCE = new SmithingViewType();
 
     private static final Identifier SMITHING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smithing.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smithing.png");
 
     @Override
     public Component getDisplayName() {
@@ -71,5 +73,33 @@ public class SmithingViewType implements IEivRecipeViewType {
     @Override
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.SMITHING_TABLE));
+    }
+
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 114, 24);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+        //Base
+        slotDefinition.addSlot(0, 4, 4);
+
+        //Addition
+        slotDefinition.addSlot(1, 22, 4);
+
+        //Template
+        slotDefinition.addSlot(2, 40, 4);
+
+        //Result
+        slotDefinition.addSlot(3, 94, 4);
+
     }
 }

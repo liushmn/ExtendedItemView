@@ -1,9 +1,14 @@
 package de.crafty.eiv.common.network;
 
-import de.crafty.eiv.common.CommonEIV;
+import com.mojang.authlib.GameProfile;
 import de.crafty.eiv.common.api.recipe.ItemView;
+import de.crafty.eiv.common.config.Configs;
+import de.crafty.eiv.common.embeddings.ChatEmbedding;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
 import de.crafty.eiv.common.network.payload.compat.ClientboundCompatPayload;
+import de.crafty.eiv.common.network.payload.embedding.ClientboundShareRecipePayload;
+import de.crafty.eiv.common.network.payload.embedding.ServerboundShareRecipePayload;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
 import de.crafty.eiv.common.network.payload.recipe.*;
 import de.crafty.eiv.common.network.payload.reload.ClientboundServerReloadPayload;
@@ -12,12 +17,14 @@ import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePaylo
 import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.transfer.ClientboundUpdateTransferCachePayload;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
+import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -27,12 +34,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * Network Manager for all EIV packets
@@ -242,6 +249,25 @@ public class EivNetworkManager {
         });
 
         this.registerClientbound(ClientboundCompatPayload.TYPE, ClientboundCompatPayload.STREAM_CODEC, EivPayloadConverter::convertFromCompat);
+
+
+        //Embeddings
+
+        this.registerServerbound(ServerboundShareRecipePayload.TYPE, ServerboundShareRecipePayload.STREAM_CODEC, (context, payload) -> {
+            context.server().getPlayerList().getPlayers().forEach(player -> {
+                this.sendPacket(player, new ClientboundShareRecipePayload(payload.recipeId(), payload.extraData(), context.sender().getUUID()));
+            });
+        });
+
+        this.registerClientbound(ClientboundShareRecipePayload.TYPE, ClientboundShareRecipePayload.STREAM_CODEC, (context, payload) -> {
+
+            if(!Configs.CLIENT_SETTINGS.chatEmbeddings())
+                return;
+
+            Optional<GameProfile> profile = context.client().getConnection().getListedOnlinePlayers().stream().map(PlayerInfo::getProfile).filter(gameProfile -> gameProfile.id().equals(payload.sender())).findFirst();
+            profile.ifPresent(gameProfile -> ChatEmbedding.addToChatQueue(new RecipeChatEmbedding(ClientRecipeCache.INSTANCE.getRecipe(payload.recipeId()), payload.extraData(), gameProfile.name())));
+
+        });
 
         return this;
     }

@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.smelting;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,7 @@ public class SmeltingViewType implements IEivRecipeViewType {
     public static final SmeltingViewType INSTANCE = new SmeltingViewType();
 
     private static final Identifier SMELTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smelting.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smelting.png");
 
     @Override
     public Component getDisplayName() {
@@ -67,5 +69,30 @@ public class SmeltingViewType implements IEivRecipeViewType {
     @Override
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.FURNACE));
+    }
+
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 88, 60);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+        //Input Slot
+        slotDefinition.addSlot(0, 4, 4);
+
+        //Fuel Slot
+        slotDefinition.addSlot(1, 4, 40);
+
+        //Result Slot
+        slotDefinition.addSlot(2, 64, 22);
+
     }
 }

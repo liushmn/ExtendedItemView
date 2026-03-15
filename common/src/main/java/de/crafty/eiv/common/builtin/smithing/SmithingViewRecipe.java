@@ -4,6 +4,7 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
+import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
@@ -58,6 +59,15 @@ public class SmithingViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base.next()));
     }
 
+    private SmithingViewRecipe(SlotContent additionIngredient, SlotContent base, SlotContent template, SlotContent result, boolean isTrimType,  TransmuteResult upgradeResult) {
+        this.additionIngredient = additionIngredient;
+        this.base = base;
+        this.template = template;
+        this.result = result;
+        this.isTrimType = isTrimType;
+        this.upgradeResult = upgradeResult;
+    }
+
     @Override
     public IEivRecipeViewType getViewType() {
         return SmithingViewType.INSTANCE;
@@ -70,7 +80,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
         slotFillContext.bindSlot(1, this.base);
         slotFillContext.bindSlot(2, this.additionIngredient);
 
-        slotFillContext.bindDepedantSlot(3, this.additionIngredient::index, this.result);
+        slotFillContext.bindDependantSlot(3, this.additionIngredient::index, this.result);
     }
 
     @Override
@@ -106,5 +116,11 @@ public class SmithingViewRecipe implements IEivViewRecipe {
         transferMap.linkSlots(1, 1);
         transferMap.linkSlots(2, 2);
 
+    }
+
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        return new SmithingViewRecipe(this.additionIngredient.copy(), this.base.copy(), this.template.copy(), this.result.copy(), this.isTrimType, this.upgradeResult);
     }
 }

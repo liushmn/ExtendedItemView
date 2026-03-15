@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.brewing;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -14,7 +15,10 @@ import java.util.List;
 public class BrewingViewType implements IEivRecipeViewType {
 
     protected static final BrewingViewType INSTANCE = new BrewingViewType();
-    
+
+    private static final Identifier BREWING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/brewing.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/brewing.png");
+
     @Override
     public Component getDisplayName() {
         return Component.translatable("view.eiv.type.brewing");
@@ -32,7 +36,7 @@ public class BrewingViewType implements IEivRecipeViewType {
 
     @Override
     public Identifier getGuiTexture() {
-        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/brewing.png");
+        return BREWING_LOCATION;
     }
 
     @Override
@@ -67,5 +71,31 @@ public class BrewingViewType implements IEivRecipeViewType {
     @Override
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.BREWING_STAND), new ItemStack(Items.POTION));
+    }
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 139, 67);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+        //Result
+        slotDefinition.addSlot(0, 4, 5);
+
+        //magic ingredient
+        slotDefinition.addSlot(1, 61, 6);
+
+        //Ingredient bottles
+        slotDefinition.addSlot(2, 38, 40);
+        slotDefinition.addSlot(3, 61, 47);
+        slotDefinition.addSlot(4, 84, 40);
+
     }
 }

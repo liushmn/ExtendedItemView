@@ -7,6 +7,7 @@ import de.crafty.eiv.common.extra.FluidStack;
 import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
+import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -52,6 +53,19 @@ public class SlotContent {
         this.originType = SlotContent.Type.ANY;
 
         this.type = Type.INGREDIENT;
+    }
+
+    public SlotContent copy() {
+
+        SlotContent copy = new SlotContent(this.content);
+
+        copy.type = this.type;
+        copy.itemOrigin = this.itemOrigin.copy();
+        copy.itemTag = this.itemTag;
+        copy.originType = this.originType;
+        copy.current = this.current;
+
+        return copy;
     }
 
     public void setType(Type type) {
@@ -108,6 +122,10 @@ public class SlotContent {
         this.originType = SlotContent.Type.ANY;
     }
 
+    public void pointTo(int index) {
+        this.current = index;
+    }
+
 
     public List<ItemStack> getValidContents() {
         return this.content;
@@ -142,7 +160,7 @@ public class SlotContent {
             boolean potionCheck = ItemViewRecipes.makePotionCheck(origin, stack);
             boolean enchantCheck = ItemViewRecipes.makeEnchantmentCheck(origin, stack);
 
-            if(potionCheck && enchantCheck)
+            if (potionCheck && enchantCheck)
                 return index;
         }
 
@@ -154,7 +172,27 @@ public class SlotContent {
         return this.itemTag == null ? Optional.empty() : Optional.of(this.itemTag);
     }
 
-    public static SlotContent of(){
+
+    public void encodeDetails(CompoundTag tag) {
+
+        tag.putInt("current", this.current);
+        tag.putString("originType",  this.originType.name());
+        tag.putString("type", this.type.name());
+        tag.put("itemOrigin", EivTagUtil.encodeItemStackOnClient(this.itemOrigin));
+
+    }
+
+    public void decodeDetails(CompoundTag tag) {
+
+        this.current = tag.getIntOr("current", 0);
+        this.originType = Type.valueOf(tag.getString("originType").orElseThrow());
+        this.type = Type.valueOf(tag.getString("type").orElseThrow());
+        this.itemOrigin = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("itemOrigin"));
+
+    }
+
+
+    public static SlotContent of() {
         return new SlotContent(List.of());
     }
 
@@ -201,7 +239,7 @@ public class SlotContent {
     }
 
     public static SlotContent of(Ingredient ingredient) {
-        if(ingredient == null)
+        if (ingredient == null)
             return SlotContent.of();
 
         Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();

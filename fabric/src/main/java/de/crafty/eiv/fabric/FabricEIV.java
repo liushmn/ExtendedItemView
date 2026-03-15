@@ -2,6 +2,7 @@ package de.crafty.eiv.fabric;
 
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
+import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.fabricmc.api.ModInitializer;
@@ -26,6 +27,8 @@ public class FabricEIV implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Hello Minecraft!");
+
+        EivDataComponents.logTypes();
 
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> EivCommand.register(commandDispatcher));
 

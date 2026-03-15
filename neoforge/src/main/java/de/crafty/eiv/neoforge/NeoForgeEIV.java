@@ -3,11 +3,14 @@ package de.crafty.eiv.neoforge;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
+import de.crafty.eiv.common.component.EivDataComponents;
+import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.Optional;
 
@@ -18,6 +21,7 @@ public class NeoForgeEIV {
         CommonEIV.LOGGER.info("Hello Minecraft!");
 
         NeoForge.EVENT_BUS.addListener(this::onCommandRegistry);
+        eventBus.addListener(this::onRegistry);
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");
@@ -43,5 +47,12 @@ public class NeoForgeEIV {
 
     private void onCommandRegistry(RegisterCommandsEvent event) {
         EivCommand.register(event.getDispatcher());
+    }
+
+    public void onRegistry(RegisterEvent event) {
+
+        event.register(Registries.DATA_COMPONENT_TYPE, dataComponentTypeRegisterHelper -> {
+            EivDataComponents.logTypes();
+        });
     }
 }

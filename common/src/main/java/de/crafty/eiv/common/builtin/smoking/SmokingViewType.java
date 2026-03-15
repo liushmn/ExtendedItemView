@@ -14,6 +14,7 @@ public class SmokingViewType extends SmeltingViewType {
     public static final SmokingViewType INSTANCE = new SmokingViewType();
 
     private static final Identifier BLASTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smoking.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smoking.png");
 
     @Override
     public Component getDisplayName() {
@@ -39,4 +40,11 @@ public class SmokingViewType extends SmeltingViewType {
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.SMOKER));
     }
+
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 88, 60);
+    }
+
 }

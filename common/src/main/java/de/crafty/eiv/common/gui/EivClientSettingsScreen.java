@@ -43,6 +43,11 @@ public class EivClientSettingsScreen extends Screen {
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.resize_mode"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setItemWrapMode(b))
         );
+        linearLayout.addChild(
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.chat_embeddings.enabled"), Component.translatable("eiv.client_settings.chat_embeddings.disabled"), Configs.CLIENT_SETTINGS.chatEmbeddings())
+                        .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.chat_embeddings"),
+                                (cycleButton, b) -> Configs.CLIENT_SETTINGS.setChatEmbeddings(b))
+        );
 
         this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).size(100, 20).build());
 

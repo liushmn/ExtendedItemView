@@ -64,6 +64,12 @@ public class AnimationTicker {
         return this.duration;
     }
 
+    public AnimationTicker copy(){
+        AnimationTicker copy = new AnimationTicker(this.id, this.duration);
+        copy.tick = this.tick;
+        return copy;
+    }
+
     /**
      *
      * @param id The id for this ticker (use the same id for same durations)

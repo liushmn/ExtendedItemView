@@ -2,10 +2,12 @@ package de.crafty.eiv.forge;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.forge.resolver.ForgeEivResolver;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,10 +25,11 @@ public class ForgeEIVClient {
 
 
     @SubscribeEvent
-    public static void onMenuRegistry(RegisterEvent event) {
+    public static void onRegistry(RegisterEvent event) {
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> {
             helper.register(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         });
+
     }
 
     @SubscribeEvent

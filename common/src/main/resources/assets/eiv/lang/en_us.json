@@ -45,5 +45,9 @@
   "eiv.client_settings.background.disabled": "Hide",
   "eiv.client_settings.resize_mode": "Resize Mode",
   "eiv.client_settings.resize_mode.wrap": "Wrap",
-  "eiv.client_settings.resize_mode.cut": "Cut"
+  "eiv.client_settings.resize_mode.cut": "Cut",
+  "embedding.sharedBy": "Shared by",
+  "eiv.client_settings.chat_embeddings": "Chat Embeddings",
+  "eiv.client_settings.chat_embeddings.enabled": "Enabled",
+  "eiv.client_settings.chat_embeddings.disabled": "Disabled"
 }

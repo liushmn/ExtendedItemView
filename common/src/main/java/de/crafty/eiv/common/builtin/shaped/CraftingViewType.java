@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.shaped;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,7 @@ public class CraftingViewType implements IEivRecipeViewType {
     public static final CraftingViewType INSTANCE = new CraftingViewType();
 
     private static final Identifier CRAFTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/crafting.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/crafting.png");
 
     @Override
     public Component getDisplayName() {
@@ -72,4 +74,28 @@ public class CraftingViewType implements IEivRecipeViewType {
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.CRAFTER));
     }
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 122, 60);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                slotDefinition.addSlot(y * 3 + x, 4 + x * 18, 4 + y * 18);
+            }
+        }
+
+        slotDefinition.addSlot(9, 98, 22);
+
+    }
+
 }

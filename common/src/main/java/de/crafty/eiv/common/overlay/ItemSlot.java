@@ -68,9 +68,6 @@ public class ItemSlot {
         if (CommonEIVClient.isCheatmodeActive())
             tooltip.addLast(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
 
-        tooltip.addLast(Component.literal(CommonEIVClient.resolver().getModNameForItem(this.stack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
-
-
         if (this.isHovered())
             guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
 

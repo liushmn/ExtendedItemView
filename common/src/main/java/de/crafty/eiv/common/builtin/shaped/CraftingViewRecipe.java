@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.builtin.shaped;
 
+import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.builtin.tipped_arrow.TippedArrowServerRecipe;
@@ -10,6 +11,8 @@ import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -32,11 +35,18 @@ public class CraftingViewRecipe implements IEivViewRecipe {
 
     }
 
+    private CraftingViewRecipe(HashMap<Integer, SlotContent> ingredientSlotContents, SlotContent result, int width, int height) {
+        this.ingredientSlotContents.putAll(ingredientSlotContents);
+        this.result = result;
+        this.width = width;
+        this.height = height;
+    }
+
     public CraftingViewRecipe(TippedArrowServerRecipe recipe) {
 
-        for(int i = 0; i < 9; i++){
+        for (int i = 0; i < 9; i++) {
 
-            if(i == 4)
+            if (i == 4)
                 this.ingredientSlotContents.put(i, SlotContent.of(recipe.getPotion()));
             else
                 this.ingredientSlotContents.put(i, SlotContent.of(Items.ARROW));
@@ -109,7 +119,15 @@ public class CraftingViewRecipe implements IEivViewRecipe {
             map.linkSlots(3, 3);
             map.linkSlots(4, 4);
         }
+    }
 
 
+    @Override
+    public IEivViewRecipe asChatCopy() {
+
+        HashMap<Integer, SlotContent> map = new HashMap<>();
+        this.ingredientSlotContents.forEach((slotId, slotContent) -> map.put(slotId, slotContent.copy()));
+
+        return new CraftingViewRecipe(map, this.result.copy(), this.width, this.height);
     }
 }

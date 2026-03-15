@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.stonecutting;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +16,8 @@ public class StonecutterViewType implements IEivRecipeViewType {
     protected static final StonecutterViewType INSTANCE = new StonecutterViewType();
 
     private static final Identifier STONECUTTER_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/stonecutter.png");
+
 
     @Override
     public Component getDisplayName() {
@@ -64,5 +67,24 @@ public class StonecutterViewType implements IEivRecipeViewType {
     @Override
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.STONECUTTER));
+    }
+
+
+    @Override
+    public boolean supportsRecipeShare() {
+        return true;
+    }
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground() {
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 80, 24);
+    }
+
+    @Override
+    public void placeChatSlots(RecipeChatEmbedding.SlotDefinition slotDefinition) {
+
+        slotDefinition.addSlot(0, 4, 4);
+        slotDefinition.addSlot(1, 60, 4);
+
     }
 }

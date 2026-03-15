@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -40,18 +41,21 @@ public abstract class MixinEffectsInInventory {
     @Final
     private AbstractContainerScreen<?> screen;
 
+    @Shadow
+    protected abstract Component getEffectName(MobEffectInstance p_376252_);
+
     @Inject(method = "renderEffects", at = @At("HEAD"))
-    private void injectBlocking$0(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci){
+    private void injectBlocking$0(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
 
         List<Identifier> effectsToRemove = new ArrayList<>();
-        for(BlockingGuiComponent guiBlock : OverlayManager.INSTANCE.allGuiBlockings()){
+        for (BlockingGuiComponent guiBlock : OverlayManager.INSTANCE.allGuiBlockings()) {
 
-            if(!guiBlock.id().getPath().startsWith("mobeffect_"))
+            if (!guiBlock.id().getPath().startsWith("mobeffect_"))
                 continue;
 
             String descriptionId = guiBlock.id().getPath().split("_")[1];
 
-            if(this.minecraft.player.getActiveEffects().stream().noneMatch(mobEffectInstance -> mobEffectInstance.getDescriptionId().equals(descriptionId)))
+            if (this.minecraft.player.getActiveEffects().stream().noneMatch(mobEffectInstance -> mobEffectInstance.getDescriptionId().equals(descriptionId)))
                 effectsToRemove.add(guiBlock.id());
 
         }
@@ -59,27 +63,29 @@ public abstract class MixinEffectsInInventory {
         OverlayManager.INSTANCE.removeGuiBlocking(effectsToRemove::contains, !effectsToRemove.isEmpty());
     }
 
-    @Inject(method = "renderBackground", at = @At("HEAD"))
-    private void injectBlocking$1(GuiGraphics guiGraphics, Font font, Component component, Component component2, int i, int j, boolean bl, int k, CallbackInfoReturnable<Integer> cir){
+    @Inject(method = "renderEffects", at = @At("RETURN"))
+    private void injectBlocking$1(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
 
-        if(this.minecraft.player == null)
+        if (this.minecraft.player == null)
             return;
+
 
         int topPos = OverlayManager.INSTANCE.currentInfo().topPos();
 
+        int n = 0;
         for (MobEffectInstance mobEffectInstance : this.minecraft.player.getActiveEffects()) {
-            if (bl) {
-                OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                        Identifier.withDefaultNamespace("mobeffect_" + mobEffectInstance.getDescriptionId()), i, topPos, 120, 32
-                ));
 
-            } else {
-                OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                        Identifier.withDefaultNamespace("mobeffect_" + mobEffectInstance.getDescriptionId()), i, topPos, 32, 32
-                ));
+            Component effectName = this.getEffectName(mobEffectInstance);
+            Component durationText = MobEffectUtil.formatDuration(mobEffectInstance, 1.0F, this.minecraft.level.tickRateManager().tickrate());
 
-            }
-            k += j;
+            int nameWidth = 32 + this.minecraft.font.width(effectName) + 7;
+            int durationWidth = 32 + this.minecraft.font.width(durationText) + 7;
+            int effectWidth = Math.min(m, Math.max(nameWidth, durationWidth));
+
+            OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
+                    Identifier.withDefaultNamespace("mobeffect_" + mobEffectInstance.getDescriptionId()), i, topPos + n, effectWidth, 32
+            ));
+            n += j;
         }
 
 

@@ -4,6 +4,7 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
@@ -48,6 +49,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     private final HashMap<Identifier, Integer> animationTickCache;
 
     private final List<Button> transferButtons;
+    private final List<RecipeShareButton> shareButtons;
 
     //View Type
     private final List<ViewTypeButton> viewTypeButtons;
@@ -58,6 +60,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         super(recipeViewMenu, inventory, component);
 
         this.transferButtons = new ArrayList<>();
+        this.shareButtons = new ArrayList<>();
         this.viewTypeButtons = new ArrayList<>();
         this.viewTypePage = 0;
 
@@ -235,6 +238,30 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
         }
 
+        this.shareButtons.forEach(this::removeWidget);
+        this.shareButtons.clear();
+
+
+        for (int i = 0; i < this.getMenu().getCurrentDisplay().size(); i++) {
+            IEivViewRecipe currentView = this.getMenu().getCurrentDisplay().get(i);
+            IEivRecipeViewType viewType = currentView.getViewType();;
+
+            if (!viewType.supportsRecipeShare())
+                continue;
+
+            int topPos = this.topPos + this.getMenu().guiOffsetTop(i) + viewType.getShareButtonLocation().y();
+            int leftPos = this.leftPos + this.getMenu().guiOffsetLeft() + viewType.getShareButtonLocation().x();
+
+            RecipeShareButton shareButton = new RecipeShareButton(currentView, 14, 14, 12, 12, (button -> ((RecipeShareButton) button).shareRecipe()));
+            shareButton.setPosition(leftPos, topPos);
+
+            shareButton.active = Configs.CLIENT_SETTINGS.chatEmbeddings();
+
+            this.shareButtons.add(shareButton);
+            this.addRenderableWidget(shareButton);
+        }
+
+
     }
 
     private void checkTickers() {
@@ -269,28 +296,6 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
-
-    @Override
-    protected @NotNull List<Component> getTooltipFromContainerItem(ItemStack itemStack) {
-        List<Component> tooltip = super.getTooltipFromContainerItem(itemStack);
-
-        CompoundTag tagTag = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        if (tagTag.contains(CommonEIV.MODID + "_recipeTag")) {
-            tooltip.add(
-                    Component.translatable("view.eiv.tags").append(": ").withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal("#" + tagTag.getStringOr(CommonEIV.MODID + "_recipeTag", "Error")).withStyle(ChatFormatting.GRAY))
-
-            );
-        }
-
-        if (this.hoveredSlot != null && this.hoveredSlot.hasItem())
-            this.getMenu().getAdditionalStackModifier(this.hoveredSlot.getContainerSlot()).addTooltip(itemStack, tooltip);
-
-        //TODO make more performance
-        tooltip.addLast(Component.literal(CommonEIVClient.resolver().getModNameForItem(itemStack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
-
-        return tooltip;
-    }
 
 
     @Override
@@ -480,6 +485,10 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
         }
     }
 
+
+    public Slot getHoveredSlot(){
+        return this.hoveredSlot;
+    }
 
     record ViewTypeButton(RecipeViewScreen viewScreen, int x, int y, int width, int height, IEivRecipeViewType viewType,
                           int viewTypeId) {

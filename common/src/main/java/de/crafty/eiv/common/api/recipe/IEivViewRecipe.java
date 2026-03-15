@@ -1,24 +1,20 @@
 package de.crafty.eiv.common.api.recipe;
 
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 public interface IEivViewRecipe {
 
@@ -126,6 +122,29 @@ public interface IEivViewRecipe {
 
     }
 
+
+    default void tickContents() {
+
+        RecipeViewMenu.SlotFillContext slotFillContext = new RecipeViewMenu.SlotFillContext();
+        this.bindSlots(slotFillContext);
+
+        for (int j = 0; j < this.getViewType().getSlotCount(); j++) {
+
+            //Exclude DependencySlots
+            if (!slotFillContext.contentDependencies().containsKey(j))
+                slotFillContext.contentBySlot(j).next();
+
+        }
+
+        for (int j = 0; j < this.getViewType().getSlotCount(); j++) {
+
+            if (slotFillContext.contentDependencies().containsKey(j))
+                slotFillContext.contentBySlot(j).pointTo(Math.min(slotFillContext.contentDependencies().get(j).get(), slotFillContext.contentBySlot(j).size() - 1));
+
+        }
+    }
+
+
     /**
      * Called when this recipe pop's up in the viewScreen
      * <br>
@@ -188,6 +207,63 @@ public interface IEivViewRecipe {
     }
 
 
+    default void renderChatRecipeBackground(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        if (this.getViewType().getChatRecipeBackground() == null)
+            return;
+
+        IEivRecipeViewType.ChatRecipeBackground background = this.getViewType().getChatRecipeBackground();
+
+        // + 6 for margin
+        renderer.renderTexture(background.texture(), guiGraphics, background.x(), background.y(), 0, 0, background.width(), background.height(), background.width(), background.height());
+    }
+
+    default void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+
+    }
+
+    default void saveExtraEmbeddingData(CompoundTag tag) {
+
+        RecipeViewMenu.SlotFillContext ctx = new RecipeViewMenu.SlotFillContext();
+        this.bindSlots(ctx);
+
+        for (int i = 0; i < this.getViewType().getSlotCount(); i++) {
+            SlotContent content = ctx.contentBySlot(i);
+
+            CompoundTag encoded = new CompoundTag();
+            content.encodeDetails(encoded);
+
+            tag.put(String.valueOf(i), encoded);
+        }
+    }
+
+    default void loadExtraEmbeddingData(CompoundTag tag) {
+
+        RecipeViewMenu.SlotFillContext ctx = new RecipeViewMenu.SlotFillContext();
+        this.bindSlots(ctx);
+
+        for (int i = 0; i < this.getViewType().getSlotCount(); i++) {
+            CompoundTag encoded = tag.getCompoundOrEmpty(String.valueOf(i));
+            if (encoded.isEmpty())
+                continue;
+
+            SlotContent content = ctx.contentBySlot(i);
+            content.decodeDetails(encoded);
+        }
+    }
+
+    default int getSenderXPosition() {
+        return this.getViewType().getChatRecipeBackground().width() + 4;
+    }
+
+    default int getSenderYPosition() {
+        return Math.round((this.getViewType().getChatRecipeBackground().height() - Minecraft.getInstance().font.lineHeight) / 2.0F);
+    }
+
+    default IEivViewRecipe asChatCopy() {
+        return null;
+    }
+
+
     /**
      * A representation of a TransferMap
      */
@@ -214,6 +290,7 @@ public interface IEivViewRecipe {
      * <br><br>
      * <b>Reason</b>: Since minecraft changed things like tooltip and entity rendering,
      * we cannot render these things within a previously moved matrix anymore
+     *
      * @param left
      * @param top
      * @param width
@@ -222,4 +299,5 @@ public interface IEivViewRecipe {
     record RecipePosition(int left, int top, int width, int height) {
 
     }
+
 }

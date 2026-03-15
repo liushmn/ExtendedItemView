@@ -3,6 +3,7 @@ package de.crafty.eiv.common;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
+import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;

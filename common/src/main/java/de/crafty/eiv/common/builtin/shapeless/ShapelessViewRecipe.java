@@ -27,6 +27,11 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(shapelessRecipe.getResult());
     }
 
+    private ShapelessViewRecipe(SlotContent result, List<SlotContent> ingredients) {
+        this.result = result;
+        this.ingredients = ingredients;
+    }
+
     public ShapelessViewRecipe(TransmuteServerRecipe transmuteRecipe) {
         this.ingredients = new ArrayList<>();
         this.ingredients.add(SlotContent.of(transmuteRecipe.getInput()));
@@ -97,5 +102,12 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     @Override
     public boolean canTransferToScreen(AbstractContainerScreen<?> screen) {
         return screen instanceof CraftingScreen || this.ingredients.size() <= 4;
+    }
+
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        List<SlotContent> ingredients = this.ingredients.stream().map(SlotContent::copy).toList();
+        return new  ShapelessViewRecipe(this.result.copy(), ingredients);
     }
 }

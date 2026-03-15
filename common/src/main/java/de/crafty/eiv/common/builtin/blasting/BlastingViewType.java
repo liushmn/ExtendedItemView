@@ -14,6 +14,7 @@ public class BlastingViewType extends SmeltingViewType {
     public static final BlastingViewType INSTANCE = new BlastingViewType();
 
     private static final Identifier BLASTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/blasting.png");
+    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/blasting.png");
 
     @Override
     public Component getDisplayName() {
@@ -38,5 +39,12 @@ public class BlastingViewType extends SmeltingViewType {
     @Override
     public List<ItemStack> getCraftReferences() {
         return List.of(new ItemStack(Items.BLAST_FURNACE));
+    }
+
+
+
+    @Override
+    public ChatRecipeBackground getChatRecipeBackground(){
+        return new ChatRecipeBackground(CHAT_BACKGROUND, 0, 0, 88, 60);
     }
 }

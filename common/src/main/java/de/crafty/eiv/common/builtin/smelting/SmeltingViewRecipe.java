@@ -2,6 +2,7 @@ package de.crafty.eiv.common.builtin.smelting;
 
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -25,6 +26,12 @@ public class SmeltingViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(recipe.getResult());
 
         this.smeltingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("smelting_tick"), 200);
+    }
+
+    private SmeltingViewRecipe(SlotContent input, SlotContent result, AnimationTicker ticker) {
+        this.input = input;
+        this.result = result;
+        this.smeltingTicker = ticker;
     }
 
     @Override
@@ -80,5 +87,24 @@ public class SmeltingViewRecipe implements IEivViewRecipe {
     public void mapRecipeItems(RecipeTransferMap transferMap, AbstractContainerScreen<?> screen) {
 
         transferMap.linkSlots(0, 0);
+    }
+
+
+    @Override
+    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        int litProgress = Math.round(this.smeltingTicker.getProgress() * 14);
+        int smeltProgress = Math.round(this.smeltingTicker.getProgress() * 24);
+
+        //renderer.renderTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, Math.round(4 / 2.0F), Math.round(23 / 2.0F), 0, 0, 14, 14, 128, 128);
+
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 4, 23 + (14 - litProgress), 0, 14 - litProgress, 14, litProgress, 128, 128);
+
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 27, 22, 14, 0, smeltProgress, 16, 128, 128);
+    }
+
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        return new SmeltingViewRecipe(this.input, this.result, this.smeltingTicker.copy());
     }
 }

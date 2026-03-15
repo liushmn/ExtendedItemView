@@ -3,6 +3,7 @@ package de.crafty.eiv.common.builtin.campfire;
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
+import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
@@ -25,6 +26,12 @@ public class CampfireViewRecipe implements IEivViewRecipe {
         this.result = SlotContent.of(campfireCookingRecipe.getResult());
 
         this.cookingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("campfire_cooking_ticker"), 300);
+    }
+
+    private CampfireViewRecipe(SlotContent input, SlotContent result, AnimationTicker cookingTicker) {
+        this.input = input;
+        this.result = result;
+        this.cookingTicker = cookingTicker;
     }
 
     @Override
@@ -60,5 +67,18 @@ public class CampfireViewRecipe implements IEivViewRecipe {
 
         int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
+    }
+
+    @Override
+    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+
+        renderer.renderItem(guiGraphics, new ItemStack(Items.CAMPFIRE), 4, 23);
+
+        int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 28, 4, 14, 0, cookingProgress, 16, 128, 128);    }
+
+    @Override
+    public IEivViewRecipe asChatCopy() {
+        return new CampfireViewRecipe(this.input.copy(), this.result.copy(), this.cookingTicker.copy());
     }
 }

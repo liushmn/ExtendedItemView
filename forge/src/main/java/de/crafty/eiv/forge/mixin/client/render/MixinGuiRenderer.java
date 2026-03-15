@@ -1,7 +1,7 @@
 package de.crafty.eiv.forge.mixin.client.render;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import de.crafty.eiv.common.rendering.IEivWrappedRenderState;
+import de.crafty.eiv.common.access.IEivWrappedRenderState;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -48,7 +48,7 @@ public abstract class MixinGuiRenderer<T extends PictureInPictureRenderState> im
         if (!(renderer instanceof GuiEntityRenderer) || !(renderState instanceof GuiEntityRenderState guiEntityRenderState))
             return;
 
-        if(!(guiEntityRenderState.renderState() instanceof IEivWrappedRenderState wrappedRenderState) || !wrappedRenderState.extendedItemView$isMultiRenderingEnabled())
+        if(!(guiEntityRenderState.renderState() instanceof IEivWrappedRenderState wrappedRenderState) || !wrappedRenderState.eiv$isMultiRenderingEnabled())
             return;
 
         if (this.eiv$renderersLastFrame.containsKey(renderState))

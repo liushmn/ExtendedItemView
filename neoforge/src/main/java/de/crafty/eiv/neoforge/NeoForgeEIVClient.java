@@ -2,9 +2,11 @@ package de.crafty.eiv.neoforge;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
+import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.neoforge.resolver.NeoForgeEivResolver;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
@@ -25,6 +27,7 @@ public class NeoForgeEIVClient {
         event.register(Registries.MENU, menuTypeRegisterHelper -> {
             menuTypeRegisterHelper.register(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         });
+
     }
 
     @SubscribeEvent

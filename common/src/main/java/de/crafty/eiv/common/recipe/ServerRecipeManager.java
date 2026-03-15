@@ -155,11 +155,11 @@ public class ServerRecipeManager {
     }
 
 
-    public record ServerRecipeEntry(Identifier modRecipeId, IEivServerRecipe recipe) {
+    public record ServerRecipeEntry(Identifier recipeId, IEivServerRecipe recipe) {
 
         public static final StreamCodec<FriendlyByteBuf, ServerRecipeEntry> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8,
-                entry -> entry.modRecipeId().toString(),
+                entry -> entry.recipeId().toString(),
                 ByteBufCodecs.COMPOUND_TAG,
                 ServerRecipeEntry::createFullTag,
                 (s, compoundTag) -> new ServerRecipeEntry(Identifier.tryParse(s), ServerRecipeEntry.fromTag(compoundTag))
@@ -177,7 +177,7 @@ public class ServerRecipeManager {
                 this.recipe().writeToTag(dataTag);
                 tag.put("recipeData", dataTag);
             }catch (Exception e) {
-                CommonEIV.LOGGER.error("Failed to encode recipe {}: {}, please contact the mod author", this.modRecipeId(), e.getMessage());
+                CommonEIV.LOGGER.error("Failed to encode recipe {}: {}, please contact the mod author", this.recipeId(), e.getMessage());
             }
 
             return tag;
