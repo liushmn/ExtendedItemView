@@ -12,9 +12,13 @@ Currently supported functions are:
 
 - **recipe viewing**
 - **bookmarking items**
-- **hiding/showing overlay**
+- **hiding/showing overlays**
+- **transferring items (into crafting containers)**
+- **item filtering (highlight items in containers)**
+- **sharing recipes (displayed in game chat)**
 
 **NOTE: _Must be installed on both the client and server_**
+
 
 Questions, suggestions or bug reports? Feel free to join my [discord](https://discord.gg/eDDRdvtkBR)!
 
