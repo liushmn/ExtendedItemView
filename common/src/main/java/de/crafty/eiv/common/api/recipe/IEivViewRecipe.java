@@ -213,7 +213,6 @@ public interface IEivViewRecipe {
 
         IEivRecipeViewType.ChatRecipeBackground background = this.getViewType().getChatRecipeBackground();
 
-        // + 6 for margin
         renderer.renderTexture(background.texture(), guiGraphics, background.x(), background.y(), 0, 0, background.width(), background.height(), background.width(), background.height());
     }
 

@@ -23,7 +23,7 @@ dependencies {
 
 loom {
 
-    accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.classtweaker"))
+    accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accessWidener"))
 
     mixin {
         defaultRefmapName.set("${mod_id}.refmap.json")

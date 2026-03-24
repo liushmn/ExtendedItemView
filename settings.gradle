@@ -21,5 +21,5 @@ pluginManagement {
 include(":common")
 include(":fabric")
 include(":forge")
-include(":neoforge")
+//include(":neoforge") Not supported on 1.20.1
 //include(":servercompat")
