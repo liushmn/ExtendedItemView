@@ -9,7 +9,7 @@ import de.crafty.eiv.forge.resolver.ForgeEivResolver;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -27,7 +27,7 @@ public class ForgeEIVClient {
     @SubscribeEvent
     public static void onRegistry(RegisterEvent event) {
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> {
-            helper.register(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
+            helper.register(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         });
 
     }

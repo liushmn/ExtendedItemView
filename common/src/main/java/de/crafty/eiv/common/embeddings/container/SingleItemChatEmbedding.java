@@ -3,12 +3,12 @@ package de.crafty.eiv.common.embeddings.container;
 import de.crafty.eiv.common.CommonEIV;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class SingleItemChatEmbedding extends ContainerChatEmbedding {
 
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/single_item.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/single_item.png");
 
     public SingleItemChatEmbedding(ItemStack stack) {
         super(24, 26, 1.0F);

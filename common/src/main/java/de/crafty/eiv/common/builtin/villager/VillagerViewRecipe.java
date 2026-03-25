@@ -18,7 +18,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -144,8 +144,8 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         Font font = Minecraft.getInstance().font;
 
         ResourceKey<VillagerProfession> profession = this.villagerOffer.profession();
-        String namespace = profession.identifier().getNamespace();
-        String path = profession.identifier().getPath();
+        String namespace = profession.ResourceLocation().getNamespace();
+        String path = profession.ResourceLocation().getPath();
         float scale = 0.75F;
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
@@ -164,7 +164,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
             return;
 
         if (mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36) {
-            Identifier typeLocation = this.villagerOffer.requiredtype().identifier();
+            ResourceLocation typeLocation = this.villagerOffer.requiredtype().ResourceLocation();
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
             guiGraphics.setComponentTooltipForNextFrame(font, List.of(typeComponent), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
         }
@@ -194,8 +194,8 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         Font font = Minecraft.getInstance().font;
 
         ResourceKey<VillagerProfession> profession = this.villagerOffer.profession();
-        String namespace = profession.identifier().getNamespace();
-        String path = profession.identifier().getPath();
+        String namespace = profession.ResourceLocation().getNamespace();
+        String path = profession.ResourceLocation().getPath();
         float scale = 0.85F;
 
         Component professionComp = Component.translatable("entity." + namespace + ".villager." + path).append(" - ").append(Component.translatable("merchant.level." + this.villagerOffer.professionLevel())).withStyle(ChatFormatting.DARK_GRAY);
@@ -212,7 +212,7 @@ public class VillagerViewRecipe implements IEivViewRecipe {
         if (mouseX >= 0 && mouseX <= 24 && mouseY >= 0 && mouseY <= 36) {
             float chatScaling = Minecraft.getInstance().options.chatScale().get().floatValue();
 
-            Identifier typeLocation = this.villagerOffer.requiredtype().identifier();
+            ResourceLocation typeLocation = this.villagerOffer.requiredtype().ResourceLocation();
             Component typeComponent = Component.translatable("view.eiv.type.trading." + typeLocation.getNamespace() + "." + typeLocation.getPath()).withStyle(ChatFormatting.GOLD);
             guiGraphics.setComponentTooltipForNextFrame(font, List.of(typeComponent), mouseX + Math.round(renderer.getTotalXOffset() * renderer.getGuiScaling() * chatScaling), mouseY + renderer.getTotalYOffset());
         }

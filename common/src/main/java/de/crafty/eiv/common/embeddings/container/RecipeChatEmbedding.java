@@ -16,7 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -213,15 +213,15 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
         }
 
         // + 3 for margin
-        public void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
+        public void renderTexture(ResourceLocation texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
             this.renderTexture(texture, guiGraphics, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, false);
         }
 
-        public void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
+        public void renderTexture(ResourceLocation texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
             this.embedding.renderTexture(texture, guiGraphics, x, y, u, v, width, height, textureWidth, textureHeight, scaling, requiresFullAlpha);
         }
 
-        public void renderTopLevelTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
+        public void renderTopLevelTexture(ResourceLocation texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
             this.renderTexture(texture, guiGraphics, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, true);
         }
 

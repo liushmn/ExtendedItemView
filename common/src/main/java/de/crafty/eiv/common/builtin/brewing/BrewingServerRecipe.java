@@ -4,7 +4,7 @@ import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -12,7 +12,7 @@ public class BrewingServerRecipe implements IEivServerRecipe {
 
 
     public static final EivRecipeType<BrewingServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("brewing"),
+            ResourceLocation.withDefaultNamespace("brewing"),
             () -> new BrewingServerRecipe(ItemStack.EMPTY, null, ItemStack.EMPTY)
     );
 

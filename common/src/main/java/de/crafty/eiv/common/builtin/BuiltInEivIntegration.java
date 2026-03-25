@@ -47,7 +47,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.villager.VillagerTrades;
@@ -75,13 +75,13 @@ import static de.crafty.eiv.common.CommonEIV.*;
 
 public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
-    public static final Identifier WIDGETS = Identifier.fromNamespaceAndPath(MODID, "textures/gui/eiv_widgets.png");
+    public static final ResourceLocation WIDGETS = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/eiv_widgets.png");
 
     //Default slot rendering
-    public static final Identifier DEFAULT_SLOT_TEXTURE = Identifier.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
+    public static final ResourceLocation DEFAULT_SLOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/default_slot.png");
 
-    private static final TagKey<Item> EXCLUDED_ITEMS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
-    private static final TagKey<Block> EXCLUDED_BLOCKS = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
+    private static final TagKey<Item> EXCLUDED_ITEMS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
+    private static final TagKey<Block> EXCLUDED_BLOCKS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "hidden_from_recipe_viewers"));
 
     @Override
     public void onIntegrationInitialize() {

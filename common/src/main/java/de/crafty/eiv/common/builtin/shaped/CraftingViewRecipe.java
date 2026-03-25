@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;

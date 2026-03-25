@@ -2,7 +2,7 @@ package de.crafty.eiv.common.builtin.shapeless;
 
 import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class ShapelessViewType extends CraftingViewType {
 
@@ -14,8 +14,8 @@ public class ShapelessViewType extends CraftingViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("crafting_shapeless");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("crafting_shapeless");
     }
 
 

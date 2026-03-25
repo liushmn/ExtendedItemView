@@ -5,7 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public class EntityServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<EntityServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("entity_loot"),
+            ResourceLocation.withDefaultNamespace("entity_loot"),
             () -> new EntityServerRecipe(null, List.of())
     );
 
@@ -45,7 +45,7 @@ public class EntityServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(tag.getStringOr("entity", "")));
+        this.entityType = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(tag.getStringOr("entity", "")));
         this.drops = EivTagUtil.readList(tag, "stacks", EivTagUtil::decodeItemStackOnClient);
 
     }

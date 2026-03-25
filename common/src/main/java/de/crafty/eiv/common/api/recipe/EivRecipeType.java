@@ -1,6 +1,6 @@
 package de.crafty.eiv.common.api.recipe;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 
@@ -10,14 +10,14 @@ import java.util.HashMap;
  */
 public interface EivRecipeType<T extends IEivServerRecipe> {
 
-    HashMap<Identifier, EivRecipeType<?>> EIV_RECIPE_TYPES = new HashMap<>();
+    HashMap<ResourceLocation, EivRecipeType<?>> EIV_RECIPE_TYPES = new HashMap<>();
 
 
     /**
      *
      * @return A unique id for the recipe type used in network communication
      */
-    Identifier getId();
+    ResourceLocation getId();
 
     /**
      *
@@ -33,11 +33,11 @@ public interface EivRecipeType<T extends IEivServerRecipe> {
      * @return The recipe type
      * @param <S> The server recipe class
      */
-    static <S extends IEivServerRecipe> EivRecipeType<S> register(Identifier id, EmptyRecipeConstructor<S> emptyRecipeConstructor) {
+    static <S extends IEivServerRecipe> EivRecipeType<S> register(ResourceLocation id, EmptyRecipeConstructor<S> emptyRecipeConstructor) {
 
         EivRecipeType<S> type = new EivRecipeType<S>() {
             @Override
-            public Identifier getId() {
+            public ResourceLocation getId() {
                 return id;
             }
 
@@ -57,7 +57,7 @@ public interface EivRecipeType<T extends IEivServerRecipe> {
      * @param id The id
      * @return The server recipe type by id
      */
-    static EivRecipeType<?> byId(Identifier id){
+    static EivRecipeType<?> byId(ResourceLocation id){
         return EIV_RECIPE_TYPES.getOrDefault(id, null);
     }
 
@@ -66,7 +66,7 @@ public interface EivRecipeType<T extends IEivServerRecipe> {
      * @param recipeType The recipe type
      * @return The id of the type
      */
-    static Identifier idFromType(EivRecipeType<?> recipeType) {
+    static ResourceLocation idFromType(EivRecipeType<?> recipeType) {
         return recipeType.getId();
     }
 

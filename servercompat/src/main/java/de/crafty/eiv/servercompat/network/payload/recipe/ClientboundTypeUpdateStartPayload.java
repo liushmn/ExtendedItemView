@@ -7,14 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundTypeUpdateStartPayload(EivCompatRecipeType<?> recipeType, int amount) implements IEivCompatPacketPayload {
 
 
     @Override
-    public Identifier getId() {
-        return Identifier.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "type_start");
+    public ResourceLocation getId() {
+        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "type_start");
     }
 
     @Override

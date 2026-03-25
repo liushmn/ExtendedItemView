@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.ChatVisiblity;
@@ -167,11 +167,11 @@ public abstract class ChatEmbedding {
     }
 
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling) {
+    protected void renderTexture(ResourceLocation texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling) {
         this.renderTexture(texture, guiGraphics, x, y, u, v, width, height, textureWidth, textureHeight, scaling, false);
     }
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
+    protected void renderTexture(ResourceLocation texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
 
         if (requiresFullAlpha && this.getLineAlpha() < 1.0F)
             return;

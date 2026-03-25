@@ -5,7 +5,7 @@ import de.crafty.eiv.common.network.EivNetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinCustomPacketPayload {
 
     @Shadow
-    protected abstract <B extends FriendlyByteBuf> StreamCodec<B, ? extends CustomPacketPayload> findCodec(Identifier $$0x);
+    protected abstract <B extends FriendlyByteBuf> StreamCodec<B, ? extends CustomPacketPayload> findCodec(ResourceLocation $$0x);
 
 
-    @Redirect(method = "decode(Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
-    private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$1(@Coerce StreamCodec<B, CustomPacketPayload> instance, Identifier $$0) {
+    @Redirect(method = "decode(Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$1(@Coerce StreamCodec<B, CustomPacketPayload> instance, ResourceLocation $$0) {
 
         if (EivNetworkManager.INSTANCE.getClientbound().containsKey($$0)) {
             return (StreamCodec<? super B, ? extends CustomPacketPayload>) EivNetworkManager.INSTANCE.getClientbound().get($$0).codec();
@@ -33,8 +33,8 @@ public abstract class MixinCustomPacketPayload {
         return this.findCodec($$0);
     }
 
-    @Redirect(method = "writeCap", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
-    private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$2(@Coerce StreamCodec<B, CustomPacketPayload> instance, Identifier $$0) {
+    @Redirect(method = "writeCap", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/network/codec/StreamCodec;"))
+    private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$2(@Coerce StreamCodec<B, CustomPacketPayload> instance, ResourceLocation $$0) {
 
         if (EivNetworkManager.INSTANCE.getClientbound().containsKey($$0)) {
             return (StreamCodec<? super B, ? extends CustomPacketPayload>) EivNetworkManager.INSTANCE.getClientbound().get($$0).codec();

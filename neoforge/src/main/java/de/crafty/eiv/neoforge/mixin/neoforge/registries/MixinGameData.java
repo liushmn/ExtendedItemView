@@ -5,7 +5,7 @@ import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -34,7 +34,7 @@ public class MixinGameData {
         ModLoader.postEventWrapContainerInModOrder(e);
 
         RegisterEvent event = (RegisterEvent) e;
-        if(!event.getRegistryKey().identifier().equals(Registries.ITEM.identifier()))
+        if(!event.getRegistryKey().ResourceLocation().equals(Registries.ITEM.ResourceLocation()))
             return;
 
         HashMap<Fluid, Item> fluidItemMap = new HashMap<>();
@@ -44,7 +44,7 @@ public class MixinGameData {
             if (fluid == Fluids.EMPTY || !fluid.isSource(fluid.defaultFluidState()))
                 return;
 
-            Identifier fluidLocation = BuiltInRegistries.FLUID.getKey(fluid);
+            ResourceLocation fluidLocation = BuiltInRegistries.FLUID.getKey(fluid);
 
             if(event.getRegistry().containsKey(fluidLocation)){
                 fluidItemMap.put(fluid, (Item) event.getRegistry().getValue(fluidLocation));

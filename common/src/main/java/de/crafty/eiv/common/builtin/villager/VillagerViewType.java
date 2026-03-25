@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
@@ -25,8 +25,8 @@ public class VillagerViewType implements IEivRecipeViewType {
 
     protected static final VillagerViewType INSTANCE = new VillagerViewType();
 
-    private static final Identifier VILLAGER_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/villager.png");
-    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/villager.png");
+    private static final ResourceLocation VILLAGER_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/villager.png");
+    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/villager.png");
 
     private static final ReferenceCondition REFERENCE_CONDITION = (stack, viewRecipe) -> {
         if (!(stack.getItem() instanceof BlockItem blockItem))
@@ -64,7 +64,7 @@ public class VillagerViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
+    public ResourceLocation getGuiTexture() {
         return VILLAGER_LOCATION;
     }
 
@@ -85,8 +85,8 @@ public class VillagerViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("villager_trading");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("villager_trading");
     }
 
     @Override

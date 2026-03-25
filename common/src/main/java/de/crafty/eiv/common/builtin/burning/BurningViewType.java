@@ -5,7 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -16,8 +16,8 @@ public class BurningViewType implements IEivRecipeViewType {
     public static final BurningViewType INSTANCE = new BurningViewType();
 
 
-    private static final Identifier BURNING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
-    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/burning.png");
+    private static final ResourceLocation BURNING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
+    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/burning.png");
 
 
     @Override
@@ -36,7 +36,7 @@ public class BurningViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
+    public ResourceLocation getGuiTexture() {
         return BURNING_LOCATION;
     }
 
@@ -51,8 +51,8 @@ public class BurningViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("furnace_burning");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("furnace_burning");
     }
 
     @Override

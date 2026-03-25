@@ -6,11 +6,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
 
-public record ClientboundShareRecipePayload(Identifier recipeId, CompoundTag extraData, UUID sender) implements CustomPacketPayload {
+public record ClientboundShareRecipePayload(ResourceLocation recipeId, CompoundTag extraData, UUID sender) implements CustomPacketPayload {
 
     public static final StreamCodec<RegistryFriendlyByteBuf,  ClientboundShareRecipePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
@@ -19,10 +19,10 @@ public record ClientboundShareRecipePayload(Identifier recipeId, CompoundTag ext
             ClientboundShareRecipePayload::extraData,
             ByteBufCodecs.STRING_UTF8,
             clientboundShareRecipePayload -> clientboundShareRecipePayload.sender().toString(),
-            (id, extraData, sender) -> new ClientboundShareRecipePayload(Identifier.tryParse(id), extraData, UUID.fromString(sender))
+            (id, extraData, sender) -> new ClientboundShareRecipePayload(ResourceLocation.tryParse(id), extraData, UUID.fromString(sender))
     );
 
-    public static final Type<ClientboundShareRecipePayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "share_recipe_to_client"));
+    public static final Type<ClientboundShareRecipePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "share_recipe_to_client"));
 
 
     @Override

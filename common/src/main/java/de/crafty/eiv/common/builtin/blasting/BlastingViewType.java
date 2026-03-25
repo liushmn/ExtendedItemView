@@ -3,7 +3,7 @@ package de.crafty.eiv.common.builtin.blasting;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.builtin.smelting.SmeltingViewType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -13,8 +13,8 @@ public class BlastingViewType extends SmeltingViewType {
 
     public static final BlastingViewType INSTANCE = new BlastingViewType();
 
-    private static final Identifier BLASTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/blasting.png");
-    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/blasting.png");
+    private static final ResourceLocation BLASTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/blasting.png");
+    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/blasting.png");
 
     @Override
     public Component getDisplayName() {
@@ -22,7 +22,7 @@ public class BlastingViewType extends SmeltingViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
+    public ResourceLocation getGuiTexture() {
         return BLASTING_LOCATION;
     }
 
@@ -32,8 +32,8 @@ public class BlastingViewType extends SmeltingViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "furnace_blasting");
+    public ResourceLocation getId() {
+        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "furnace_blasting");
     }
 
     @Override

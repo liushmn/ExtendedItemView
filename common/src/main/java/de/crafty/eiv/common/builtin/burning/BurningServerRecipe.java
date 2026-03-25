@@ -4,7 +4,7 @@ import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 public class BurningServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<BurningServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("burning"),
+            ResourceLocation.withDefaultNamespace("burning"),
             () -> new BurningServerRecipe(null, 0)
     );
 

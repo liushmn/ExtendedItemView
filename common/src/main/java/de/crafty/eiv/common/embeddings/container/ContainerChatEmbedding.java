@@ -8,7 +8,7 @@ import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -71,7 +71,7 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
 
     protected abstract void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight){
+    protected void renderTexture(ResourceLocation texture, GuiGraphics guiGraphics, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight){
         this.renderTexture(texture, guiGraphics, x * this.guiScaling, y * this.guiScaling, u, v, width, height, textureWidth, textureHeight, this.guiScaling);
     }
 

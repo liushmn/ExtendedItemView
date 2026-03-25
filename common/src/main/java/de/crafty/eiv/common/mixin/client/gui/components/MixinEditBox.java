@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,20 +20,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinEditBox extends AbstractWidget {
 
     @Unique
-    private static final Identifier FILTERMODE_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "widget/searchbar_filtermode");
+    private static final ResourceLocation FILTERMODE_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "widget/searchbar_filtermode");
 
     public MixinEditBox(int $$0, int $$1, int $$2, int $$3, Component $$4) {
         super($$0, $$1, $$2, $$3, $$4);
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"))
-    private void renderFilterMode(GuiGraphics instance, RenderPipeline renderPipeline, Identifier Identifier, int i, int j, int k, int l) {
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
+    private void renderFilterMode(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation ResourceLocation, int i, int j, int k, int l) {
 
 
         if (this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode()) {
             instance.blitSprite(renderPipeline, FILTERMODE_LOCATION, i, j, k, l);
         } else
-            instance.blitSprite(renderPipeline, Identifier, i, j, k, l);
+            instance.blitSprite(renderPipeline, ResourceLocation, i, j, k, l);
     }
 
 }

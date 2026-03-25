@@ -5,7 +5,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.network.EivNetworkManager;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,11 +25,11 @@ public abstract class MixinServerGamePacketListenerImpl {
 
         CustomPacketPayload payload = packet.payload();
 
-        Identifier payloadId = payload.type().id();
+        ResourceLocation payloadId = payload.type().id();
 
-        EivNetworkManager.INSTANCE.getServerbound().forEach((Identifier, typeAndCodec) -> {
+        EivNetworkManager.INSTANCE.getServerbound().forEach((ResourceLocation, typeAndCodec) -> {
 
-            if (!payloadId.equals(Identifier))
+            if (!payloadId.equals(ResourceLocation))
                 return;
 
             if (EivNetworkManager.INSTANCE.serverPayloadHandlers().containsKey(payloadId)){

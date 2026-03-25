@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
 import java.util.*;
@@ -221,7 +221,7 @@ public class OverlayManager {
     }
 
 
-    public void removeGuiBlocking(Identifier id, boolean updateOverlays) {
+    public void removeGuiBlocking(ResourceLocation id, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> blockingGuiComponent.id().equals(id));
 
         if (updateOverlays) {
@@ -230,7 +230,7 @@ public class OverlayManager {
 
     }
 
-    public void removeGuiBlocking(Predicate<Identifier> filter, boolean updateOverlays) {
+    public void removeGuiBlocking(Predicate<ResourceLocation> filter, boolean updateOverlays) {
         this.guiBlockings.removeIf(blockingGuiComponent -> filter.test(blockingGuiComponent.id()));
 
         if (updateOverlays) {

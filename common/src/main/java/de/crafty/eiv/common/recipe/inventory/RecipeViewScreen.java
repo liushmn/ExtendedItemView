@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -37,7 +37,7 @@ import java.util.List;
 
 public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
 
-    private static final Identifier VIEW_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/recipe_view.png");
+    private static final ResourceLocation VIEW_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/recipe_view.png");
 
     //Timestamp when opening the view
     private final long timestamp;
@@ -46,7 +46,7 @@ public class RecipeViewScreen extends AbstractContainerScreen<RecipeViewMenu> {
     private Component guiTitle, page;
 
     private final List<AnimationTicker> animationTickers;
-    private final HashMap<Identifier, Integer> animationTickCache;
+    private final HashMap<ResourceLocation, Integer> animationTickCache;
 
     private final List<Button> transferButtons;
     private final List<RecipeShareButton> shareButtons;

@@ -6,7 +6,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -43,8 +43,8 @@ public class EntityViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
-        return Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/entity.png");
+    public ResourceLocation getGuiTexture() {
+        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/entity.png");
     }
 
     //Mob loot should not exceed 54 slots
@@ -65,8 +65,8 @@ public class EntityViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("entity_loot");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("entity_loot");
     }
 
     @Override

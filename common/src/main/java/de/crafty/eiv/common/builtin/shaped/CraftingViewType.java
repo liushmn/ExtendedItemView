@@ -5,7 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -15,8 +15,8 @@ public class CraftingViewType implements IEivRecipeViewType {
 
     public static final CraftingViewType INSTANCE = new CraftingViewType();
 
-    private static final Identifier CRAFTING_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/crafting.png");
-    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/crafting.png");
+    private static final ResourceLocation CRAFTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/crafting.png");
+    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/crafting.png");
 
     @Override
     public Component getDisplayName() {
@@ -24,8 +24,8 @@ public class CraftingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("crafting_shaped");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("crafting_shaped");
     }
 
     @Override
@@ -45,7 +45,7 @@ public class CraftingViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
+    public ResourceLocation getGuiTexture() {
         return CRAFTING_LOCATION;
     }
 

@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -47,7 +47,7 @@ public abstract class MixinEffectsInInventory {
     @Inject(method = "renderEffects", at = @At("HEAD"))
     private void injectBlocking$0(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
 
-        List<Identifier> effectsToRemove = new ArrayList<>();
+        List<ResourceLocation> effectsToRemove = new ArrayList<>();
         for (BlockingGuiComponent guiBlock : OverlayManager.INSTANCE.allGuiBlockings()) {
 
             if (!guiBlock.id().getPath().startsWith("mobeffect_"))
@@ -83,7 +83,7 @@ public abstract class MixinEffectsInInventory {
             int effectWidth = Math.min(m, Math.max(nameWidth, durationWidth));
 
             OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                    Identifier.withDefaultNamespace("mobeffect_" + mobEffectInstance.getDescriptionId()), i, topPos + n, effectWidth, 32
+                    ResourceLocation.withDefaultNamespace("mobeffect_" + mobEffectInstance.getDescriptionId()), i, topPos + n, effectWidth, 32
             ));
             n += j;
         }

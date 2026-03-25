@@ -5,7 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -15,8 +15,8 @@ public class StonecutterViewType implements IEivRecipeViewType {
 
     protected static final StonecutterViewType INSTANCE = new StonecutterViewType();
 
-    private static final Identifier STONECUTTER_LOCATION = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
-    private static final Identifier CHAT_BACKGROUND = Identifier.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/stonecutter.png");
+    private static final ResourceLocation STONECUTTER_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
+    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/stonecutter.png");
 
 
     @Override
@@ -25,8 +25,8 @@ public class StonecutterViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getId() {
-        return Identifier.withDefaultNamespace("stonecutting");
+    public ResourceLocation getId() {
+        return ResourceLocation.withDefaultNamespace("stonecutting");
     }
 
     @Override
@@ -45,7 +45,7 @@ public class StonecutterViewType implements IEivRecipeViewType {
     }
 
     @Override
-    public Identifier getGuiTexture() {
+    public ResourceLocation getGuiTexture() {
         return STONECUTTER_LOCATION;
     }
 

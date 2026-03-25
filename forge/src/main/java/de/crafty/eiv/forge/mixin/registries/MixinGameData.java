@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluid;
@@ -37,9 +37,9 @@ public class MixinGameData {
     private static Logger LOGGER;
 
     @Inject(method = "loadPersistentDataToStagingRegistry", at = @At("HEAD"))
-    private static void excludeFluidItems(RegistryManager pool, RegistryManager _to, Map<Identifier, IdMappingEvent.IdRemapping> remaps, Object2IntMap<Identifier> missing, Identifier name, ForgeRegistry.Snapshot snap, CallbackInfo ci) {
+    private static void excludeFluidItems(RegistryManager pool, RegistryManager _to, Map<ResourceLocation, IdMappingEvent.IdRemapping> remaps, Object2IntMap<ResourceLocation> missing, ResourceLocation name, ForgeRegistry.Snapshot snap, CallbackInfo ci) {
 
-        if (!name.equals(Registries.ITEM.identifier()))
+        if (!name.equals(Registries.ITEM.ResourceLocation()))
             return;
 
         BuiltInRegistries.FLUID.forEach(fluid -> {
@@ -64,7 +64,7 @@ public class MixinGameData {
 
         RegisterEvent event = (RegisterEvent) e;
 
-        if (!event.getRegistryKey().identifier().equals(Registries.ITEM.identifier()))
+        if (!event.getRegistryKey().ResourceLocation().equals(Registries.ITEM.ResourceLocation()))
             return;
 
         HashMap<Fluid, Item> fluidItemMap = new HashMap<>();
@@ -74,7 +74,7 @@ public class MixinGameData {
             if (fluid == Fluids.EMPTY || !fluid.isSource(fluid.defaultFluidState()))
                 return;
 
-            Identifier fluidLocation = ForgeRegistries.FLUIDS.getKey(fluid);
+            ResourceLocation fluidLocation = ForgeRegistries.FLUIDS.getKey(fluid);
             if(fluidLocation == null)
                 return;
 

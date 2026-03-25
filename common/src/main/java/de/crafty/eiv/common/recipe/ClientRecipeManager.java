@@ -1,7 +1,6 @@
 package de.crafty.eiv.common.recipe;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.network.payload.ServerboundRequestEivUpdate;
 import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;

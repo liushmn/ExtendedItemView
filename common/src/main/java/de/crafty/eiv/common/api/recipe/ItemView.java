@@ -2,10 +2,6 @@ package de.crafty.eiv.common.api.recipe;
 
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
-import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -199,12 +195,6 @@ public class ItemView {
      * @param stack The itemStack used as an item-variant
      */
     public record StackSensitive(ItemStack stack) {
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, StackSensitive> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.COMPOUND_TAG,
-                stackSensitive -> EivTagUtil.encodeItemStackOnServer(stackSensitive.stack()),
-                (compoundTag) -> new StackSensitive(EivTagUtil.decodeItemStackOnClient(compoundTag))
-        );
 
         @Override
         public ItemStack stack() {

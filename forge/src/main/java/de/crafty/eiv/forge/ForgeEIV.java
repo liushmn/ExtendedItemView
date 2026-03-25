@@ -6,7 +6,7 @@ import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
 import de.crafty.eiv.common.component.EivDataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;

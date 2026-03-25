@@ -16,7 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class VillagerServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<VillagerServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("villager_trading"),
+            ResourceLocation.withDefaultNamespace("villager_trading"),
             () -> new VillagerServerRecipe(null, 0, null)
     );
 
@@ -78,7 +78,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
     @Override
     public void writeToTag(CompoundTag tag) {
 
-        tag.putString("profession", this.profession.identifier().toString());
+        tag.putString("profession", this.profession.ResourceLocation().toString());
         tag.putInt("professionLevel", this.professionLevel);
 
         tag.putString("type", this.dataObject.type().id().toString());
@@ -92,11 +92,11 @@ public class VillagerServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
         if (tag.contains("profession"))
-            this.profession = BuiltInRegistries.VILLAGER_PROFESSION.get(Identifier.parse(tag.getString("profession").orElseThrow())).orElseThrow().key();
+            this.profession = BuiltInRegistries.VILLAGER_PROFESSION.get(ResourceLocation.parse(tag.getString("profession").orElseThrow())).orElseThrow().key();
 
         this.professionLevel = tag.getIntOr("professionLevel", 0);
 
-        VillagerOfferType<?> type = VillagerOfferType.byId(Identifier.parse(tag.getString("type").orElseThrow()));
+        VillagerOfferType<?> type = VillagerOfferType.byId(ResourceLocation.parse(tag.getString("type").orElseThrow()));
         this.clientSideVillagerOffers = type.decoder().decode(this.profession, this.professionLevel, tag.getCompoundOrEmpty("data"));
 
     }
@@ -122,14 +122,14 @@ public class VillagerServerRecipe implements IEivServerRecipe {
     }
 
 
-    public record VillagerOfferType<T extends VillagerTrades.ItemListing>(Identifier id, Encoder<T> encoder,
+    public record VillagerOfferType<T extends VillagerTrades.ItemListing>(ResourceLocation id, Encoder<T> encoder,
                                                                           Decoder decoder) {
 
-        private static final HashMap<Identifier, VillagerOfferType<?>> TYPES = new HashMap<>();
-        private static final HashMap<Class<?>, Identifier> ID_BY_CLASS = new HashMap<>();
+        private static final HashMap<ResourceLocation, VillagerOfferType<?>> TYPES = new HashMap<>();
+        private static final HashMap<Class<?>, ResourceLocation> ID_BY_CLASS = new HashMap<>();
 
         public static final VillagerOfferType<VillagerTrades.EmeraldForItems> EMERALD_FOR_ITEMS = register(
-                Identifier.withDefaultNamespace("emerald_for_items"),
+                ResourceLocation.withDefaultNamespace("emerald_for_items"),
                 VillagerTrades.EmeraldForItems.class,
                 (listing, out) -> {
                     EmeraldForItemsAccessor accessor = (EmeraldForItemsAccessor) listing;
@@ -147,14 +147,14 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, List.of(new ItemStack(Items.EMERALD, emeraldCount)), List.of(cost), List.of(), villagerXp, maxUses));
                 }
         );
 
         public static final VillagerOfferType<VillagerTrades.ItemsForEmeralds> ITEMS_FOR_EMERALDS = register(
-                Identifier.withDefaultNamespace("items_for_emeralds"),
+                ResourceLocation.withDefaultNamespace("items_for_emeralds"),
                 VillagerTrades.ItemsForEmeralds.class,
                 (listing, out) -> {
 
@@ -182,14 +182,14 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, offers, List.of(new ItemStack(Items.EMERALD, emeraldCost)), List.of(), villagerXp, maxUses));
                 }
         );
 
         public static final VillagerOfferType<VillagerTrades.SuspiciousStewForEmerald> SUSPICIOUS_STEW = register(
-                Identifier.withDefaultNamespace("suspicious_stew"),
+                ResourceLocation.withDefaultNamespace("suspicious_stew"),
                 VillagerTrades.SuspiciousStewForEmerald.class,
                 (listing, out) -> {
                     SuspiciousStewForEmeraldAccessor accessor = (SuspiciousStewForEmeraldAccessor) listing;
@@ -209,14 +209,14 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, List.of(stew), List.of(new ItemStack(Items.EMERALD, emeraldCost)), List.of(), villagerXp, maxUses));
                 }
         );
 
         public static final VillagerOfferType<VillagerTrades.EnchantBookForEmeralds> ENCHANT_BOOK = register(
-                Identifier.withDefaultNamespace("enchant_book"),
+                ResourceLocation.withDefaultNamespace("enchant_book"),
                 VillagerTrades.EnchantBookForEmeralds.class,
                 (listing, out) -> {
                     EnchantBookForEmeraldsAccessor accessor = (EnchantBookForEmeraldsAccessor) listing;
@@ -270,7 +270,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         CompoundTag offerTag = new CompoundTag();
                         offerTag.put("offerStacks", EivTagUtil.writeList(stacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
                         offerTag.put("costStacks", EivTagUtil.writeList(costStacks, (origin, tag) -> EivTagUtil.encodeItemStackOnServer(origin)));
-                        offersTag.put(enchantment.identifier().toDebugFileName(), offerTag);
+                        offersTag.put(enchantment.ResourceLocation().toDebugFileName(), offerTag);
                     });
 
                     out.put("offers", offersTag);
@@ -280,7 +280,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     List<VillagerOffer> villagerOffers = new ArrayList<>();
 
@@ -303,13 +303,13 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.TreasureMapForEmeralds> TREASURE_MAP = register(
-                Identifier.withDefaultNamespace("treasure_map"),
+                ResourceLocation.withDefaultNamespace("treasure_map"),
                 VillagerTrades.TreasureMapForEmeralds.class,
                 (listing, out) -> {
 
                     TreasureMapForEmeraldsAccessor accessor = (TreasureMapForEmeraldsAccessor) listing;
 
-                    out.putString("decoration", accessor.destinationType().unwrapKey().orElseThrow().identifier().toString());
+                    out.putString("decoration", accessor.destinationType().unwrapKey().orElseThrow().ResourceLocation().toString());
                     out.putString("displayName", accessor.displayName());
                     out.putInt("emeraldCost", accessor.emeraldCost());
                     out.putInt("villagerXp", accessor.villagerXp());
@@ -318,7 +318,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 },
                 (profession, professionLevel, in) -> {
 
-                    MapDecorationType decorationType = BuiltInRegistries.MAP_DECORATION_TYPE.getOptional(Identifier.parse(in.getString("decoration").orElseThrow())).orElseThrow();
+                    MapDecorationType decorationType = BuiltInRegistries.MAP_DECORATION_TYPE.getOptional(ResourceLocation.parse(in.getString("decoration").orElseThrow())).orElseThrow();
                     String displayName = in.getStringOr("displayName", "");
                     int emeraldCost = in.getIntOr("emeraldCost", 0);
                     int villagerXp = in.getIntOr("villagerXp", 0);
@@ -332,7 +332,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     ItemStack costStack1 = new ItemStack(Items.EMERALD, emeraldCost);
                     ItemStack costStack2 = new ItemStack(Items.COMPASS);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, List.of(offerStack), List.of(costStack1), List.of(costStack2), villagerXp, maxUses));
                 }
@@ -340,7 +340,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.TippedArrowForItemsAndEmeralds> TIPPED_ARROW = register(
-                Identifier.withDefaultNamespace("tipped_arrow"),
+                ResourceLocation.withDefaultNamespace("tipped_arrow"),
                 VillagerTrades.TippedArrowForItemsAndEmeralds.class,
                 (listing, out) -> {
                     TippedArrowForItemsAndEmeraldsAccessor accessor = (TippedArrowForItemsAndEmeraldsAccessor) listing;
@@ -372,7 +372,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, offers, List.of(new ItemStack(Items.EMERALD, emeraldCost)), List.of(new ItemStack(fromItem, fromCount)), villagerXp, maxUses));
                 }
@@ -380,7 +380,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.EnchantedItemForEmeralds> ENCHANTED_ITEM_FOR_EMERALDS = register(
-                Identifier.withDefaultNamespace("enchanted_item_for_emeralds"),
+                ResourceLocation.withDefaultNamespace("enchanted_item_for_emeralds"),
                 VillagerTrades.EnchantedItemForEmeralds.class,
                 (listing, out) -> {
 
@@ -445,7 +445,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, offerStacks, List.of(costStack), List.of(), villagerXp, maxUses));
@@ -455,7 +455,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.DyedArmorForEmeralds> DYED_ARMOR = register(
-                Identifier.withDefaultNamespace("dyed_armor"),
+                ResourceLocation.withDefaultNamespace("dyed_armor"),
                 VillagerTrades.DyedArmorForEmeralds.class,
                 (listing, out) -> {
                     DyedArmorForEmeraldsAccessor accessor = (DyedArmorForEmeraldsAccessor) listing;
@@ -495,7 +495,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     } else
                         offerStacks.add(offerStack);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, offerStacks, List.of(new ItemStack(Items.EMERALD, emeraldCost)), List.of(), villagerXp, maxUses));
                 }
@@ -503,7 +503,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.ItemsAndEmeraldsToItems> ITEMS_AND_EMERALDS_TO_ITEMS = register(
-                Identifier.withDefaultNamespace("items_and_emeralds_to_items"),
+                ResourceLocation.withDefaultNamespace("items_and_emeralds_to_items"),
                 VillagerTrades.ItemsAndEmeraldsToItems.class,
                 (listing, out) -> {
                     ItemsAndEmeraldsToItemsAccessor accessor = (ItemsAndEmeraldsToItemsAccessor) listing;
@@ -533,7 +533,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     int villagerXp = in.getIntOr("villagerXp", 0);
                     int maxUses = in.getIntOr("maxUses", 0);
 
-                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
+                    ResourceKey<VillagerType> villagerType = !in.contains("requiredType") ? null : BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(in.getString("requiredType").orElseThrow())).orElseThrow().key();
 
                     return List.of(new VillagerOffer(profession, professionLevel, villagerType, offerStacks, List.of(new ItemStack(Items.EMERALD, emeraldCost)), List.of(costStack), villagerXp, maxUses));
                 }
@@ -541,7 +541,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
 
         public static final VillagerOfferType<VillagerTrades.EmeraldsForVillagerTypeItem> EMERALDS_FOR_VILLAGER_TYPE = register(
-                Identifier.withDefaultNamespace("emeralds_for_villager_type"),
+                ResourceLocation.withDefaultNamespace("emeralds_for_villager_type"),
                 VillagerTrades.EmeraldsForVillagerTypeItem.class,
                 (listing, out) -> {
                     EmeraldsForVillagerTypeItemAccessor accessor = (EmeraldsForVillagerTypeItemAccessor) listing;
@@ -554,7 +554,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     CompoundTag tradesTag = new CompoundTag();
 
                     accessor.getTrades().forEach((villagerType, item) -> {
-                        tradesTag.putString(villagerType.identifier().toString(), EivTagUtil.itemToString(item));
+                        tradesTag.putString(villagerType.ResourceLocation().toString(), EivTagUtil.itemToString(item));
                     });
 
                     out.put("trades", tradesTag);
@@ -569,7 +569,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     CompoundTag tradesTag = in.getCompoundOrEmpty("trades");
 
                     tradesTag.forEach((s, tag) -> {
-                        ResourceKey<VillagerType> villagerType = BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(s)).orElseThrow().key();
+                        ResourceKey<VillagerType> villagerType = BuiltInRegistries.VILLAGER_TYPE.get(ResourceLocation.parse(s)).orElseThrow().key();
                         Item item = EivTagUtil.itemFromString(tag.asString().orElseThrow());
                         trades.put(villagerType, item);
                     });
@@ -585,7 +585,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
         );
 
         public static final VillagerOfferType<VillagerTrades.TypeSpecificTrade> TYPE_SPECIFIC = register(
-                Identifier.withDefaultNamespace("type_specific"),
+                ResourceLocation.withDefaultNamespace("type_specific"),
                 VillagerTrades.TypeSpecificTrade.class,
                 (listing, out) -> {
 
@@ -598,10 +598,10 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                         CompoundTag encodedListing = new CompoundTag();
                         offerType.encoder().encode(VillagerServerRecipe.castListing(itemListing), encodedListing);
 
-                        encodedListing.putString("requiredType", villagerType.identifier().toString());
+                        encodedListing.putString("requiredType", villagerType.ResourceLocation().toString());
                         encodedListing.putString("listingType", offerType.id().toString());
 
-                        out.put(villagerType.identifier().toString(), encodedListing);
+                        out.put(villagerType.ResourceLocation().toString(), encodedListing);
                     });
 
                 },
@@ -613,7 +613,7 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
                         CompoundTag listingTag = tag.asCompound().orElseThrow();
 
-                        Identifier listingId = Identifier.parse(listingTag.getString("listingType").orElseThrow());
+                        ResourceLocation listingId = ResourceLocation.parse(listingTag.getString("listingType").orElseThrow());
                         VillagerOfferType<?> offerType = byId(listingId);
 
                         villagerOffers.addAll(offerType.decoder().decode(profession, professionLevel, listingTag));
@@ -623,14 +623,14 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                 }
         );
 
-        public static <T extends VillagerTrades.ItemListing> VillagerOfferType<T> register(Identifier id, Class<T> clazz, Encoder<T> encoder, Decoder decoder) {
+        public static <T extends VillagerTrades.ItemListing> VillagerOfferType<T> register(ResourceLocation id, Class<T> clazz, Encoder<T> encoder, Decoder decoder) {
             VillagerOfferType<T> type = new VillagerOfferType<>(id, encoder, decoder);
             TYPES.put(id, type);
             ID_BY_CLASS.put(clazz, id);
             return type;
         }
 
-        public static <T extends VillagerTrades.ItemListing> VillagerOfferType<T> byId(Identifier id) {
+        public static <T extends VillagerTrades.ItemListing> VillagerOfferType<T> byId(ResourceLocation id) {
             return (VillagerOfferType<T>) TYPES.get(id);
         }
 

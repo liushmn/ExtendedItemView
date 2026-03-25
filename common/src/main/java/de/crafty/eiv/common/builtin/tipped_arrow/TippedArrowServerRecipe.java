@@ -4,13 +4,13 @@ import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class TippedArrowServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<TippedArrowServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("tipped_arrow_crafting"),
+            ResourceLocation.withDefaultNamespace("tipped_arrow_crafting"),
             () -> new TippedArrowServerRecipe(ItemStack.EMPTY)
     );
 

@@ -4,14 +4,14 @@ import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public class SmeltingServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<SmeltingServerRecipe> TYPE = EivRecipeType.register(
-            Identifier.withDefaultNamespace("smelting"),
+            ResourceLocation.withDefaultNamespace("smelting"),
             () -> new SmeltingServerRecipe(null, ItemStack.EMPTY)
     );
 

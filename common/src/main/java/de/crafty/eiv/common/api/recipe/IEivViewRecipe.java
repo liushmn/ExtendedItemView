@@ -241,7 +241,7 @@ public interface IEivViewRecipe {
         this.bindSlots(ctx);
 
         for (int i = 0; i < this.getViewType().getSlotCount(); i++) {
-            CompoundTag encoded = tag.getCompoundOrEmpty(String.valueOf(i));
+            CompoundTag encoded = tag.getCompound(String.valueOf(i));
             if (encoded.isEmpty())
                 continue;
 

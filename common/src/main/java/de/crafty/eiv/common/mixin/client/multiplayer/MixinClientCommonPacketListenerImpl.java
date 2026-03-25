@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

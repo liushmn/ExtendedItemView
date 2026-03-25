@@ -5,7 +5,7 @@ import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.extra.FluidItemSpecialRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,10 +19,10 @@ public abstract class MixinSpecialModelRenderers {
 
     @Shadow
     @Final
-    private static ExtraCodecs.LateBoundIdMapper<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked>> ID_MAPPER;
+    private static ExtraCodecs.LateBoundIdMapper<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> ID_MAPPER;
 
     @Inject(method = "bootstrap", at = @At("HEAD"))
     private static void injectFluidItemRenderer(CallbackInfo ci) {
-        ID_MAPPER.put(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "fluiditem"), FluidItemSpecialRenderer.Unbaked.MAP_CODEC);
+        ID_MAPPER.put(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "fluiditem"), FluidItemSpecialRenderer.Unbaked.MAP_CODEC);
     }
 }

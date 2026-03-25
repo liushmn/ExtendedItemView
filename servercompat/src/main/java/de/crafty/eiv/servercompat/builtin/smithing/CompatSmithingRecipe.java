@@ -5,7 +5,7 @@ import de.crafty.eiv.servercompat.api.recipe.IEivCompatServerRecipe;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.TransmuteResult;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
 import org.bukkit.inventory.RecipeChoice;
@@ -15,7 +15,7 @@ public class CompatSmithingRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatSmithingRecipe> TYPE = EivCompatRecipeType.register(
-            Identifier.withDefaultNamespace("smithing")
+            ResourceLocation.withDefaultNamespace("smithing")
     );
 
     private boolean isTrim;

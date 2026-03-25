@@ -13,7 +13,7 @@ import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -29,13 +29,13 @@ import static de.crafty.eiv.common.CommonEIV.MODID;
 
 public class CommonEIVClient {
 
-    public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MODID, "fluiditem"), "inventory");
+    public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MODID, "fluiditem"), "inventory");
 
     public static final MenuType<RecipeViewMenu> RECIPE_VIEW_MENU = new MenuType<>(RecipeViewMenu::new, FeatureFlagSet.of());
 
 
-    public static final KeyMapping.Category EIV_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MODID, "eiv"));
-    public static final KeyMapping.Category EIV_ADMIN_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MODID, "eiv_admin"));
+    public static final KeyMapping.Category EIV_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MODID, "eiv"));
+    public static final KeyMapping.Category EIV_ADMIN_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MODID, "eiv_admin"));
     
     public static final KeyMapping USAGE_KEYBIND = new KeyMapping("key.eiv.usage", 85, EIV_CATEGORY);
 

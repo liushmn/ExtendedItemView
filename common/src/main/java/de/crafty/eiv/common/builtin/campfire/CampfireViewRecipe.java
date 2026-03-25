@@ -10,7 +10,7 @@ import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -25,7 +25,7 @@ public class CampfireViewRecipe implements IEivViewRecipe {
         this.input = SlotContent.of(campfireCookingRecipe.getInput());
         this.result = SlotContent.of(campfireCookingRecipe.getResult());
 
-        this.cookingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("campfire_cooking_ticker"), 300);
+        this.cookingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("campfire_cooking_ticker"), 300);
     }
 
     private CampfireViewRecipe(SlotContent input, SlotContent result, AnimationTicker cookingTicker) {

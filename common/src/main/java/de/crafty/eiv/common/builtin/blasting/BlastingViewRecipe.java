@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BlastFurnaceScreen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class BlastingViewRecipe implements IEivViewRecipe {
         this.input = SlotContent.of(blastingRecipe.getInput());
         this.result = SlotContent.of(blastingRecipe.getResult());
 
-        this.blastingTicker = AnimationTicker.create(Identifier.withDefaultNamespace("blasting_ticker"), 100);
+        this.blastingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("blasting_ticker"), 100);
     }
 
     private BlastingViewRecipe(SlotContent input, SlotContent result, AnimationTicker ticker) {

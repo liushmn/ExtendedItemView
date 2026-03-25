@@ -4,7 +4,7 @@ import de.crafty.eiv.servercompat.api.recipe.EivCompatRecipeType;
 import de.crafty.eiv.servercompat.api.recipe.IEivCompatServerRecipe;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 
@@ -12,7 +12,7 @@ public class CompatStonecutterRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatStonecutterRecipe> TYPE = EivCompatRecipeType.register(
-            Identifier.withDefaultNamespace("stonecutting")
+            ResourceLocation.withDefaultNamespace("stonecutting")
     );
 
     private RecipeChoice input;

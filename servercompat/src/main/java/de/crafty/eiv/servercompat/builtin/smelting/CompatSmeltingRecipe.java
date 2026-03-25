@@ -4,7 +4,7 @@ import de.crafty.eiv.servercompat.api.recipe.EivCompatRecipeType;
 import de.crafty.eiv.servercompat.api.recipe.IEivCompatServerRecipe;
 import de.crafty.eiv.servercompat.util.EivCompatTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.bukkit.inventory.RecipeChoice;
@@ -13,7 +13,7 @@ public class CompatSmeltingRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatSmeltingRecipe> TYPE = EivCompatRecipeType.register(
-            Identifier.withDefaultNamespace("smelting")
+            ResourceLocation.withDefaultNamespace("smelting")
     );
 
     private RecipeChoice input;
