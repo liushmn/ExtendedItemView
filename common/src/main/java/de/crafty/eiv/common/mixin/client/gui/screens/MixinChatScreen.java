@@ -1,7 +1,7 @@
 package de.crafty.eiv.common.mixin.client.gui.screens;
 
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -21,17 +21,17 @@ public abstract class MixinChatScreen extends Screen {
     }
 
 
-    @Inject(method = "mouseClicked", at = @At("RETURN"))
+    @Inject(method = "mouseClicked", at = @At("RETURN"), remap = false)
     private void clickEmbeddings(MouseButtonEvent mouseButtonEvent, boolean doubleClick, CallbackInfoReturnable<Boolean> cir){
         ChatEmbedding.onMouseClicked(mouseButtonEvent, doubleClick);
     }
 
-    @Inject(method = "mouseScrolled", at = @At("RETURN"))
+    @Inject(method = "mouseScrolled", at = @At("RETURN"), remap = false)
     private void scrollEmbeddings(double mouseX, double mouseY, double horizontal, double vertical, CallbackInfoReturnable<Boolean> cir){
         ChatEmbedding.onMouseScrolled(mouseX, mouseY, horizontal, vertical);
     }
 
-    @Inject(method = "keyPressed", at = @At("RETURN"))
+    @Inject(method = "keyPressed", at = @At("RETURN"), remap = false)
     private void keyPressEmbeddings(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir){
         ChatEmbedding.onKeyPressed(keyEvent);
     }

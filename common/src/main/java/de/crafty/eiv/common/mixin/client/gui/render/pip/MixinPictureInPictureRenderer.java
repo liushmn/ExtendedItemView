@@ -7,12 +7,11 @@ import de.crafty.eiv.common.embeddings.EmbeddingData;
 import de.crafty.eiv.common.access.IEivWrappedRenderState;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.BlitRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.gui.BlitRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.util.ARGB;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,10 +24,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinPictureInPictureRenderer<T extends PictureInPictureRenderState> implements AutoCloseable {
 
 
-    @Shadow
+    @Shadow(remap = false)
     private @Nullable GpuTextureView textureView;
 
-    @Inject(method = "blitTexture", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "blitTexture", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectEmbeddingData(T pictureInPictureRenderState, GuiRenderState guiRenderState, CallbackInfo ci) {
 
         if (!(pictureInPictureRenderState instanceof GuiEntityRenderState state))
@@ -39,7 +38,7 @@ public abstract class MixinPictureInPictureRenderer<T extends PictureInPictureRe
             return;
 
 
-        guiRenderState.submitBlitToCurrentLayer(
+        guiRenderState.addBlitToCurrentLayer(
                 new BlitRenderState(
                         RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
                         TextureSetup.singleTexture(this.textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),

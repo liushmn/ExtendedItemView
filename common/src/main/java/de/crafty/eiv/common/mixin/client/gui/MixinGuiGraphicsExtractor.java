@@ -6,7 +6,7 @@ import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -31,21 +31,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 import java.util.Random;
 
-@Mixin(GuiGraphics.class)
-public abstract class MixinGuiGraphics {
+@Mixin(GuiGraphicsExtractor.class)
+public abstract class MixinGuiGraphicsExtractor {
 
 
-    @Shadow
-    public abstract void drawString(Font p_283019_, @Nullable String p_415853_, int p_283379_, int p_283346_, int p_282119_, boolean p_416601_);
-
-    @Shadow
+    @Shadow(remap = false)
     public abstract void fill(RenderPipeline p_416410_, int p_281437_, int p_283660_, int p_282606_, int p_283413_, int p_283428_);
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private Minecraft minecraft;
 
-    @Redirect(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;updateForTopItem(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/ItemOwner;I)V"))
+    @Shadow(remap = false)
+    public abstract void text(Font font, @Nullable String str, int x, int y, int color, boolean dropShadow);
+
+    @Redirect(method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;updateForTopItem(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/ItemOwner;I)V"), remap = false)
     private void injectStackData(ItemModelResolver instance, ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext p_388835_, Level p_388064_, ItemOwner p_434877_, int p_388137_) {
         instance.updateForTopItem(renderState, stack, p_388835_, p_388064_, p_434877_, p_388137_);
 
@@ -57,7 +57,7 @@ public abstract class MixinGuiGraphics {
     }
 
 
-    @Inject(method = "renderItemCooldown", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "itemCooldown", at = @At("HEAD"), cancellable = true, remap = false)
     private void renderChatDependantCouldown(ItemStack itemStack, int i, int j, CallbackInfo ci) {
 
         if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
@@ -86,7 +86,7 @@ public abstract class MixinGuiGraphics {
     }
 
 
-    @Inject(method = "renderItemBar", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "itemBar", at = @At("HEAD"), cancellable = true, remap = false)
     private void renderChatDependantItemBar(ItemStack itemStack, int i, int j, CallbackInfo ci) {
 
         if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
@@ -110,7 +110,7 @@ public abstract class MixinGuiGraphics {
         ci.cancel();
     }
 
-    @Inject(method = "renderItemCount", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "itemCount", at = @At("HEAD"), cancellable = true, remap = false)
     private void renderChatDependantCount(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
 
         if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
@@ -126,7 +126,7 @@ public abstract class MixinGuiGraphics {
             return;
 
         String string2 = string == null ? String.valueOf(itemStack.getCount()) : string;
-        this.drawString(font, string2, i + 19 - 2 - font.width(string2), j + 6 + 3, ARGB.color(Math.round(255 * data.alpha()), 255, 255, 255), true);
+        this.text(font, string2, i + 19 - 2 - font.width(string2), j + 6 + 3, ARGB.color(Math.round(255 * data.alpha()), 255, 255, 255), true);
 
 
         ci.cancel();

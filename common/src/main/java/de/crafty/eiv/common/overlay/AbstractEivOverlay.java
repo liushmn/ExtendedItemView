@@ -2,7 +2,7 @@ package de.crafty.eiv.common.overlay;
 
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -111,11 +111,11 @@ public abstract class AbstractEivOverlay {
     }
 
 
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
     }
 
-    protected abstract void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks);
 
 
     protected BlockingPredicate getBlockingPredicate() {

@@ -19,26 +19,26 @@ import java.util.List;
 public abstract class MixinRecipeBookComponent {
 
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract int getXOrigin();
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract int getYOrigin();
 
 
-    @Shadow
+    @Shadow(remap = false)
     private boolean visible;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private List<RecipeBookTabButton> tabButtons;
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "init", at = @At("TAIL"), remap = false)
     private void injectBlocking$0(CallbackInfo ci) {
         this.setGuiBlocking();
     }
 
-    @Inject(method = "toggleVisibility", at = @At("TAIL"))
+    @Inject(method = "toggleVisibility", at = @At("TAIL"), remap = false)
     private void injectBlocking$1(CallbackInfo ci) {
         this.setGuiBlocking();
     }
@@ -68,7 +68,7 @@ public abstract class MixinRecipeBookComponent {
 
     }
 
-    @Inject(method = "updateTabs", at = @At("TAIL"))
+    @Inject(method = "updateTabs", at = @At("TAIL"), remap = false)
     private void injectBlocking$2(CallbackInfo ci) {
 
         OverlayManager.INSTANCE.removeGuiBlocking(Identifier -> Identifier.getPath().startsWith("recipetabbutton_"), false);

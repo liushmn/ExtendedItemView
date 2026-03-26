@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RegistrySnapshot.class)
 public interface RegistrySnapshotAccessor {
 
-    @Accessor("ids")
+    @Accessor(value = "ids", remap = false)
     Int2ObjectSortedMap<Identifier> accessIds();
 
 }

@@ -28,15 +28,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-@Mixin(value = GameData.class, remap = false)
+@Mixin(value = GameData.class)
 public class MixinGameData {
 
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static Logger LOGGER;
 
-    @Inject(method = "loadPersistentDataToStagingRegistry", at = @At("HEAD"))
+    @Inject(method = "loadPersistentDataToStagingRegistry", at = @At("HEAD"), remap = false)
     private static void excludeFluidItems(RegistryManager pool, RegistryManager _to, Map<Identifier, IdMappingEvent.IdRemapping> remaps, Object2IntMap<Identifier> missing, Identifier name, ForgeRegistry.Snapshot snap, CallbackInfo ci) {
 
         if (!name.equals(Registries.ITEM.identifier()))
@@ -58,7 +58,7 @@ public class MixinGameData {
     }
 
 
-    @Redirect(method = "postRegisterEvents", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/ModLoader;postEventWrapContainerInModOrder(Lnet/minecraftforge/fml/event/IModBusEvent;)V"))
+    @Redirect(method = "postRegisterEvents", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/ModLoader;postEventWrapContainerInModOrder(Lnet/minecraftforge/fml/event/IModBusEvent;)V"), remap = false)
     private static <T extends IModBusEvent> void injectFluidItems(T e) {
         ModLoader.postEventWrapContainerInModOrder(e);
 

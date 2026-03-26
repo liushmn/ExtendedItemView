@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinDiscardedPayload implements CustomPacketPayload {
 
 
-    @Inject(method = "codec", at = @At("HEAD"))
+    @Inject(method = "codec", at = @At("HEAD"), remap = false)
     private static <T extends FriendlyByteBuf> void injectCompat(Identifier Identifier, int maxPayloadSize, CallbackInfoReturnable<StreamCodec<T, DiscardedPayload>> cir){
         CommonEIV.LOGGER.info("Injecting DiscardedPayload codec for {}", Identifier);
     }

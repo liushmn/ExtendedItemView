@@ -11,9 +11,9 @@ import java.util.List;
 @Mixin(PotionBrewing.class)
 public interface PotionBrewingAccessor {
 
-    @Accessor("potionMixes")
+    @Accessor(value = "potionMixes", remap = false)
     List<PotionBrewing.Mix<Potion>> getPotionMixes();
 
-    @Accessor("containerMixes")
+    @Accessor(value = "containerMixes", remap = false)
     List<PotionBrewing.Mix<Item>> getContainerMixes();
 }

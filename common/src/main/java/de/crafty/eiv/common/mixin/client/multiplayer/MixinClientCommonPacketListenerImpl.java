@@ -21,14 +21,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinClientCommonPacketListenerImpl {
 
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     protected Minecraft minecraft;
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract void handleCustomPayload(CustomPacketPayload var1);
 
-    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true, remap = false)
     private void onEivPayloadReceived(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
 
         if (!EivNetworkManager.INSTANCE.getClientbound().containsKey(packet.payload().type().id()))

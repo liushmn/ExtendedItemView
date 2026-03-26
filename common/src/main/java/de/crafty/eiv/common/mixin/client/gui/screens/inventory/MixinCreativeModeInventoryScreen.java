@@ -21,14 +21,14 @@ public abstract class MixinCreativeModeInventoryScreen extends AbstractContainer
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectSearchBar$0(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(characterEvent))
             cir.setReturnValue(true);
 
     }
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectSearchBar$1(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (this.getFocused() != null && this.getFocused().isFocused() && this.getFocused() instanceof EditBox box) {
 

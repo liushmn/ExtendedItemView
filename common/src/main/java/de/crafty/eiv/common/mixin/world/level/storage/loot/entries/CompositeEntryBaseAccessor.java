@@ -11,6 +11,6 @@ import java.util.List;
 public interface CompositeEntryBaseAccessor {
 
 
-    @Accessor("children")
+    @Accessor(value = "children", remap = false)
     List<LootPoolEntryContainer> getChildren();
 }

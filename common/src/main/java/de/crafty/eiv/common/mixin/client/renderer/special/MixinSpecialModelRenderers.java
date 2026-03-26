@@ -17,11 +17,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SpecialModelRenderers.class)
 public abstract class MixinSpecialModelRenderers {
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static ExtraCodecs.LateBoundIdMapper<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked>> ID_MAPPER;
 
-    @Inject(method = "bootstrap", at = @At("HEAD"))
+    @Inject(method = "bootstrap", at = @At("HEAD"), remap = false)
     private static void injectFluidItemRenderer(CallbackInfo ci) {
         ID_MAPPER.put(Identifier.fromNamespaceAndPath(CommonEIV.MODID, "fluiditem"), FluidItemSpecialRenderer.Unbaked.MAP_CODEC);
     }

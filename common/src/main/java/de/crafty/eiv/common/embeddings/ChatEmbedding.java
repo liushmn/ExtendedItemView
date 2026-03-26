@@ -1,13 +1,13 @@
 package de.crafty.eiv.common.embeddings;
 
 import de.crafty.eiv.common.embeddings.util.EmbeddingComponentContents;
-import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -125,11 +125,11 @@ public abstract class ChatEmbedding {
         return this.chatOpen;
     }
 
-    private void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderEmbedding(guiGraphics, mouseX, mouseY, partialTicks);
+    private void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        this.renderEmbedding(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
     }
 
-    protected abstract void renderEmbedding(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderEmbedding(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks);
 
     protected void mouseClicked(MouseButtonEvent event, boolean doubleClick) {
     }
@@ -154,24 +154,24 @@ public abstract class ChatEmbedding {
 
     }
 
-    protected void drawString(Font font, GuiGraphics guiGraphics, Component text, float x, float y, int color, boolean withShadow, float scaling) {
+    protected void drawString(Font font, GuiGraphicsExtractor guiGraphicsExtractor, Component text, float x, float y, int color, boolean withShadow, float scaling) {
 
         Color old = new Color(color);
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().scale(scaling, scaling);
-        guiGraphics.pose().translate(x / scaling, y / scaling);
-        guiGraphics.drawString(font, text, 0, 0, ARGB.color(Math.round(old.getAlpha() * this.getLineAlpha()), old.getRed(), old.getGreen(), old.getBlue()), withShadow);
-        guiGraphics.pose().popMatrix();
+        guiGraphicsExtractor.pose().pushMatrix();
+        guiGraphicsExtractor.pose().scale(scaling, scaling);
+        guiGraphicsExtractor.pose().translate(x / scaling, y / scaling);
+        guiGraphicsExtractor.text(font, text, 0, 0, ARGB.color(Math.round(old.getAlpha() * this.getLineAlpha()), old.getRed(), old.getGreen(), old.getBlue()), withShadow);
+        guiGraphicsExtractor.pose().popMatrix();
 
     }
 
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling) {
-        this.renderTexture(texture, guiGraphics, x, y, u, v, width, height, textureWidth, textureHeight, scaling, false);
+    protected void renderTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling) {
+        this.renderTexture(texture, guiGraphicsExtractor, x, y, u, v, width, height, textureWidth, textureHeight, scaling, false);
     }
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
+    protected void renderTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
 
         if (requiresFullAlpha && this.getLineAlpha() < 1.0F)
             return;
@@ -191,11 +191,11 @@ public abstract class ChatEmbedding {
             float yStart = Math.max(startLine * occupiedLineSpace + (y - startLine * occupiedLineSpace), i * occupiedLineSpace);
 
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().scale(scaling, scaling);
-            guiGraphics.pose().translate(x / scaling, yStart / scaling);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, u, v + (height - remainingTextureHeight), width, allowedSpace, textureWidth, textureHeight, ARGB.color(Math.round(255 * this.getLineAlpha()), 255, 255, 255));
-            guiGraphics.pose().popMatrix();
+            guiGraphicsExtractor.pose().pushMatrix();
+            guiGraphicsExtractor.pose().scale(scaling, scaling);
+            guiGraphicsExtractor.pose().translate(x / scaling, yStart / scaling);
+            guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, u, v + (height - remainingTextureHeight), width, allowedSpace, textureWidth, textureHeight, ARGB.color(Math.round(255 * this.getLineAlpha()), 255, 255, 255));
+            guiGraphicsExtractor.pose().popMatrix();
 
             remainingTextureHeight -= allowedSpace;
         }
@@ -290,7 +290,7 @@ public abstract class ChatEmbedding {
 
     //---------------- Rendering ----------------
 
-    public static void renderEmbeddings(GuiGraphics guiGraphics, int mouseX, int mouseY, int currentTime, boolean chatOpen) {
+    public static void renderEmbeddings(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, int currentTime, boolean chatOpen) {
 
         if (Minecraft.getInstance().options.chatVisibility().get() == ChatVisiblity.HIDDEN)
             return;
@@ -300,7 +300,7 @@ public abstract class ChatEmbedding {
 
 
         float chatScale = Minecraft.getInstance().options.chatScale().get().floatValue();
-        final float yStartPos = (guiGraphics.guiHeight() - 40) / chatScale;
+        final float yStartPos = (guiGraphicsExtractor.guiHeight() - 40) / chatScale;
 
 
         List<ChatEmbedding> renderCandidates = CACHED.stream().filter(embedding -> embedding.getChatPos() + embedding.getOccupiedLines() >= SYNCED_CHAT_SCROLLBAR_POS && embedding.getChatPos() < SYNCED_CHAT_SCROLLBAR_POS + (displayableMessages + 1)).toList();
@@ -335,8 +335,8 @@ public abstract class ChatEmbedding {
         int scissorTop = Mth.floor(yStartPos) - occupiedSpace * (displayableMessages + 1) + totalHiddenLines * occupiedSpace;
         int scissorBot = Mth.floor(yStartPos);
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.enableScissor(0, scissorTop, ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get()), scissorBot);
+        guiGraphicsExtractor.pose().pushMatrix();
+        guiGraphicsExtractor.enableScissor(0, scissorTop, ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get()), scissorBot);
 
         for (int i = 0; i < renderables.size(); i++) {
             ChatEmbedding embedding = renderables.get(i);
@@ -344,18 +344,18 @@ public abstract class ChatEmbedding {
             int relMouseX = mouseX - ChatEmbedding.getXPosition();
             int relMouseY = mouseY - ChatEmbedding.getYPosition(embedding);
 
-            embedding.hovered = embedding.isHovered(relMouseX, relMouseY) && guiGraphics.containsPointInScissor(mouseX, mouseY);
+            embedding.hovered = embedding.isHovered(relMouseX, relMouseY) && guiGraphicsExtractor.containsPointInScissor(mouseX, mouseY);
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0, ChatEmbedding.getEmbeddingYOffset(embedding));
+            guiGraphicsExtractor.pose().pushMatrix();
+            guiGraphicsExtractor.pose().translate(0, ChatEmbedding.getEmbeddingYOffset(embedding));
             embedding.setCurrentTime(currentTime);
             embedding.setChatOpen(chatOpen);
-            embedding.render(guiGraphics, relMouseX, relMouseY, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks());
-            guiGraphics.pose().popMatrix();
+            embedding.render(guiGraphicsExtractor, relMouseX, relMouseY, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks());
+            guiGraphicsExtractor.pose().popMatrix();
         }
 
-        guiGraphics.disableScissor();
-        guiGraphics.pose().popMatrix();
+        guiGraphicsExtractor.disableScissor();
+        guiGraphicsExtractor.pose().popMatrix();
 
 
     }

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinRecipeManager extends SimplePreparableReloadListener<RecipeMap> implements RecipeAccess {
 
 
-    @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
+    @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"), remap = false)
     private void afterReload(RecipeMap recipeMap, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
         if(!((RecipeManager) (Object) this).equals(ServerRecipeManager.INSTANCE.getVanillaRecipeManager()))
             ServerRecipeManager.INSTANCE.setRecipeManager((RecipeManager) (Object) this);

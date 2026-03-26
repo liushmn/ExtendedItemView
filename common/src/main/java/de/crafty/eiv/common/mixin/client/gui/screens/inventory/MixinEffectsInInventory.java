@@ -6,7 +6,7 @@ import de.crafty.eiv.common.overlay.BlockingGuiComponent;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -33,19 +33,19 @@ import java.util.UUID;
 public abstract class MixinEffectsInInventory {
 
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private Minecraft minecraft;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private AbstractContainerScreen<?> screen;
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract Component getEffectName(MobEffectInstance p_376252_);
 
-    @Inject(method = "renderEffects", at = @At("HEAD"))
-    private void injectBlocking$0(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
+    @Inject(method = "extractEffects", at = @At("HEAD"), remap = false)
+    private void injectBlocking$0(GuiGraphicsExtractor guiGraphicsExtractor, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
 
         List<Identifier> effectsToRemove = new ArrayList<>();
         for (BlockingGuiComponent guiBlock : OverlayManager.INSTANCE.allGuiBlockings()) {
@@ -63,8 +63,8 @@ public abstract class MixinEffectsInInventory {
         OverlayManager.INSTANCE.removeGuiBlocking(effectsToRemove::contains, !effectsToRemove.isEmpty());
     }
 
-    @Inject(method = "renderEffects", at = @At("RETURN"))
-    private void injectBlocking$1(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
+    @Inject(method = "extractEffects", at = @At("RETURN"), remap = false)
+    private void injectBlocking$1(GuiGraphicsExtractor guiGraphicsExtractor, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
 
         if (this.minecraft.player == null)
             return;

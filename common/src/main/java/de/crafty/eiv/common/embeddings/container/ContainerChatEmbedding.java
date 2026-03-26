@@ -6,7 +6,7 @@ import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -63,16 +63,16 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
     }
 
     @Override
-    protected void renderEmbedding(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
+    protected void renderEmbedding(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
 
-        this.slots.forEach(slot -> slot.render(guiGraphics, mouseX, mouseY, partialTicks));
+        this.slots.forEach(slot -> slot.render(guiGraphicsExtractor, mouseX, mouseY, partialTicks));
     }
 
-    protected abstract void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks);
 
-    protected void renderTexture(Identifier texture, GuiGraphics guiGraphics, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight){
-        this.renderTexture(texture, guiGraphics, x * this.guiScaling, y * this.guiScaling, u, v, width, height, textureWidth, textureHeight, this.guiScaling);
+    protected void renderTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight){
+        this.renderTexture(texture, guiGraphicsExtractor, x * this.guiScaling, y * this.guiScaling, u, v, width, height, textureWidth, textureHeight, this.guiScaling);
     }
 
     public static class ContainerSlot {
@@ -130,15 +130,15 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
                 ItemView.openForStackIngredient(copy, this.boundViewType);
         }
 
-        private void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        private void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
             float chatScaling = Minecraft.getInstance().options.chatScale().get().floatValue();
 
             if (this.isHovered(mouseX, mouseY)){
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().scale(this.guiScaling, this.guiScaling);
-                guiGraphics.fill(this.x, this.y, this.x + SIZE, this.y + SIZE, ARGB.color(32, 255, 255, 255));
-                guiGraphics.pose().popMatrix();
+                guiGraphicsExtractor.pose().pushMatrix();
+                guiGraphicsExtractor.pose().scale(this.guiScaling, this.guiScaling);
+                guiGraphicsExtractor.fill(this.x, this.y, this.x + SIZE, this.y + SIZE, ARGB.color(32, 255, 255, 255));
+                guiGraphicsExtractor.pose().popMatrix();
             }
 
 
@@ -146,15 +146,15 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
             this.stack.set(EivDataComponents.EMBEDDING_DATA, data);
 
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().scale(this.guiScaling, this.guiScaling);
-            guiGraphics.pose().translate(this.x, this.y);
-            guiGraphics.renderItem(this.stack, 0, 0);
-            guiGraphics.renderItemDecorations(Minecraft.getInstance().font, this.stack, 0, 0);
-            guiGraphics.pose().popMatrix();
+            guiGraphicsExtractor.pose().pushMatrix();
+            guiGraphicsExtractor.pose().scale(this.guiScaling, this.guiScaling);
+            guiGraphicsExtractor.pose().translate(this.x, this.y);
+            guiGraphicsExtractor.item(this.stack, 0, 0);
+            guiGraphicsExtractor.itemDecorations(Minecraft.getInstance().font, this.stack, 0, 0);
+            guiGraphicsExtractor.pose().popMatrix();
 
             if (this.isHovered(mouseX, mouseY) && !this.stack.isEmpty())
-                guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.stack, mouseX + Math.round(ChatEmbedding.getEmbeddingXOffset() * this.guiScaling * chatScaling), mouseY + ChatEmbedding.getYPosition(this.bound));
+                guiGraphicsExtractor.setTooltipForNextFrame(Minecraft.getInstance().font, this.stack, mouseX + Math.round(ChatEmbedding.getEmbeddingXOffset() * this.guiScaling * chatScaling), mouseY + ChatEmbedding.getYPosition(this.bound));
         }
 
         private boolean isHovered(int mouseX, int mouseY) {

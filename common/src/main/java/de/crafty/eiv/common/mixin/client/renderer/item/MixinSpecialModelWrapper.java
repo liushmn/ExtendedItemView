@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinSpecialModelWrapper {
 
 
-    @Inject(method = "update", at = @At("HEAD"))
+    @Inject(method = "update", at = @At("HEAD"), remap = false)
     private void makeFluidItemsAnimated(ItemStackRenderState itemStackRenderState, ItemStack itemStack, ItemModelResolver itemModelResolver, ItemDisplayContext itemDisplayContext, ClientLevel clientLevel, ItemOwner itemOwner, int i, CallbackInfo ci){
         if(itemStack.getItem() instanceof FluidItem)
             itemStackRenderState.setAnimated();

@@ -29,7 +29,7 @@ public class MixinGameData {
 
     @Shadow @Final private static Logger LOGGER;
 
-    @Redirect(method = "postRegisterEvents", at = @At(value = "INVOKE", target = "Lnet/neoforged/fml/ModLoader;postEventWrapContainerInModOrder(Lnet/neoforged/bus/api/Event;)V"))
+    @Redirect(method = "postRegisterEvents", at = @At(value = "INVOKE", target = "Lnet/neoforged/fml/ModLoader;postEventWrapContainerInModOrder(Lnet/neoforged/bus/api/Event;)V"), remap = false)
     private static <T extends Event & IModBusEvent> void injectFluidItems(T e){
         ModLoader.postEventWrapContainerInModOrder(e);
 

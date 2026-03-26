@@ -1,13 +1,12 @@
 {
   "required": true,
   "package": "de.crafty.eiv.neoforge.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8.4",
   "refmap": "eiv.refmap.json",
   "mixins": [
     "neoforge.client.network.MixinRegistryManager",
     "neoforge.client.network.RegistrySnapshotAccessor",
-    "neoforge.common.BasicItemListingAccessor",
     "neoforge.network.registration.MixinNetworkRegistry"
   ],
   "injectors": {

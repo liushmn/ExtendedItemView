@@ -10,7 +10,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,23 +39,23 @@ import java.util.List;
 public abstract class MixinScreen extends AbstractContainerEventHandler implements Renderable {
 
 
-    @Shadow
+    @Shadow(remap = false)
     protected Font font;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     protected Minecraft minecraft;
 
-    @Inject(method = "render", at = @At("RETURN"))
-    private void renderRecipeProgress(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("RETURN"), remap = false)
+    private void renderRecipeProgress(GuiGraphicsExtractor guiGraphicsExtractor, int i, int j, float f, CallbackInfo ci) {
         String statusMsg = ClientRecipeManager.INSTANCE.status().get();
 
         if (!ClientRecipeManager.INSTANCE.status().isIdle())
-            guiGraphics.drawString(this.font, statusMsg, guiGraphics.guiWidth() - this.font.width(statusMsg) - 2, 2, -1);
+            guiGraphicsExtractor.text(this.font, statusMsg, guiGraphicsExtractor.guiWidth() - this.font.width(statusMsg) - 2, 2, -1);
     }
 
 
-    @Redirect(method = "getTooltipFromItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;"))
+    @Redirect(method = "getTooltipFromItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;"), remap = false)
     private static List<Component> appendRecipeTag(ItemStack stack, Item.TooltipContext list, @Nullable Player player, TooltipFlag flag) {
         List<Component> tooltip = stack.getTooltipLines(list, player, flag);
         CompoundTag tagTag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
@@ -79,15 +79,15 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     }
 
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void addEmbeddings(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"), remap = false)
+    private void addEmbeddings(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (!ChatEmbedding.queue().isEmpty()) {
             ChatEmbedding embedding = ChatEmbedding.poll();
             if (embedding == null)
                 return;
 
             for (int i = 0; i < embedding.getOccupiedLines(); i++) {
-                this.minecraft.gui.getChat().addMessage(MutableComponent.create(EmbeddingComponentContents.createUnbound()));
+                this.minecraft.gui.getChat().addPlayerMessage(MutableComponent.create(EmbeddingComponentContents.createUnbound()), null, null);
             }
 
             ChatEmbedding.cache(embedding);

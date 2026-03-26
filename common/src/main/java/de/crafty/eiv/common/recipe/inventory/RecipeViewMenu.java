@@ -6,7 +6,7 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -851,19 +851,19 @@ public class RecipeViewMenu extends AbstractContainerMenu {
      */
     public interface OptionalSlotRenderer {
 
-        RecipeViewMenu.OptionalSlotRenderer DEFAULT = (guiGraphics, mouseX, mouseY, partialTicks) -> {
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
+        RecipeViewMenu.OptionalSlotRenderer DEFAULT = (guiGraphicsExtractor, mouseX, mouseY, partialTicks) -> {
+            guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
         };
 
         /**
          * Render method for rendering an optional slot
          *
-         * @param guiGraphics  GuiGraphics
+         * @param GuiGraphicsExtractor  GuiGraphicsExtractor
          * @param mouseX       current mouse position on x-direction (relative to the viewRecipe)
          * @param mouseY       current mouse position on y-direction (relative to the viewRecipe)
          * @param partialTicks partialTicks
          */
-        void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
+        void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks);
 
     }
 

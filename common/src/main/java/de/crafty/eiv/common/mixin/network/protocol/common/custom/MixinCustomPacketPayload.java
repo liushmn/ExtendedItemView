@@ -12,14 +12,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(targets = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1")
+@Mixin(targets = "net/minecraft/network/protocol/common/custom/CustomPacketPayload$1", remap = false)
 public abstract class MixinCustomPacketPayload {
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract <B extends FriendlyByteBuf> StreamCodec<B, ? extends CustomPacketPayload> findCodec(Identifier $$0x);
 
 
-    @Redirect(method = "decode(Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
+    @Redirect(method = "decode(Lnet/minecraft/network/FriendlyByteBuf;)Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"), remap = false)
     private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$1(@Coerce StreamCodec<B, CustomPacketPayload> instance, Identifier $$0) {
 
         if (EivNetworkManager.INSTANCE.getClientbound().containsKey($$0)) {
@@ -33,7 +33,7 @@ public abstract class MixinCustomPacketPayload {
         return this.findCodec($$0);
     }
 
-    @Redirect(method = "writeCap", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"))
+    @Redirect(method = "writeCap", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$1;findCodec(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/network/codec/StreamCodec;"), remap = false)
     private <B extends FriendlyByteBuf> StreamCodec<? super B, ? extends CustomPacketPayload> overwriteCodec$2(@Coerce StreamCodec<B, CustomPacketPayload> instance, Identifier $$0) {
 
         if (EivNetworkManager.INSTANCE.getClientbound().containsKey($$0)) {

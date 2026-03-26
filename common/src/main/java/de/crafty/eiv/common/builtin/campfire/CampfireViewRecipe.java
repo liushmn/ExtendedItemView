@@ -8,7 +8,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -61,21 +61,21 @@ public class CampfireViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
-        guiGraphics.renderItem(new ItemStack(Items.CAMPFIRE), 1, 20);
+        guiGraphicsExtractor.item(new ItemStack(Items.CAMPFIRE), 1, 20);
 
         int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
     }
 
     @Override
-    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
-        renderer.renderItem(guiGraphics, new ItemStack(Items.CAMPFIRE), 4, 23);
+        renderer.renderItem(guiGraphicsExtractor, new ItemStack(Items.CAMPFIRE), 4, 23);
 
         int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
-        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, 28, 4, 14, 0, cookingProgress, 16, 128, 128);    }
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphicsExtractor, 28, 4, 14, 0, cookingProgress, 16, 128, 128);    }
 
     @Override
     public IEivViewRecipe asChatCopy() {

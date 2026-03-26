@@ -1,7 +1,7 @@
 package de.crafty.eiv.common.gui;
 
 import de.crafty.eiv.common.config.Configs;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.StringWidget;
@@ -56,10 +56,6 @@ public class EivClientSettingsScreen extends Screen {
     }
 
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-    }
 
 
     @Override

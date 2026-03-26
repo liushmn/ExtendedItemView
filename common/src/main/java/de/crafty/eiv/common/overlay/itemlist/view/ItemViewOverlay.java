@@ -17,7 +17,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
@@ -186,50 +186,50 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if (this.fittingPerPage() == 0)
             return;
 
         if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-            guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
+            guiGraphicsExtractor.fill(this.x, this.y, this.x + this.width, this.y + this.height, new Color(0, 0, 0, 64).getRGB());
         else
-            guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveX + this.effectiveWidth, this.effectiveY + this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
+            guiGraphicsExtractor.fill(this.effectiveX, this.effectiveY, this.effectiveX + this.effectiveWidth, this.effectiveY + this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
     }
 
     @Override
-    protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
         Minecraft client = Minecraft.getInstance();
         Font font = client.font;
 
 
         if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-            this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.x + this.width / 2, this.y + 6, -1);
+            this.drawScaledString(font, guiGraphicsExtractor, Component.literal("ItemView"), this.x + this.width / 2, this.y + 6, -1);
         else
-            this.drawScaledString(font, guiGraphics, Component.literal("ItemView"), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
+            this.drawScaledString(font, guiGraphicsExtractor, Component.literal("ItemView"), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + 6, -1);
 
 
         if (this.fittingPerPage() > 0) {
 
 
             if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
+                guiGraphicsExtractor.centeredText(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.x + this.width - this.width / 2, this.y + this.height - 2 - 20 - 10, -1);
             else
-                guiGraphics.drawCenteredString(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
+                guiGraphicsExtractor.centeredText(font, (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1), this.effectiveX + this.effectiveWidth / 2, this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
         }
 
 
         for (ItemSlot slot : this.itemSlots()) {
-            slot.render(guiGraphics, mouseX, mouseY, partialTicks);
+            slot.render(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
         }
 
 
-        this.renderItemHighlighting(OverlayManager.INSTANCE.currentInfo().screen(), guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderItemHighlighting(OverlayManager.INSTANCE.currentInfo().screen(), guiGraphicsExtractor, mouseX, mouseY, partialTicks);
 
     }
 
 
-    public void renderItemHighlighting(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderItemHighlighting(AbstractContainerScreen<?> screen, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if (!this.itemFilterMode)
             return;
 
@@ -239,12 +239,12 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
             if (!slot.isActive() || !slot.isHighlightable())
                 return;
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
+            guiGraphicsExtractor.pose().pushMatrix();
+            guiGraphicsExtractor.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
             if (!slot.hasItem() || this.availableItems.stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
-                guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
+                guiGraphicsExtractor.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
-            guiGraphics.pose().popMatrix();
+            guiGraphicsExtractor.pose().popMatrix();
 
         });
     }

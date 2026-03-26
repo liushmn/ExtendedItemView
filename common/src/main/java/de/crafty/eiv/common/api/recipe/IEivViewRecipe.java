@@ -8,7 +8,7 @@ import de.crafty.eiv.common.builtin.shaped.CraftingViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -106,12 +106,12 @@ public interface IEivViewRecipe {
 
     /**
      * @param screen       The current viewScreen
-     * @param guiGraphics  The guiGraphics supplied by Minecraft
+     * @param GuiGraphicsExtractor  The GuiGraphicsExtractor supplied by Minecraft
      * @param mouseX       The current x-position of the mouse <b>relative to the position of the rendered recipe</b>
      * @param mouseY       The current y-position of the mouse <b>relative to the position of the rendered recipe</b>
      * @param partialTicks partialTicks
      */
-    default void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    default void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
     }
 
@@ -207,17 +207,17 @@ public interface IEivViewRecipe {
     }
 
 
-    default void renderChatRecipeBackground(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    default void renderChatRecipeBackground(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if (this.getViewType().getChatRecipeBackground() == null)
             return;
 
         IEivRecipeViewType.ChatRecipeBackground background = this.getViewType().getChatRecipeBackground();
 
         // + 6 for margin
-        renderer.renderTexture(background.texture(), guiGraphics, background.x(), background.y(), 0, 0, background.width(), background.height(), background.width(), background.height());
+        renderer.renderTexture(background.texture(), guiGraphicsExtractor, background.x(), background.y(), 0, 0, background.width(), background.height(), background.width(), background.height());
     }
 
-    default void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    default void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
     }
 

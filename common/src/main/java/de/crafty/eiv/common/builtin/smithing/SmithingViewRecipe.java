@@ -27,9 +27,9 @@ public class SmithingViewRecipe implements IEivViewRecipe {
     private final SlotContent result;
 
     private final boolean isTrimType;
-    private final TransmuteResult upgradeResult;
+    private final ItemStack upgradeResult;
 
-    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, Ingredient base, Ingredient template, TrimPattern trimPattern, @Nullable TransmuteResult upgradeResult) {
+    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, Ingredient base, Ingredient template, TrimPattern trimPattern, @Nullable ItemStack upgradeResult) {
         this.isTrimType = isTrimType;
 
         this.template = template != null ? SlotContent.of(template) : SlotContent.of(Items.AIR);
@@ -48,7 +48,7 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             List<ItemStack> possibleResults = new ArrayList<>();
 
             this.additionIngredient.getValidContents().forEach(addition -> {
-                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base.next(), addition, Holder.direct(trimPattern)));
+                possibleResults.add(SmithingTrimRecipe.applyTrim(this.base.next(), addition, Holder.direct(trimPattern)));
             });
 
             this.result = SlotContent.of(possibleResults);
@@ -56,10 +56,10 @@ public class SmithingViewRecipe implements IEivViewRecipe {
             return;
         }
 
-        this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base.next()));
+        this.result = SlotContent.of(this.upgradeResult);
     }
 
-    private SmithingViewRecipe(SlotContent additionIngredient, SlotContent base, SlotContent template, SlotContent result, boolean isTrimType,  TransmuteResult upgradeResult) {
+    private SmithingViewRecipe(SlotContent additionIngredient, SlotContent base, SlotContent template, SlotContent result, boolean isTrimType,  ItemStack upgradeResult) {
         this.additionIngredient = additionIngredient;
         this.base = base;
         this.template = template;

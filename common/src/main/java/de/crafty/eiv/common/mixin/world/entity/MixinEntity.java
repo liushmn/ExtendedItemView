@@ -18,7 +18,7 @@ public abstract class MixinEntity implements IEivEntity {
     @Unique
     private EmbeddingData embeddingData;
 
-    @Inject(method = "setComponent", at = @At("HEAD"))
+    @Inject(method = "setComponent", at = @At("HEAD"), remap = false)
     private <T> void addEmbeddingData(DataComponentType<T> dataComponentType, T object, CallbackInfo ci) {
         if (dataComponentType == EivDataComponents.EMBEDDING_DATA)
             this.embeddingData = (EmbeddingData) object;

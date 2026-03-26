@@ -3,7 +3,7 @@ package de.crafty.eiv.common.mixin.client.gui.components;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -26,8 +26,8 @@ public abstract class MixinEditBox extends AbstractWidget {
         super($$0, $$1, $$2, $$3, $$4);
     }
 
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"))
-    private void renderFilterMode(GuiGraphics instance, RenderPipeline renderPipeline, Identifier Identifier, int i, int j, int k, int l) {
+    @Redirect(method = "extractWidgetRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V"), remap = false)
+    private void renderFilterMode(GuiGraphicsExtractor instance, RenderPipeline renderPipeline, Identifier Identifier, int i, int j, int k, int l) {
 
 
         if (this.getMessage().contains(Component.literal("eiv:searchbar")) && ItemViewOverlay.INSTANCE.isItemFilterMode()) {

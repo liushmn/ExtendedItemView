@@ -8,7 +8,7 @@ import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.rendering.EivGuiRenderHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -115,11 +115,11 @@ public class EntityViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
         Component entityName = this.entityType.getDescription();
 
-        this.renderEntity(screen, recipePosition, guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderEntity(screen, recipePosition, guiGraphicsExtractor, mouseX, mouseY, partialTicks);
 
         if (mouseX >= 65 && mouseX <= 65 + 32 && mouseY >= 0 && mouseY <= 32)
             this.hovered = true;
@@ -127,11 +127,11 @@ public class EntityViewRecipe implements IEivViewRecipe {
             this.hovered = false;
 
         if (this.hovered)
-            guiGraphics.setComponentTooltipForNextFrame(screen.getFont(), List.of(Component.empty().append(entityName).withStyle(ChatFormatting.GOLD)), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
+            guiGraphicsExtractor.setComponentTooltipForNextFrame(screen.getFont(), List.of(Component.empty().append(entityName).withStyle(ChatFormatting.GOLD)), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
 
     }
 
-    private void renderEntity(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    private void renderEntity(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
         if (this.previewEntity == null)
             return;
@@ -142,7 +142,7 @@ public class EntityViewRecipe implements IEivViewRecipe {
         if (boundingBox.getYsize() * scale > 26)
             scale = (float) (26.0F / boundingBox.getYsize());
 
-        EivGuiRenderHelper.renderEntityOnScreen(guiGraphics, this.previewEntity, recipePosition.left() + 67, recipePosition.top() + 2, recipePosition.left() + 67 + 28, recipePosition.top() + 2 + 28, scale, new Vector3f(0.0F, (28.0F / scale / 2.0F), 0.0F), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), (this.animationTick + partialTicks) / 180.0F * Mth.PI, 0.0F), null);
+        EivGuiRenderHelper.renderEntityOnScreen(guiGraphicsExtractor, this.previewEntity, recipePosition.left() + 67, recipePosition.top() + 2, recipePosition.left() + 67 + 28, recipePosition.top() + 2 + 28, scale, new Vector3f(0.0F, (28.0F / scale / 2.0F), 0.0F), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), (this.animationTick + partialTicks) / 180.0F * Mth.PI, 0.0F), null);
 
     }
 }

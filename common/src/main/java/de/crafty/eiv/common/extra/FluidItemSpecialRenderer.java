@@ -6,6 +6,7 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import de.crafty.eiv.common.resolver.IEivClientResolver;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
@@ -37,7 +38,8 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
 
 
     @Override
-    public void submit(@Nullable ItemStack stack, ItemDisplayContext itemDisplayContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, int j, boolean bl, int k) {
+    public void submit(@org.jspecify.annotations.Nullable ItemStack stack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+
         if(stack == null)
             return;
 
@@ -54,7 +56,7 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         Color unmodified = new Color(color);
         color = new Color(unmodified.getRed(), unmodified.getGreen(), unmodified.getBlue(), 255).getRGB();
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(fluid.defaultFluidState().createLegacyBlock()).particleIcon();
+        TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState()).stillMaterial().sprite();
         IEivClientResolver.UVInfo uvInfo = CommonEIVClient.resolver().getUVInfo(sprite);
 
         float u0 = uvInfo.u0();
@@ -72,13 +74,14 @@ public class FluidItemSpecialRenderer implements SpecialModelRenderer<ItemStack>
         float finalHeight = height;
         int finalColor = color;
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()), (pose, vertexConsumer) -> {
-            vertexConsumer.addVertex(pose.pose(), 1.0F, 0, 0).setUv(u0 + width, v0).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose.pose(), 1.0F, renderHeight, 0).setUv(u0 + width, v0 + finalHeight).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose.pose(), 0, renderHeight, 0).setUv(u0, v0 + finalHeight).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose.pose(), 0, 0, 0).setUv(u0, v0).setOverlay(j).setLight(i).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
+            vertexConsumer.addVertex(pose.pose(), 1.0F, 0, 0).setUv(u0 + width, v0).setOverlay(overlayCoords).setLight(lightCoords).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
+            vertexConsumer.addVertex(pose.pose(), 1.0F, renderHeight, 0).setUv(u0 + width, v0 + finalHeight).setOverlay(overlayCoords).setLight(lightCoords).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
+            vertexConsumer.addVertex(pose.pose(), 0, renderHeight, 0).setUv(u0, v0 + finalHeight).setOverlay(overlayCoords).setLight(lightCoords).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
+            vertexConsumer.addVertex(pose.pose(), 0, 0, 0).setUv(u0, v0).setOverlay(overlayCoords).setLight(lightCoords).setColor(finalColor).setNormal(0.0F, 0.0F, 1.0F);
         });
 
         poseStack.popPose();
+
     }
 
     @Override

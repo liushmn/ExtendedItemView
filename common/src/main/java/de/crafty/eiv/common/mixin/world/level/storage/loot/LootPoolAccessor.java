@@ -18,10 +18,10 @@ import java.util.function.Predicate;
 @Mixin(LootPool.class)
 public interface LootPoolAccessor {
 
-    @Accessor("entries")
+    @Accessor(value = "entries", remap = false)
     List<LootPoolEntryContainer> entries();
 
-    @Accessor("conditions")
+    @Accessor(value = "conditions", remap = false)
     List<LootItemCondition> conditions();
     
 }

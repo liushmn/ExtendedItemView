@@ -20,11 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 import java.util.Set;
 
-@Mixin(value = RegistryManager.class, remap = false)
+@Mixin(value = RegistryManager.class)
 public class MixinRegistryManager {
 
 
-    @Inject(method = "applySnapshot(Ljava/util/Map;Z)Ljava/util/Set;", at = @At("HEAD"))
+    @Inject(method = "applySnapshot(Ljava/util/Map;Z)Ljava/util/Set;", at = @At("HEAD"), remap = false)
     private static void test(Map<Identifier, RegistrySnapshot> snapshots, boolean isLocalWorld, CallbackInfoReturnable<Set<ResourceKey<?>>> cir) {
         snapshots.forEach((location, snapshot) -> {
             if (!location.equals(Registries.ITEM.identifier()))

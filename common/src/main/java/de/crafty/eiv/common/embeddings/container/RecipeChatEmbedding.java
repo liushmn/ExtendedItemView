@@ -12,7 +12,7 @@ import de.crafty.eiv.common.rendering.EivGuiRenderHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -109,27 +109,27 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
     }
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.recipe.renderChatRecipeBackground(new ChatRecipeRenderer(this), guiGraphics, mouseX, mouseY, partialTicks);
+    protected void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        this.recipe.renderChatRecipeBackground(new ChatRecipeRenderer(this), guiGraphicsExtractor, mouseX, mouseY, partialTicks);
     }
 
 
     @Override
-    protected void renderEmbedding(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        super.renderEmbedding(guiGraphics, mouseX, mouseY, partialTicks);
+    protected void renderEmbedding(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        super.renderEmbedding(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
 
         ChatRecipeRenderer renderer = new ChatRecipeRenderer(this);
 
-        this.recipe.renderRecipeInChat(renderer, guiGraphics, mouseX, mouseY, partialTicks);
-        this.renderSender(renderer, guiGraphics, mouseX, mouseY, partialTicks);
+        this.recipe.renderRecipeInChat(renderer, guiGraphicsExtractor, mouseX, mouseY, partialTicks);
+        this.renderSender(renderer, guiGraphicsExtractor, mouseX, mouseY, partialTicks);
 
     }
 
-    private void renderSender(ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    private void renderSender(ChatRecipeRenderer renderer, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
         Component senderComp = Component.empty().append(Component.translatable("embedding.sharedBy").append(": ").withStyle(ChatFormatting.GRAY)).append(this.sender);
 
-        renderer.drawString(this.minecraft.font, guiGraphics, senderComp, this.recipe.getSenderXPosition(), this.recipe.getSenderYPosition(), -1, true);
+        renderer.drawString(this.minecraft.font, guiGraphicsExtractor, senderComp, this.recipe.getSenderXPosition(), this.recipe.getSenderYPosition(), -1, true);
 
     }
 
@@ -177,7 +177,7 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
             return (int) ChatEmbedding.getEmbeddingYOffset(this.embedding);
         }
 
-        public void renderEntity(GuiGraphics guiGraphics, LivingEntity livingEntity, float x0, float y0, float x1, float y1, float scale, Vector3f translation, Quaternionf rotation, Quaternionf cameraAngleOverride) {
+        public void renderEntity(GuiGraphicsExtractor guiGraphicsExtractor, LivingEntity livingEntity, float x0, float y0, float x1, float y1, float scale, Vector3f translation, Quaternionf rotation, Quaternionf cameraAngleOverride) {
 
             float chatScale = Minecraft.getInstance().options.chatScale().get().floatValue();
 
@@ -201,41 +201,41 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
             int yStart = Mth.floor(y0 + yOff);
             int yEnd = Mth.floor(y1 + yOff);
 
-            EivGuiRenderHelper.renderEntityOnScreen(guiGraphics, livingEntity, xStart, yStart, xEnd, yEnd, scale, translation.mul(this.getGuiScaling()).add(((x0 + xOff) - xStart) / scale, ((y0 + yOff) - yStart) / scale, 0.0F), rotation, cameraAngleOverride);
+            EivGuiRenderHelper.renderEntityOnScreen(guiGraphicsExtractor, livingEntity, xStart, yStart, xEnd, yEnd, scale, translation.mul(this.getGuiScaling()).add(((x0 + xOff) - xStart) / scale, ((y0 + yOff) - yStart) / scale, 0.0F), rotation, cameraAngleOverride);
         }
 
-        public void drawString(Font font, GuiGraphics guiGraphics, Component text, float x, float y, int color, boolean withShadow) {
-            this.drawString(font, guiGraphics, text, x * this.embedding.guiScaling, y * this.embedding.guiScaling + 1, color, withShadow, this.embedding.guiScaling);
+        public void drawString(Font font, GuiGraphicsExtractor guiGraphicsExtractor, Component text, float x, float y, int color, boolean withShadow) {
+            this.drawString(font, guiGraphicsExtractor, text, x * this.embedding.guiScaling, y * this.embedding.guiScaling + 1, color, withShadow, this.embedding.guiScaling);
         }
 
-        public void drawString(Font font, GuiGraphics guiGraphics, Component text, float x, float y, int color, boolean withShadow, float scaling) {
-            this.embedding.drawString(font, guiGraphics, text, x, y, color, withShadow, scaling);
+        public void drawString(Font font, GuiGraphicsExtractor guiGraphicsExtractor, Component text, float x, float y, int color, boolean withShadow, float scaling) {
+            this.embedding.drawString(font, guiGraphicsExtractor, text, x, y, color, withShadow, scaling);
         }
 
         // + 3 for margin
-        public void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
-            this.renderTexture(texture, guiGraphics, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, false);
+        public void renderTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
+            this.renderTexture(texture, guiGraphicsExtractor, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, false);
         }
 
-        public void renderTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
-            this.embedding.renderTexture(texture, guiGraphics, x, y, u, v, width, height, textureWidth, textureHeight, scaling, requiresFullAlpha);
+        public void renderTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight, float scaling, boolean requiresFullAlpha) {
+            this.embedding.renderTexture(texture, guiGraphicsExtractor, x, y, u, v, width, height, textureWidth, textureHeight, scaling, requiresFullAlpha);
         }
 
-        public void renderTopLevelTexture(Identifier texture, GuiGraphics guiGraphics, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
-            this.renderTexture(texture, guiGraphics, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, true);
+        public void renderTopLevelTexture(Identifier texture, GuiGraphicsExtractor guiGraphicsExtractor, float x, float y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
+            this.renderTexture(texture, guiGraphicsExtractor, x * embedding.guiScaling, y * embedding.guiScaling + 1, u, v, width, height, textureWidth, textureHeight, embedding.guiScaling, true);
         }
 
-        public void renderItem(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
+        public void renderItem(GuiGraphicsExtractor guiGraphicsExtractor, ItemStack stack, int x, int y) {
 
             stack.set(EivDataComponents.EMBEDDING_DATA, new EmbeddingData(this.getCurrentAlpha()));
 
 
             // + 3 for margin
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(x * this.getGuiScaling(), y * this.getGuiScaling() + 1);
-            guiGraphics.pose().scale(this.embedding.guiScaling, this.embedding.guiScaling);
-            guiGraphics.renderItem(stack, 0, 0);
-            guiGraphics.pose().popMatrix();
+            guiGraphicsExtractor.pose().pushMatrix();
+            guiGraphicsExtractor.pose().translate(x * this.getGuiScaling(), y * this.getGuiScaling() + 1);
+            guiGraphicsExtractor.pose().scale(this.embedding.guiScaling, this.embedding.guiScaling);
+            guiGraphicsExtractor.item(stack, 0, 0);
+            guiGraphicsExtractor.pose().popMatrix();
         }
 
     }

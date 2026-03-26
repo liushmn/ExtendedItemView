@@ -1,6 +1,5 @@
 package de.crafty.eiv.common.mixin.client.gui.screens.inventory;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.BlockingGuiComponent;
@@ -8,9 +7,8 @@ import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -22,15 +20,12 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -40,33 +35,33 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen implements MenuAccess<T> {
 
 
-    @Shadow
+    @Shadow(remap = false)
     protected int leftPos;
 
-    @Shadow
+    @Shadow(remap = false)
     protected int topPos;
 
-    @Shadow
+    @Final
+    @Shadow(remap = false)
     protected int imageWidth;
 
-    @Shadow
+    @Final
+    @Shadow(remap = false)
     protected int imageHeight;
 
 
-    @Shadow
+    @Shadow(remap = false)
     @Nullable
     protected Slot hoveredSlot;
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract T getMenu();
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract void onStopHovering(Slot slot);
 
     protected MixinAbstractContainerScreen(Component component) {
@@ -74,7 +69,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "init", at = @At("TAIL"), remap = false)
     private void injectOverlay$0(CallbackInfo ci) {
 
         //In recipe book screens we initalize after the recipe button init
@@ -98,13 +93,13 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
 
-    @Inject(method = "renderBackground", at = @At("HEAD"))
-    private void injectOverlayBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        OverlayManager.INSTANCE.renderAllBackground(guiGraphics, mouseX, mouseY, partialTicks);
+    @Inject(method = "extractContents", at = @At("HEAD"), remap = false)
+    private void injectOverlayBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        OverlayManager.INSTANCE.renderAllBackground(graphics, mouseX, mouseY, partialTicks);
     }
 
-    @Inject(method = "renderContents", at = @At("TAIL"))
-    private void injectOverlay$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+    @Inject(method = "extractContents", at = @At("TAIL"), remap = false)
+    private void injectOverlay$1(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (minecraft == null) return;
 
 
@@ -125,19 +120,19 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
             this.updateWidgets();
 
 
-        OverlayManager.INSTANCE.renderAll(guiGraphics, mouseX, mouseY, partialTicks);
+        OverlayManager.INSTANCE.renderAll(graphics, mouseX, mouseY, partialTicks);
 
     }
 
 
-    @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectOverlay$2(double mouseX, double mouseY, double scrolledX, double scrolledY, CallbackInfoReturnable<Boolean> cir) {
         if (OverlayManager.INSTANCE.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
             cir.setReturnValue(true);
     }
 
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectOverlay$3(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
 
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
@@ -168,14 +163,14 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"))
+    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"), remap = false)
     private boolean injectOverlay$3(Screen instance, MouseButtonEvent mouseButtonEvent, boolean b) {
         return super.mouseClicked(mouseButtonEvent, b) | OverlayManager.INSTANCE.mouseClicked(mouseButtonEvent, b);
 
     }
 
 
-    @Inject(method = "onClose", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onClose", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectOverlay$4(CallbackInfo ci) {
         OverlayManager.INSTANCE.oldWidgets().clear();
         OverlayManager.INSTANCE.screenContextMap().clear();
@@ -193,14 +188,14 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
 
     //Optional Slots
 
-    @Inject(method = "renderSlotHighlightBack", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$0(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractSlotHighlightBack", at = @At("HEAD"), cancellable = true, remap = false)
+    private void preventFromRender$0(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }
 
-    @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
-    private void preventFromRender$1(GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "extractSlotHighlightFront", at = @At("HEAD"), cancellable = true, remap = false)
+    private void preventFromRender$1(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (this.hoveredSlot != null && !this.hoveredSlot.hasItem() && ((AbstractContainerScreen) (Object) this) instanceof RecipeViewScreen viewScreen && viewScreen.getMenu().isOptionalSlot(this.hoveredSlot.index))
             ci.cancel();
     }

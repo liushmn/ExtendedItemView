@@ -5,7 +5,7 @@ import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -130,15 +130,15 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     }
 
 
-    protected void drawScaledString(Font font, GuiGraphics guiGraphics, Component comp, int x, int y, int color) {
+    protected void drawScaledString(Font font, GuiGraphicsExtractor guiGraphicsExtractor, Component comp, int x, int y, int color) {
 
         float scaleFactor = Math.min(1.0F, 1.0F / (font.width(comp) / ((Configs.CLIENT_SETTINGS.isItemWrapMode() ? this.width : this.effectiveWidth) - 4.0F)));
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y);
-        guiGraphics.pose().scale(scaleFactor, scaleFactor);
-        guiGraphics.drawCenteredString(font, comp, 0, 0, color);
-        guiGraphics.pose().popMatrix();
+        guiGraphicsExtractor.pose().pushMatrix();
+        guiGraphicsExtractor.pose().translate(x, y);
+        guiGraphicsExtractor.pose().scale(scaleFactor, scaleFactor);
+        guiGraphicsExtractor.centeredText(font, comp, 0, 0, color);
+        guiGraphicsExtractor.pose().popMatrix();
 
     }
 

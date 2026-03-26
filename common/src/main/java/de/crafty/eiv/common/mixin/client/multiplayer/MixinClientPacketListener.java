@@ -30,22 +30,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl implements ClientGamePacketListener, TickablePacketListener {
 
 
-    @Shadow public CommandDispatcher<SharedSuggestionProvider> commands;
+    @Shadow(remap = false)
+    private CommandDispatcher<SharedSuggestionProvider> commands;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow(remap = false) @Final private static Logger LOGGER;
 
     protected MixinClientPacketListener(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
     }
 
-    @Inject(method = "handleLogin", at = @At("RETURN"))
+    @Inject(method = "handleLogin", at = @At("RETURN"), remap = false)
     private void requestRecipes(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
         ClientRecipeManager.INSTANCE.requestServerEivData();
         ItemView.getClientReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
     }
 
 
-    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true, remap = false)
     private void onEivPayloadReceived(CustomPacketPayload payload, CallbackInfo ci) {
         Identifier payloadId = payload.type().id();
 

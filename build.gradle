@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:1.1.7' // Required for NeoGradle
+        classpath 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:1.4.1' // Required for NeoGradle
         classpath 'com.google.code.gson:gson:2.10.1' //fix cache issues
     }
 }

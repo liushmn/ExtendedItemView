@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface SetPotionFunctionAccessor {
 
 
-    @Accessor("potion")
+    @Accessor(value = "potion", remap = false)
     Holder<Potion> getPotion();
 }

@@ -6,7 +6,7 @@ import de.crafty.eiv.common.overlay.ItemSlot;
 import de.crafty.eiv.common.overlay.itemlist.AbstractEivItemListOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
@@ -44,7 +44,7 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if(this.fittingPerPage() == 0)
             return;
 
@@ -52,14 +52,14 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
             return;
 
         if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-            guiGraphics.fill(this.x, this.y, this.width, this.height, new Color(0, 0, 0, 64).getRGB());
+            guiGraphicsExtractor.fill(this.x, this.y, this.width, this.height, new Color(0, 0, 0, 64).getRGB());
         else
-            guiGraphics.fill(this.effectiveX, this.effectiveY, this.effectiveWidth, this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
+            guiGraphicsExtractor.fill(this.effectiveX, this.effectiveY, this.effectiveWidth, this.effectiveHeight, new Color(0, 0, 0, 64).getRGB());
 
     }
 
     @Override
-    protected void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if (this.itemSlots().isEmpty())
             return;
 
@@ -71,21 +71,21 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
             return;
 
         if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-            this.drawScaledString(font, guiGraphics, Component.translatable("eiv.bookmarks"), this.x + this.width / 2, 6, -1);
+            this.drawScaledString(font, guiGraphicsExtractor, Component.translatable("eiv.bookmarks"), this.x + this.width / 2, 6, -1);
         else
-            this.drawScaledString(font, guiGraphics, Component.translatable("eiv.bookmarks"), this.effectiveX + this.effectiveWidth / 2, 6, -1);
+            this.drawScaledString(font, guiGraphicsExtractor, Component.translatable("eiv.bookmarks"), this.effectiveX + this.effectiveWidth / 2, 6, -1);
 
 
         String pageString = (this.getPage() + 1) + "/" + (this.getMaxPageIndex() + 1);
 
         if (Configs.CLIENT_SETTINGS.isItemWrapMode())
-            guiGraphics.drawCenteredString(font, pageString, Math.max(this.width / 2, font.width(pageString) / 2 + 2), this.y + this.height - 2 - 20 - 10, -1);
+            guiGraphicsExtractor.centeredText(font, pageString, Math.max(this.width / 2, font.width(pageString) / 2 + 2), this.y + this.height - 2 - 20 - 10, -1);
         else
-            guiGraphics.drawCenteredString(font, pageString, Math.max(this.effectiveWidth / 2, font.width(pageString) / 2 + 2), this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
+            guiGraphicsExtractor.centeredText(font, pageString, Math.max(this.effectiveWidth / 2, font.width(pageString) / 2 + 2), this.effectiveY + this.effectiveHeight - 2 - 20 - 10, -1);
 
 
         for (ItemSlot slot : this.itemSlots()) {
-            slot.render(guiGraphics, mouseX, mouseY, partialTicks);
+            slot.render(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
         }
     }
 

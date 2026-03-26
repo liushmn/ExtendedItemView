@@ -1,19 +1,14 @@
 package de.crafty.eiv.forge;
 
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
 import de.crafty.eiv.common.component.EivDataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 
 import java.util.Optional;
@@ -32,8 +27,8 @@ public class ForgeEIV {
 
 
         CommonEIV.LOGGER.info("Scanning for integrations...");
-        FMLLoader.getLoadingModList().getMods().forEach(modInfo -> {
-            Optional<String> optional = modInfo.getConfigElement("eiv");
+        ModList.getLoadedMods().forEach(modInfo -> {
+            Optional<String> optional = modInfo.getModInfo().getConfig().getConfigElement("eiv");
 
             if (optional.isPresent()) {
                 CommonEIV.LOGGER.info("Loading integration: {}", optional.get());

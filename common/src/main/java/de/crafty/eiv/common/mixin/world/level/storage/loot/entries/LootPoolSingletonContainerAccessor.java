@@ -10,6 +10,6 @@ import java.util.List;
 @Mixin(LootPoolSingletonContainer.class)
 public interface LootPoolSingletonContainerAccessor {
 
-    @Accessor("functions")
+    @Accessor(value = "functions", remap = false)
     List<LootItemFunction> getFunctions();
 }

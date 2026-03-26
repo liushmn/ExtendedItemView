@@ -1,7 +1,7 @@
 package de.crafty.eiv.common.embeddings.container;
 
 import de.crafty.eiv.common.CommonEIV;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -20,9 +20,9 @@ public class SingleItemChatEmbedding extends ContainerChatEmbedding {
 
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
-        this.renderTexture(TEXTURE, guiGraphics, 0, 2, 0, 0, 24, 24, 24, 24);
+        this.renderTexture(TEXTURE, guiGraphicsExtractor, 0, 2, 0, 0, 24, 24, 24, 24);
 
     }
 }

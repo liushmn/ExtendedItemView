@@ -8,7 +8,7 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
@@ -81,27 +81,27 @@ public class BrewingViewRecipe implements IEivViewRecipe {
     }
 
     @Override
-    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 39, 30, 38, 0, 18, 4, 128, 128);
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 39, 30, 38, 0, 18, 4, 128, 128);
 
         int brewProgress = Math.round(this.brewProgressTicker.getProgress() * 28);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 76, 2, 56, 0, 9, brewProgress, 128, 128);
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 76, 2, 56, 0, 9, brewProgress, 128, 128);
 
         int bubbleProgress = 29 - BUBBLELENGTHS[this.brewProgressTicker.getTick() / 2 % 7];
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 42, 29 - bubbleProgress, 64, 29 - bubbleProgress, 13, bubbleProgress, 128, 128);
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 42, 29 - bubbleProgress, 64, 29 - bubbleProgress, 13, bubbleProgress, 128, 128);
     }
 
 
     @Override
-    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, (39 + 3), (30 + 3), 38, 0, 18, 4, 128, 128);
+    public void renderRecipeInChat(RecipeChatEmbedding.ChatRecipeRenderer renderer, GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphicsExtractor, (39 + 3), (30 + 3), 38, 0, 18, 4, 128, 128);
 
         int brewProgress = Math.round(this.brewProgressTicker.getProgress() * 28);
-        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, (76 + 3), (2 + 3), 56, 0, 9, brewProgress, 128, 128);
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphicsExtractor, (76 + 3), (2 + 3), 56, 0, 9, brewProgress, 128, 128);
 
         int bubbleProgress = 29 - BUBBLELENGTHS[this.brewProgressTicker.getTick() / 2 % 7];
-        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphics, (42 + 3), 29 + 3 - bubbleProgress, 64, 29 - bubbleProgress, 13, bubbleProgress, 128, 128);    }
+        renderer.renderTopLevelTexture(BuiltInEivIntegration.WIDGETS, guiGraphicsExtractor, (42 + 3), 29 + 3 - bubbleProgress, 64, 29 - bubbleProgress, 13, bubbleProgress, 128, 128);    }
 
     @Override
     public IEivViewRecipe asChatCopy() {

@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("26.1-R0.1-SNAPSHOT")
 }
 
 runServer {
@@ -39,6 +39,6 @@ paperweight {
         // Example scenario:
         // Paper 1.17.1 was originally built with JDK 16 and the bundle
         // has not been updated to work with 21+ (but we want to compile with a 25 toolchain)
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }

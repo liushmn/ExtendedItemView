@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinMinecraftServer {
 
 
-    @Inject(method = "setPlayerList", at = @At("RETURN"))
+    @Inject(method = "setPlayerList", at = @At("RETURN"), remap = false)
     private void setServer(PlayerList $$0, CallbackInfo ci) {
         ServerRecipeManager.INSTANCE.setServer((MinecraftServer) (Object) this);
     }

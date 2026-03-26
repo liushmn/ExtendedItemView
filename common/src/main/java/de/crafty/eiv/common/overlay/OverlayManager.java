@@ -3,7 +3,7 @@ package de.crafty.eiv.common.overlay;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.config.Configs;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.KeyEvent;
@@ -190,19 +190,19 @@ public class OverlayManager {
     }
 
 
-    public void renderAllBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderAllBackground(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if (Configs.CLIENT_SETTINGS.drawBackground())
-            PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.renderBackground(guiGraphics, mouseX, mouseY, partialTicks));
+            PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.renderBackground(guiGraphicsExtractor, mouseX, mouseY, partialTicks));
     }
 
-    public void renderAll(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.render(guiGraphics, mouseX, mouseY, partialTicks));
+    public void renderAll(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.render(guiGraphicsExtractor, mouseX, mouseY, partialTicks));
 
         if (Minecraft.getInstance().gui.getDebugOverlay().showDebugScreen())
-            this.renderDebug(guiGraphics, mouseX, mouseY, partialTicks);
+            this.renderDebug(guiGraphicsExtractor, mouseX, mouseY, partialTicks);
     }
 
-    public void renderDebug(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderDebug(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
 
 
         this.guiBlockings.forEach(blockingGuiComponent -> {
@@ -210,11 +210,11 @@ public class OverlayManager {
             Random rand = new Random(blockingGuiComponent.id().toString().chars().sum());
             int debugColor = new Color(rand.nextInt(255 + 1), rand.nextInt(255 + 1), rand.nextInt(255 + 1)).getRGB();
 
-            guiGraphics.hLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), debugColor);
-            guiGraphics.hLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+            guiGraphicsExtractor.horizontalLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), debugColor);
+            guiGraphicsExtractor.horizontalLine(blockingGuiComponent.x(), blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
 
-            guiGraphics.vLine(blockingGuiComponent.x(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
-            guiGraphics.vLine(blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+            guiGraphicsExtractor.verticalLine(blockingGuiComponent.x(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
+            guiGraphicsExtractor.verticalLine(blockingGuiComponent.x() + blockingGuiComponent.width(), blockingGuiComponent.y(), blockingGuiComponent.y() + blockingGuiComponent.height(), debugColor);
 
         });
 

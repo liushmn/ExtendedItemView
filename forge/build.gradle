@@ -1,69 +1,66 @@
 plugins {
-    id 'net.minecraftforge.gradle' version '6.+'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'java'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 
 }
 
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+sourceSets.main.resources {
+    srcDir "src/generated/resources"
+}
 
 base {
     archivesName = "${mod_id}-forge-${mod_version}+${minecraft_version}"
 }
 
-repositories {
-
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    compileOnly project(":common")
-}
-
 
 minecraft {
-    mappings channel: "official", version: "${minecraft_version}"
-
-    accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
-
-    reobf = false
-    copyIdeResources = true
+    mappings channel: "official", version: minecraft_version
+    accessTransformers = files("src/main/resources/META-INF/accesstransformer.cfg")
 
     runs {
         configureEach {
-            workingDirectory project.file('run')
+            workingDir = layout.projectDirectory.dir('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+            systemProperty 'forge.enabledGameTestNamespaces', 'eiv'
         }
 
-        client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
+        register('client') {
+            args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
         }
 
-        server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
-
+        register('server') {
+            args '--nogui', "-mixin.config=${mod_id}.mixins.json","-mixin.config=${mod_id}.forge.mixins.json"
         }
 
-        data {
-            workingDirectory project.file('run-data')
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        register('gameTestServer')
+
+        register('data') {
+            workingDir = layout.projectDirectory.dir('run-data')
+
+            args '--mod', 'eiv', '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
         }
     }
 }
 
-sourceSets.main.resources {
-    srcDir "src/generated/resources"
+repositories {
+    minecraft.mavenizer(it) // In Kotlin, it = this
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
 }
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+
+    compileOnly project(":common")
+}
+
 
 processResources {
 
@@ -83,22 +80,23 @@ tasks.withType(JavaCompile).configureEach {
 jar {
     manifest {
         attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1', // We are version 1 of ourselves
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                "MixinConfigs": "${mod_id}.mixins.json" + "," + "${mod_id}.forge.mixins.json"
+                'Specification-Title'   : mod_id,
+                'Specification-Vendor'  : mod_authors,
+                'Specification-Version' : '1', // We are version 1 of ourselves
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Vendor' : mod_authors,
+                "MixinConfigs"          : "${mod_id}.mixins.json" + "," + "${mod_id}.forge.mixins.json"
         ])
     }
 }
 
-mixin {
-    add sourceSets.main, 'mixins.mymod.refmap.json'
-    config "${mod_id}.mixins.json"
-    config "${mod_id}.forge.mixins.json"
+/*mixin {
+   add sourceSets.main, 'mixins.mymod.refmap.json'
+   config "${mod_id}.mixins.json"
+   config "${mod_id}.forge.mixins.json"
 }
+ */
 
 sourceSets.each {
     def dir = layout.buildDirectory.dir("sourcesSets/$it.name")

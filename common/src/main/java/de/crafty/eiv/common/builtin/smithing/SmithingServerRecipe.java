@@ -3,18 +3,14 @@ package de.crafty.eiv.common.builtin.smithing;
 import com.mojang.datafixers.util.Pair;
 import de.crafty.eiv.common.api.recipe.EivRecipeType;
 import de.crafty.eiv.common.api.recipe.IEivServerRecipe;
-import de.crafty.eiv.common.builtin.shapeless.ShapelessServerRecipe;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.TransmuteResult;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class SmithingServerRecipe implements IEivServerRecipe {
 
@@ -27,9 +23,9 @@ public class SmithingServerRecipe implements IEivServerRecipe {
     private Ingredient base, template, addition;
     private TrimPattern pattern;
 
-    private TransmuteResult upgradeResult;
+    private ItemStack upgradeResult;
 
-    public SmithingServerRecipe(boolean isTrim, Ingredient base, Ingredient template, Ingredient addition, TrimPattern pattern, @Nullable TransmuteResult upgradeResult) {
+    public SmithingServerRecipe(boolean isTrim, Ingredient base, Ingredient template, Ingredient addition, TrimPattern pattern, @Nullable ItemStack upgradeResult) {
         this.isTrim = isTrim;
         this.base = base;
         this.template = template;
@@ -60,7 +56,7 @@ public class SmithingServerRecipe implements IEivServerRecipe {
     }
 
     @Nullable
-    public TransmuteResult getUpgradeResult() {
+    public ItemStack getUpgradeResult() {
         return this.upgradeResult;
     }
 
@@ -76,7 +72,7 @@ public class SmithingServerRecipe implements IEivServerRecipe {
             tag.put("pattern", TrimPattern.DIRECT_CODEC.encode(this.pattern, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
 
         if(this.upgradeResult != null)
-            tag.put("upgradeResult", TransmuteResult.CODEC.encode(this.upgradeResult, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+            tag.put("upgradeResult", EivTagUtil.encodeItemStackOnServer(this.upgradeResult));
     }
 
     @Override
@@ -88,7 +84,7 @@ public class SmithingServerRecipe implements IEivServerRecipe {
         this.addition = EivTagUtil.readIngredient(tag.getCompound("addition").orElseGet(CompoundTag::new));
 
         this.pattern = TrimPattern.DIRECT_CODEC.decode(NbtOps.INSTANCE, tag.getCompound("pattern").orElseGet(CompoundTag::new)).mapOrElse(Pair::getFirst, pairError -> null);
-        this.upgradeResult = TransmuteResult.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("upgradeResult").orElseGet(CompoundTag::new)).mapOrElse(Pair::getFirst, pairError -> null);
+        this.upgradeResult = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("upgradeResult"));
     }
 
     @Override

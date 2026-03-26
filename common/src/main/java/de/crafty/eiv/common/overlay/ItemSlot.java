@@ -6,7 +6,7 @@ import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPay
 import de.crafty.eiv.common.overlay.itemlist.view.ItemViewOverlay;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -56,7 +56,7 @@ public class ItemSlot {
     /**
      * Renders the slot
      */
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY);
 
         if (!this.isHovered() && this.currentCheatmodeCount > 1)
@@ -69,14 +69,14 @@ public class ItemSlot {
             tooltip.addLast(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
 
         if (this.isHovered())
-            guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
+            guiGraphicsExtractor.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
 
 
-        guiGraphics.renderItem(this.stack, this.x + 2, this.y + 2);
+        guiGraphicsExtractor.item(this.stack, this.x + 2, this.y + 2);
 
 
         if (this.isHovered())
-            guiGraphics.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY);
+            guiGraphicsExtractor.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY);
     }
 
     /**

@@ -11,6 +11,6 @@ import java.util.List;
 public interface LootTableAccessor {
 
 
-    @Accessor("pools")
+    @Accessor(value = "pools", remap = false)
     List<LootPool> getPools();
 }

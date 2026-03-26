@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinServerGamePacketListenerImpl {
 
     
-    @Shadow public ServerPlayer player;
+    @Shadow(remap = false) public ServerPlayer player;
 
-    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true, remap = false)
     private void onEivPayloadReceived(ServerboundCustomPayloadPacket packet, CallbackInfo ci){
 
         CustomPacketPayload payload = packet.payload();

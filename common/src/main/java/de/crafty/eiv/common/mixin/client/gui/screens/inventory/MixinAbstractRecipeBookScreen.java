@@ -31,7 +31,7 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "init", at = @At("TAIL"), remap = false)
     private void injectOverlay$0(CallbackInfo ci) {
 
         AbstractEivOverlay.InventoryPositionInfo info = new AbstractEivOverlay.InventoryPositionInfo((AbstractRecipeBookScreen<T>) (Object) this, this.width, this.height, this.leftPos, this.topPos, this.imageWidth, this.imageHeight);
@@ -50,7 +50,7 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
 
     }
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectOverlay$1(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box) {
             box.keyPressed(keyEvent);
@@ -61,7 +61,7 @@ public abstract class MixinAbstractRecipeBookScreen<T extends RecipeBookMenu> ex
 
     }
 
-    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true, remap = false)
     private void injectOverlay$2(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
         if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(characterEvent))
             cir.setReturnValue(true);

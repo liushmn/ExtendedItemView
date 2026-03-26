@@ -12,14 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 
-    @Inject(method = "close", at = @At("RETURN"))
+    @Inject(method = "close", at = @At("RETURN"), remap = false)
     private void saveData(CallbackInfo ci) {
         CommonEIVClient.saveConfigs();
     }
 
 
 
-    @Inject(method = "setScreen", at = @At("HEAD"))
+    @Inject(method = "setScreen", at = @At("HEAD"), remap = false)
     private void clearBlockings(Screen screen, CallbackInfo ci){
         OverlayManager.INSTANCE.allGuiBlockings().clear();
     }

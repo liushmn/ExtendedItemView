@@ -4,7 +4,7 @@ import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGui {
 
 
-    @Shadow public abstract Font getFont();
+    @Shadow(remap = false) public abstract Font getFont();
 
-    @Inject(method = "render", at = @At("RETURN"))
-    private void renderRecipeProgress(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("RETURN"), remap = false)
+    private void renderRecipeProgress(GuiGraphicsExtractor guiGraphicsExtractor, DeltaTracker deltaTracker, CallbackInfo ci) {
         Font font = this.getFont();
         String statusMsg = ClientRecipeManager.INSTANCE.status().get();
 
         if(!ClientRecipeManager.INSTANCE.status().isIdle())
-            guiGraphics.drawString(font, statusMsg, guiGraphics.guiWidth() - font.width(statusMsg) - 2, 2, -1);
+            guiGraphicsExtractor.text(font, statusMsg, guiGraphicsExtractor.guiWidth() - font.width(statusMsg) - 2, 2, -1);
     }
 }
