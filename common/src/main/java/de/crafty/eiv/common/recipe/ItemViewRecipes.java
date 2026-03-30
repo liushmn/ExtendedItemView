@@ -133,7 +133,7 @@ public class ItemViewRecipes {
                 if (!stack.is(validStack.getItem()))
                     continue;
 
-                if (ItemViewRecipes.makeEnchantmentCheck(stack, validStack))
+                if (ItemViewRecipes.makeEnchantmentCheck(stack, validStack) || !stack.is(Items.ENCHANTED_BOOK))
                     return true;
             }
 

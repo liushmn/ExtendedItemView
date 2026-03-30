@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.component;
 
+import com.mojang.serialization.Codec;
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.core.Registry;
@@ -17,7 +18,7 @@ public class EivDataComponents {
     private static final HashMap<Identifier, DataComponentType<?>> COMPONENTS = new HashMap<>();
 
     public static final DataComponentType<EmbeddingData> EMBEDDING_DATA = EivDataComponents.register("embedding_data", embeddingDataBuilder -> embeddingDataBuilder.persistent(EmbeddingData.CODEC));
-
+    public static final DataComponentType<Integer> TRADE_COST_PLACEHOLDER = EivDataComponents.register("trade_cost_placeholder", booleanBuilder -> booleanBuilder.persistent(Codec.INT));
 
     private static <T> DataComponentType<T> register(String id, UnaryOperator<DataComponentType.Builder<T>> builder) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CommonEIV.MODID, id);

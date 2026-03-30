@@ -106,7 +106,7 @@ public interface IEivViewRecipe {
 
     /**
      * @param screen       The current viewScreen
-     * @param GuiGraphicsExtractor  The GuiGraphicsExtractor supplied by Minecraft
+     * @param guiGraphicsExtractor  The GuiGraphicsExtractor supplied by Minecraft
      * @param mouseX       The current x-position of the mouse <b>relative to the position of the rendered recipe</b>
      * @param mouseY       The current y-position of the mouse <b>relative to the position of the rendered recipe</b>
      * @param partialTicks partialTicks
