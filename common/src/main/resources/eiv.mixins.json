@@ -28,8 +28,7 @@
     "world.level.storage.loot.functions.SetNameFunctionAccessor",
     "world.level.storage.loot.functions.SetPotionFunctionAccessor",
     "world.level.storage.loot.functions.SetRandomDyesFunctionAccessor",
-    "world.level.storage.loot.functions.SetRandomPotionFunctionAccessor",
-    "world.level.storage.loot.functions.SetStewEffectFunctionAccessor"
+    "world.level.storage.loot.functions.SetRandomPotionFunctionAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -5,6 +5,7 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.util.EmbeddingComponentContents;
 import de.crafty.eiv.common.mixin.client.gui.components.IChatComponentAccessor;
+import de.crafty.eiv.common.overlay.OverlayManager;
 import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.ChatFormatting;
@@ -94,4 +95,11 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
             embedding.bindMsg(((IChatComponentAccessor) this.minecraft.gui.getChat()).getAllMessages().getFirst());
         }
     }
+
+
+    @Inject(method = "extractBackground", at = @At("HEAD"), remap = false)
+    private void injectOverlayBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        OverlayManager.INSTANCE.renderAllBackground(graphics, mouseX, mouseY, partialTicks);
+    }
+
 }

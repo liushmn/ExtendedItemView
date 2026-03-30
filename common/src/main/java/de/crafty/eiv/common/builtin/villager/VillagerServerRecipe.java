@@ -99,11 +99,11 @@ public class VillagerServerRecipe implements IEivServerRecipe {
 
         VillagerTradeAccessor tradeAccessor = (VillagerTradeAccessor) trade;
 
-        //Required type
+        //Required type TODO implement multiple villager variants
         tradeAccessor.merchantPredicate().ifPresent(lootItemCondition -> {
             if (lootItemCondition instanceof LootItemEntityPropertyCondition(
                     Optional<EntityPredicate> predicate, LootContext.EntityTarget entityTarget
-            ))
+            )) {
                 predicate.ifPresent(entityPredicate -> {
                     if (entityPredicate.components().partial().containsKey(DataComponentPredicates.VILLAGER_VARIANT)) {
                         VillagerTypePredicate typePredicate = (VillagerTypePredicate) entityPredicate.components().partial().get(DataComponentPredicates.VILLAGER_VARIANT);
@@ -112,6 +112,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
                     }
 
                 });
+            }
+
         });
 
         if (tradeAccessor.doubleTradePriceEnchantments().isPresent())
@@ -171,6 +173,9 @@ public class VillagerServerRecipe implements IEivServerRecipe {
         tag.putString("profession", this.profession.identifier().toString());
         tag.putInt("professionLevel", this.professionLevel);
 
+        if(this.requiredType != null)
+            tag.putString("requiredType", this.requiredType.identifier().toString());
+
         ListTag subTrades = new ListTag();
         this.subTradeGroups.forEach(group -> {
             subTrades.add(SubTradeGroup.CODEC.encode(group, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).getOrThrow());
@@ -196,6 +201,8 @@ public class VillagerServerRecipe implements IEivServerRecipe {
             this.profession = BuiltInRegistries.VILLAGER_PROFESSION.get(Identifier.parse(tag.getString("profession").orElseThrow())).orElseThrow().key();
 
         this.professionLevel = tag.getIntOr("professionLevel", 0);
+        if(tag.contains("requiredType"))
+            this.requiredType = BuiltInRegistries.VILLAGER_TYPE.get(Identifier.parse(tag.getString("requiredType").orElseThrow())).orElseThrow().key();
 
         this.subTradeGroups.clear();
         tag.getListOrEmpty("subTrades").forEach(subTrade -> {

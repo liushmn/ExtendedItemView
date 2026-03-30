@@ -585,24 +585,13 @@ public class RecipeViewMenu extends AbstractContainerMenu {
                 stackSupply.set(playerSlot, ItemStack.EMPTY);
 
             foundStack.setCount(prevReq - requiredAmount);
-
-            OptionalInt menuSlotId = player.containerMenu.findSlot(player.getInventory(), playerSlot);
-
-            if (menuSlotId.isPresent())
-                usedPlayerSlots.put(menuSlotId.getAsInt(), foundStack);
-            else {
-                //Just for safety, we do not want to lose any player items
-                this.returnToCache(usedPlayerSlots, stackSupply);
-                return new HashMap<>();
-            }
-
+            usedPlayerSlots.put(playerSlot, foundStack);
         }
 
         if (requiredAmount == 0)
             return usedPlayerSlots;
         else {
             this.returnToCache(usedPlayerSlots, stackSupply);
-
             return new HashMap<>();
         }
     }

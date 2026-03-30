@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO split Smithing recipes in upgrade and trim recipes
 public class SmithingViewRecipe implements IEivViewRecipe {
 
     private final SlotContent additionIngredient;

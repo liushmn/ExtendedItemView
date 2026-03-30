@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.builtin;
 
+import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.builtin.blasting.BlastingServerRecipe;
@@ -21,6 +22,8 @@ import de.crafty.eiv.common.builtin.transmute.TransmuteServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerServerRecipe;
 import de.crafty.eiv.common.builtin.villager.VillagerViewRecipe;
 import de.crafty.eiv.common.mixin.world.item.alchemy.PotionBrewingAccessor;
+import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
+import de.crafty.eiv.common.mixin.world.item.crafting.TransmuteRecipeAccessor;
 import de.crafty.eiv.common.mixin.world.level.storage.loot.LootPoolAccessor;
 import de.crafty.eiv.common.mixin.world.level.storage.loot.LootTableAccessor;
 import de.crafty.eiv.common.mixin.world.level.storage.loot.entries.CompositeEntryBaseAccessor;
@@ -236,7 +239,7 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
                     recipeList.add(new ShapedServerRecipe(shapedRecipe.getWidth(), shapedRecipe.getHeight(), ingredients, shapedRecipe.result.create()));
                 }
-                /*
+
                                 if (recipe instanceof TransmuteRecipe) {
                     TransmuteRecipeAccessor accessor = (TransmuteRecipeAccessor) recipe;
 
@@ -256,14 +259,14 @@ public class BuiltInEivIntegration implements IExtendedItemViewIntegration {
 
 
                     ingredients.forEach(ingredient -> {
-                        results.add(accessor.getResult().apply(new ItemStack(ingredient)));
+                        results.add(TransmuteRecipe.createWithOriginalComponents(accessor.getResult(), new ItemStack(ingredient)));
                     });
 
                     if (!ingredients.isEmpty() && !results.isEmpty())
                         recipeList.add(new TransmuteServerRecipe(accessor.getInput(), accessor.getMaterial(), results));
 
                 }
-                 */
+
 
             });
 

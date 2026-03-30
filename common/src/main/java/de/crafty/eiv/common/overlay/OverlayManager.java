@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
 
-//TODO fix background rendering over gui
 public class OverlayManager {
 
     public static final OverlayManager INSTANCE = new OverlayManager();

@@ -244,13 +244,21 @@ public class ServerRecipeManager {
             HashMap<Integer, ItemStack> usedSlots = usedPlayerSlots.getOrDefault(recipeSlot, new HashMap<>());
             Slot destSlot = player.containerMenu.getSlot(destSlotId);
 
+            //Check if slots exist
+            for(int slot : usedSlots.keySet()){
+                if(player.containerMenu.findSlot(player.getInventory(), slot).isEmpty())
+                    return;
+            }
+
             usedSlots.forEach((playerSlot, stack) -> {
                 ItemStack currentInDest = destSlot.getItem();
 
+                OptionalInt slot = player.containerMenu.findSlot(player.getInventory(), playerSlot);
+
                 if (currentInDest.isEmpty()) {
-                    destSlot.set(player.containerMenu.getSlot(playerSlot).remove(stack.getCount()));
+                    destSlot.set(player.containerMenu.getSlot(slot.getAsInt()).remove(stack.getCount()));
                 } else {
-                    destSlot.set(currentInDest.copyWithCount(currentInDest.getCount() + player.containerMenu.getSlot(playerSlot).remove(Math.min(stack.getCount(), currentInDest.getMaxStackSize() - currentInDest.getCount())).getCount()));
+                    destSlot.set(currentInDest.copyWithCount(currentInDest.getCount() + player.containerMenu.getSlot(slot.getAsInt()).remove(Math.min(stack.getCount(), currentInDest.getMaxStackSize() - currentInDest.getCount())).getCount()));
                 }
 
             });
