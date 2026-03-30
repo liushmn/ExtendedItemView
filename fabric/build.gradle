@@ -16,17 +16,11 @@ dependencies {
 
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    compileOnly(project(":common"))
 }
 
 loom {
 
     accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.classtweaker"))
-
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
 
     runs {
 
@@ -52,8 +46,6 @@ processResources {
         expand project.properties
     }
 
-    from project(":common").sourceSets.main.resources
-
 }
 
 java {
@@ -76,5 +68,4 @@ jar {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.release = 25
-    source(project(":common").sourceSets.main.allSource)
 }

@@ -11,12 +11,12 @@ import java.util.Optional;
 @Mixin(EnchantRandomlyFunction.class)
 public interface EnchantRandomlyFunctionAccessor {
 
-    @Accessor("options")
+    @Accessor(value = "options", remap = false)
     Optional<HolderSet<Enchantment>> options();
 
-    @Accessor("onlyCompatible")
+    @Accessor(value = "onlyCompatible", remap = false)
     boolean onlyCompatible();
 
-    @Accessor("includeAdditionalCostComponent")
+    @Accessor(value = "includeAdditionalCostComponent", remap = false)
     boolean includeAdditionalCostComponent();
 }

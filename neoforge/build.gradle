@@ -1,6 +1,4 @@
 plugins {
-    id 'java-library'
-    id 'idea'
     id 'net.neoforged.moddev' version '2.0.141'
 }
 
@@ -81,7 +79,7 @@ neoForge {
 }
 
 dependencies {
-    compileOnly project(":common")
+
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -128,13 +126,7 @@ sourceSets.main.resources {
 
 
 
-processResources {
-
-    from project(":common").sourceSets.main.resources
-}
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-
-    source(project(":common").sourceSets.main.allSource)
 }

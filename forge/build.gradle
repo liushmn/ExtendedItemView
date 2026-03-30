@@ -1,6 +1,4 @@
 plugins {
-    id 'java'
-    id 'idea'
     id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 
 }
@@ -56,9 +54,7 @@ repositories {
 
 dependencies {
     implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
-    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
-
-    compileOnly project(":common")
+    //annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 }
 
 
@@ -68,13 +64,10 @@ processResources {
         expand project.properties
     }
 
-    from project(":common").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-
-    source(project(":common").sourceSets.main.allSource)
 }
 
 jar {

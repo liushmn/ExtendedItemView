@@ -7,6 +7,22 @@ repositories {
 
 }
 
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
 java {
     withSourcesJar()
 
@@ -26,6 +42,7 @@ dependencies {
     //Only for mixin bundle
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
+
 
 loom {
 

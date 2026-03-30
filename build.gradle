@@ -8,3 +8,38 @@ buildscript {
         classpath 'com.google.code.gson:gson:2.10.1' //fix cache issues
     }
 }
+
+// Build setup for non-common subprojects
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'java-library'
+
+    if (project.name != "common") {
+        configurations {
+            commonJava {
+                canBeResolved = true
+            }
+            commonResources {
+                canBeResolved = true
+            }
+        }
+
+        dependencies {
+            compileOnly(project(':common'))
+            commonJava project(path: ':common', configuration: 'commonJava')
+            commonResources project(path: ':common', configuration: 'commonResources')
+        }
+
+        tasks.named('compileJava', JavaCompile) {
+            dependsOn(configurations.commonJava)
+            source(configurations.commonJava)
+        }
+
+        processResources {
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        }
+
+    }
+}
