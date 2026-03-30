@@ -99,7 +99,9 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
 
     @Inject(method = "extractBackground", at = @At("HEAD"), remap = false)
     private void injectOverlayBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        OverlayManager.INSTANCE.renderAllBackground(graphics, mouseX, mouseY, partialTicks);
+
+        if((Object) this instanceof AbstractContainerScreen<?>)
+            OverlayManager.INSTANCE.renderAllBackground(graphics, mouseX, mouseY, partialTicks);
     }
 
 }
