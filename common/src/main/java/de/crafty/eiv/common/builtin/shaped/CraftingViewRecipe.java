@@ -1,6 +1,5 @@
 package de.crafty.eiv.common.builtin.shaped;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.builtin.tipped_arrow.TippedArrowServerRecipe;
@@ -9,12 +8,9 @@ import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +53,7 @@ public class CraftingViewRecipe implements IEivViewRecipe {
         this.height = 3;
 
         ItemStack result = new ItemStack(Items.TIPPED_ARROW, 8);
+        PotionUtils.setPotion(result, recipe.getPotion())
         result.set(DataComponents.POTION_CONTENTS, recipe.getPotion().get(DataComponents.POTION_CONTENTS));
         this.result = SlotContent.of(result);
 

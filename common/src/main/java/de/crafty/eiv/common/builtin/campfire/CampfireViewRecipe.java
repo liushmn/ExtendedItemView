@@ -9,7 +9,6 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,7 +24,7 @@ public class CampfireViewRecipe implements IEivViewRecipe {
         this.input = SlotContent.of(campfireCookingRecipe.getInput());
         this.result = SlotContent.of(campfireCookingRecipe.getResult());
 
-        this.cookingTicker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("campfire_cooking_ticker"), 300);
+        this.cookingTicker = AnimationTicker.create(new ResourceLocation("campfire_cooking_ticker"), 300);
     }
 
     private CampfireViewRecipe(SlotContent input, SlotContent result, AnimationTicker cookingTicker) {
@@ -66,7 +65,7 @@ public class CampfireViewRecipe implements IEivViewRecipe {
         guiGraphics.renderItem(new ItemStack(Items.CAMPFIRE), 1, 20);
 
         int cookingProgress = Math.round(this.cookingTicker.getProgress() * 24);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
+        guiGraphics.blit(BuiltInEivIntegration.WIDGETS, 25, 1, 14, 0, cookingProgress, 16, 128, 128);
     }
 
     @Override

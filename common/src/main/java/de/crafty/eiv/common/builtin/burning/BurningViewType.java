@@ -16,8 +16,8 @@ public class BurningViewType implements IEivRecipeViewType {
     public static final BurningViewType INSTANCE = new BurningViewType();
 
 
-    private static final ResourceLocation BURNING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/burning.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/burning.png");
+    private static final ResourceLocation BURNING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/burning.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/burning.png");
 
 
     @Override
@@ -52,7 +52,7 @@ public class BurningViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("furnace_burning");
+        return new ResourceLocation("furnace_burning");
     }
 
     @Override

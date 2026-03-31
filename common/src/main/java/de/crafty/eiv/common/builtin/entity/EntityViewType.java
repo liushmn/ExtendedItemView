@@ -5,6 +5,7 @@ import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -23,7 +24,7 @@ public class EntityViewType implements IEivRecipeViewType {
         if(!(craftReference.getItem() instanceof SpawnEggItem eggItem) || !(viewRecipe instanceof EntityViewRecipe entityViewRecipe))
             return true;
 
-        return eggItem.getType(craftReference) == entityViewRecipe.getEntityType();
+        return eggItem.spawnsEntity(null, entityViewRecipe.getEntityType());
 
     };
 
@@ -44,7 +45,7 @@ public class EntityViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/entity.png");
+        return new ResourceLocation(CommonEIV.MODID, "textures/gui/type/entity.png");
     }
 
     //Mob loot should not exceed 54 slots
@@ -66,7 +67,7 @@ public class EntityViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("entity_loot");
+        return new ResourceLocation("entity_loot");
     }
 
     @Override

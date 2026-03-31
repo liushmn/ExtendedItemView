@@ -15,8 +15,8 @@ public class CraftingViewType implements IEivRecipeViewType {
 
     public static final CraftingViewType INSTANCE = new CraftingViewType();
 
-    private static final ResourceLocation CRAFTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/crafting.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/crafting.png");
+    private static final ResourceLocation CRAFTING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/crafting.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/crafting.png");
 
     @Override
     public Component getDisplayName() {
@@ -25,7 +25,7 @@ public class CraftingViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("crafting_shaped");
+        return new ResourceLocation("crafting_shaped");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CraftingViewType implements IEivRecipeViewType {
 
     @Override
     public List<ItemStack> getCraftReferences() {
-        return List.of(new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.CRAFTER));
+        return List.of(new ItemStack(Items.CRAFTING_TABLE));
     }
 
     @Override

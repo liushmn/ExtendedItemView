@@ -13,8 +13,8 @@ public class BlastingViewType extends SmeltingViewType {
 
     public static final BlastingViewType INSTANCE = new BlastingViewType();
 
-    private static final ResourceLocation BLASTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/blasting.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/blasting.png");
+    private static final ResourceLocation BLASTING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/blasting.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/blasting.png");
 
     @Override
     public Component getDisplayName() {
@@ -33,7 +33,7 @@ public class BlastingViewType extends SmeltingViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "furnace_blasting");
+        return new ResourceLocation(CommonEIV.MODID, "furnace_blasting");
     }
 
     @Override

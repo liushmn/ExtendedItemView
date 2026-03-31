@@ -10,7 +10,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 public class BlastingServerRecipe extends SmeltingServerRecipe {
 
     public static final EivRecipeType<BlastingServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("blasting"),
+            new ResourceLocation("blasting"),
             () -> new BlastingServerRecipe(null, ItemStack.EMPTY)
     );
 

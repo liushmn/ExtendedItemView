@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 public class TippedArrowServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<TippedArrowServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("tipped_arrow_crafting"),
+            new ResourceLocation("tipped_arrow_crafting"),
             () -> new TippedArrowServerRecipe(ItemStack.EMPTY)
     );
 
@@ -34,7 +34,7 @@ public class TippedArrowServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.potionStack = EivTagUtil.decodeItemStackOnClient(tag.getCompound("potionStack").orElseGet(CompoundTag::new));
+        this.potionStack = EivTagUtil.decodeItemStackOnClient(tag.getCompound("potionStack"));
 
     }
 

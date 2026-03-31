@@ -14,7 +14,7 @@ import java.util.List;
 public class EntityServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<EntityServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("entity_loot"),
+            new ResourceLocation("entity_loot"),
             () -> new EntityServerRecipe(null, List.of())
     );
 
@@ -45,7 +45,7 @@ public class EntityServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.entityType = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(tag.getStringOr("entity", "")));
+        this.entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(tag.getString("entity")));
         this.drops = EivTagUtil.readList(tag, "stacks", EivTagUtil::decodeItemStackOnClient);
 
     }

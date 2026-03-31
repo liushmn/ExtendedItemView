@@ -1,5 +1,6 @@
 package de.crafty.eiv.common.overlay.itemlist.view;
 
+import com.mojang.datafixers.util.Pair;
 import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
@@ -96,17 +97,17 @@ public class ItemFilters {
         List<ItemStack> firstPrio = new ArrayList<>();
         List<ItemStack> secondPrio = new ArrayList<>();
 
-        for (TagKey<Item> tag : BuiltInRegistries.ITEM.getTags().map(HolderSet.Named::key).toList()) {
+        for (TagKey<Item> tag : BuiltInRegistries.ITEM.getTags().map(Pair::getFirst).toList()) {
             String tagName = tag.location().getPath().toLowerCase();
 
             if (tagName.startsWith(query.toLowerCase())) {
-                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item)).forEach(stack -> {
+                BuiltInRegistries.ITEM.getTag(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item)).forEach(stack -> {
                     firstPrio.add(stack);
                     firstPrio.addAll(ClientRecipeCache.INSTANCE.getStackSensitives(stack.getItem()).stream().map(ItemView.StackSensitive::stack).toList());
                 }));
 
             } else if (tagName.contains(query.toLowerCase())) {
-                BuiltInRegistries.ITEM.get(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item) && !secondPrio.contains(item)).forEach(stack -> {
+                BuiltInRegistries.ITEM.getTag(tag).ifPresent(items -> items.stream().map(itemHolder -> new ItemStack(itemHolder.value())).filter(item -> !firstPrio.contains(item) && !secondPrio.contains(item)).forEach(stack -> {
                     secondPrio.add(stack);
                     secondPrio.addAll(ClientRecipeCache.INSTANCE.getStackSensitives(stack.getItem()).stream().map(ItemView.StackSensitive::stack).toList());
                 }));

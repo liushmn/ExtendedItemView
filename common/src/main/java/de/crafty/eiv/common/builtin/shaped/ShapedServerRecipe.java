@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class ShapedServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<ShapedServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("shaped_crafting"),
+            new ResourceLocation("shaped_crafting"),
             () -> new ShapedServerRecipe(0, 0, new HashMap<>(), ItemStack.EMPTY)
     );
 
@@ -60,21 +60,21 @@ public class ShapedServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.width = tag.getIntOr("width", 0);
-        this.height = tag.getIntOr("height", 0);
+        this.width = tag.getInt("width");
+        this.height = tag.getInt("height");
 
         HashMap<Integer, Ingredient> ingredients = new HashMap<>();
 
-        tag.keySet().forEach(key -> {
+        tag.getAllKeys().forEach(key -> {
             if (!key.startsWith("ci_"))
                 return;
 
             int slot = Integer.parseInt(key.replace("ci_", ""));
-            ingredients.put(slot, EivTagUtil.readIngredient(tag.getCompound(key).orElseGet(CompoundTag::new)));
+            ingredients.put(slot, EivTagUtil.readIngredient(tag.getCompound(key)));
         });
 
         this.ingredients = ingredients;
-        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result").orElseGet(CompoundTag::new));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result"));
     }
 
     @Override

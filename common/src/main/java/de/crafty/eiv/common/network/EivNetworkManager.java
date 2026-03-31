@@ -157,55 +157,6 @@ public class EivNetworkManager {
      */
     public EivNetworkManager registerPayloads() {
 
-        this.registerServerbound(ServerboundRequestEivUpdate.TYPE, ServerboundRequestEivUpdate.STREAM_CODEC, (context, payload) -> {
-            ServerRecipeManager.INSTANCE.updateStackSensitives(context.sender());
-            ServerRecipeManager.INSTANCE.informAboutRecipes(context.sender());
-        });
-
-        this.registerClientbound(ClientboundServerReloadPayload.TYPE, ClientboundServerReloadPayload.STREAM_CODEC, (context, payload) -> {
-            ItemView.getClientReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
-        });
-
-        //Stack-Sensitives
-        this.registerClientbound(ClientboundStartStackSensitivesPayload.TYPE, ClientboundStartStackSensitivesPayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.stackSensitiveStartReceived(payload.amount());
-        });
-
-        this.registerClientbound(ClientboundStackSensitivePayload.TYPE, ClientboundStackSensitivePayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.stackSensitiveReceived(payload.stackSensitive());
-        });
-
-        this.registerClientbound(ClientboundFinishStackSensitivesPayload.TYPE, ClientboundFinishStackSensitivesPayload.STREAM_CODEC, (context, payload) -> {
-            LowEndRecipeCache.INSTANCE.stackSensitiveEndReceived();
-        });
-
-        /*
-         * Enclosing payloads (for update start and end)
-         */
-        this.registerClientbound(ClientboundStartUpdatesPayload.TYPE, ClientboundStartUpdatesPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(ClientRecipeManager.INSTANCE::startUpdate);
-        });
-
-        this.registerClientbound(ClientboundFinishUpdatesPayload.TYPE, ClientboundFinishUpdatesPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(ClientRecipeManager.INSTANCE::processRecipes);
-            ClientRecipeManager.INSTANCE.runTasks();
-        });
-
-        //Recipes
-        this.registerClientbound(ClientboundCacheStartPayload.TYPE, ClientboundCacheStartPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.cacheStartReceived(payload.types()));
-        });
-        this.registerClientbound(ClientboundTypeUpdateStartPayload.TYPE, ClientboundTypeUpdateStartPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.startCaching(payload.recipeType(), payload.amount()));
-        });
-        this.registerClientbound(ClientboundTypeUpdatePayload.TYPE, ClientboundTypeUpdatePayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.cacheModRecipe(payload.entry()));
-        });
-        this.registerClientbound(ClientboundTypeUpdateEndPayload.TYPE, ClientboundTypeUpdateEndPayload.STREAM_CODEC, (context, payload) -> {
-            ClientRecipeManager.INSTANCE.queueTask(() -> LowEndRecipeCache.INSTANCE.endCaching(payload.recipeType()));
-        });
-
-
         //Item-Transfer payloads
         this.registerServerbound(ServerboundTransferPayload.TYPE, ServerboundTransferPayload.STREAM_CODEC, (context, payload) -> {
             ServerRecipeManager.INSTANCE.performRecipeTransfer(context.sender(), payload.transferMap(), payload.usedPlayerSlots());
@@ -247,7 +198,7 @@ public class EivNetworkManager {
 
         });
 
-        this.registerClientbound(ClientboundCompatPayload.TYPE, ClientboundCompatPayload.STREAM_CODEC, EivPayloadConverter::convertFromCompat);
+        //this.registerClientbound(ClientboundCompatPayload.TYPE, ClientboundCompatPayload.STREAM_CODEC, EivPayloadConverter::convertFromCompat);
 
 
         //Embeddings

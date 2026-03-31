@@ -100,7 +100,7 @@ public class EntityViewRecipe implements IEivViewRecipe {
         if (level == null)
             return;
 
-        Entity entity = this.getEntityType().create(level, EntitySpawnReason.LOAD);
+        Entity entity = this.getEntityType().create(level);
         if (entity instanceof LivingEntity livingEntity) {
             this.previewEntity = livingEntity;
             this.previewEntity.setYBodyRot(30.0F);
@@ -127,7 +127,7 @@ public class EntityViewRecipe implements IEivViewRecipe {
             this.hovered = false;
 
         if (this.hovered)
-            guiGraphics.setComponentTooltipForNextFrame(screen.getFont(), List.of(Component.empty().append(entityName).withStyle(ChatFormatting.GOLD)), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
+            guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.empty().append(entityName).withStyle(ChatFormatting.GOLD), recipePosition.left() + mouseX, recipePosition.top() + mouseY);
 
     }
 

@@ -11,7 +11,6 @@ import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -28,7 +27,7 @@ public class BurningViewRecipe implements IEivViewRecipe {
         this.fuel = SlotContent.of(recipe.getFuel());
         this.burnTime = recipe.getBurnTime();
 
-        this.ticker = AnimationTicker.create(ResourceLocation.withDefaultNamespace("burning_tick_" + this.burnTime), this.burnTime);
+        this.ticker = AnimationTicker.create(new ResourceLocation("burning_tick_" + this.burnTime), this.burnTime);
     }
 
     private BurningViewRecipe(SlotContent fuel,  int burnTime, AnimationTicker ticker) {
@@ -70,7 +69,7 @@ public class BurningViewRecipe implements IEivViewRecipe {
 
         Font font = Minecraft.getInstance().font;
 
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
+        guiGraphics.blit(BuiltInEivIntegration.WIDGETS, 19, 2 + (14 - burnProgress), 0, 14 - burnProgress, 14, burnProgress, 128, 128);
         guiGraphics.drawString(font, Component.literal(this.burnTime + " ticks"), 38, 18 / 2 - font.lineHeight / 2, 0xFF808080, false);
     }
 

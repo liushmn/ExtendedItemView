@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -29,6 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
@@ -88,16 +90,10 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
         //---- Client Settings Button ----
-        SpriteIconButton btn = SpriteIconButton.builder(
-                        Component.translatable("eiv.client_settings.btn"),
-                        button -> Minecraft.getInstance().setScreen(new EivClientSettingsScreen(info.screen())),
-                        true
-                )
-                .size(18, 18)
-                .sprite(SETTINGS_WHEEL, 14, 14)
-                .build();
-
-        btn.setPosition(0, info.screenHeight() - 18);
+        ImageButton btn = new ImageButton(0, info.screenHeight() - 18, 18, 18, 0, 0, 18, SETTINGS_WHEEL, 14, 14, (button) -> {
+             Minecraft.getInstance().setScreen(new EivClientSettingsScreen(info.screen()));
+        });
+        btn.setMessage(Component.translatable("eiv.client_settings.btn"));
 
         ctx.addRenderable(btn);
     }
@@ -239,12 +235,12 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
             if (!slot.isActive() || !slot.isHighlightable())
                 return;
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(OverlayManager.INSTANCE.currentInfo().leftPos() - 1, OverlayManager.INSTANCE.currentInfo().topPos() - 1, 0.0F);
             if (!slot.hasItem() || this.availableItems.stream().noneMatch(stack -> stack.getItem() == slot.getItem().getItem())) {
                 guiGraphics.fill(slot.x, slot.y, slot.x + 18, slot.y + 18, new Color(0, 0, 0, 128).getRGB());
             }
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().popPose();
 
         });
     }

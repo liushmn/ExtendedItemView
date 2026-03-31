@@ -16,8 +16,8 @@ public class BrewingViewType implements IEivRecipeViewType {
 
     protected static final BrewingViewType INSTANCE = new BrewingViewType();
 
-    private static final ResourceLocation BREWING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/brewing.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/brewing.png");
+    private static final ResourceLocation BREWING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/brewing.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/brewing.png");
 
     @Override
     public Component getDisplayName() {
@@ -60,7 +60,7 @@ public class BrewingViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("brewing");
+        return new ResourceLocation("brewing");
     }
 
     @Override

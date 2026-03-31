@@ -171,7 +171,7 @@ public class ClientRecipeCache {
 
 
     private ResourceLocation getUniqueId(ServerRecipeManager.ServerRecipeEntry modEntry, int index) {
-        return ResourceLocation.fromNamespaceAndPath(modEntry.recipeId().getNamespace(), modEntry.recipeId().getPath() + "/" + index);
+        return new ResourceLocation(modEntry.recipeId().getNamespace(), modEntry.recipeId().getPath() + "/" + index);
     }
 
 

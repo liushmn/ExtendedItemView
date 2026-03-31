@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 public class BurningServerRecipe implements IEivServerRecipe {
 
     public static final EivRecipeType<BurningServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("burning"),
+            new ResourceLocation("burning"),
             () -> new BurningServerRecipe(null, 0)
     );
 
@@ -43,8 +43,9 @@ public class BurningServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.fuel = EivTagUtil.itemFromString(tag.getStringOr("fuel", ""));
-        this.burnTime = tag.getIntOr("burnTime", AbstractFurnaceBlockEntity.BURN_TIME_STANDARD);
+        this.fuel = EivTagUtil.itemFromString(tag.getString("fuel"));
+        this.burnTime = tag.getInt("burnTime");
+
     }
 
     @Override

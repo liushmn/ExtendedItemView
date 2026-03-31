@@ -15,8 +15,8 @@ public class CampfireViewType implements IEivRecipeViewType {
 
     protected static final CampfireViewType INSTANCE = new CampfireViewType();
 
-    private static final ResourceLocation CAMPFIRE_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/campfire.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/campfire.png");
+    private static final ResourceLocation CAMPFIRE_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/campfire.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/campfire.png");
 
     @Override
     public Component getDisplayName() {
@@ -25,7 +25,7 @@ public class CampfireViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("campfire_cooking");
+        return new ResourceLocation("campfire_cooking");
     }
 
     @Override

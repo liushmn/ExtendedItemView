@@ -12,7 +12,7 @@ public class BrewingServerRecipe implements IEivServerRecipe {
 
 
     public static final EivRecipeType<BrewingServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("brewing"),
+            new ResourceLocation("brewing"),
             () -> new BrewingServerRecipe(ItemStack.EMPTY, null, ItemStack.EMPTY)
     );
 
@@ -49,9 +49,9 @@ public class BrewingServerRecipe implements IEivServerRecipe {
     @Override
     public void loadFromTag(CompoundTag tag) {
 
-        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("result"));
-        this.magicIngredient = EivTagUtil.readIngredient(tag.getCompoundOrEmpty("magicIngredient"));
-        this.bottleIngredient = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("bottleIngredient"));
+        this.result = EivTagUtil.decodeItemStackOnClient(tag.getCompound("result"));
+        this.magicIngredient = EivTagUtil.readIngredient(tag.getCompound("magicIngredient"));
+        this.bottleIngredient = EivTagUtil.decodeItemStackOnClient(tag.getCompound("bottleIngredient"));
 
     }
 

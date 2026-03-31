@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 public class CampfireServerRecipe extends SmeltingServerRecipe {
 
     public static final EivRecipeType<CampfireServerRecipe> TYPE = EivRecipeType.register(
-            ResourceLocation.withDefaultNamespace("campfire_cooking"),
+            new ResourceLocation("campfire_cooking"),
             () -> new CampfireServerRecipe(null, ItemStack.EMPTY)
     );
 
