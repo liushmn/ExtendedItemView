@@ -41,6 +41,7 @@ import de.crafty.eiv.common.builtin.smithing.SmithingViewRecipe;
 import de.crafty.eiv.common.builtin.smoking.SmokingViewRecipe;
 import de.crafty.eiv.common.builtin.stonecutting.StonecutterViewRecipe;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
