@@ -2,15 +2,17 @@ package de.crafty.eiv.common.builtin.shaped;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
-import de.crafty.eiv.common.builtin.tipped_arrow.TippedArrowServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +23,20 @@ public class CraftingViewRecipe implements IEivViewRecipe {
     private final SlotContent result;
     private final int width, height;
 
-    public CraftingViewRecipe(ShapedServerRecipe recipe) {
+    private ResourceLocation id;
+
+    public CraftingViewRecipe(ShapedRecipe recipe) {
+
+        this.id = recipe.getId();
 
         this.width = recipe.getWidth();
         this.height = recipe.getHeight();
 
-        recipe.getIngredients().forEach((slotId, ingredient) -> this.ingredientSlotContents.put(slotId, SlotContent.of(ingredient)));
-        this.result = SlotContent.of(recipe.getResult());
+        for(int i = 0; i < recipe.getIngredients().size(); i++){
+            this.ingredientSlotContents.put(i, SlotContent.of(recipe.getIngredients().get(i)));
+        }
+
+        this.result = SlotContent.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
     }
 
@@ -38,30 +47,16 @@ public class CraftingViewRecipe implements IEivViewRecipe {
         this.height = height;
     }
 
-    public CraftingViewRecipe(TippedArrowServerRecipe recipe) {
-
-        for (int i = 0; i < 9; i++) {
-
-            if (i == 4)
-                this.ingredientSlotContents.put(i, SlotContent.of(recipe.getPotion()));
-            else
-                this.ingredientSlotContents.put(i, SlotContent.of(Items.ARROW));
-
-        }
-
-        this.width = 3;
-        this.height = 3;
-
-        ItemStack result = new ItemStack(Items.TIPPED_ARROW, 8);
-        PotionUtils.setPotion(result, recipe.getPotion())
-        result.set(DataComponents.POTION_CONTENTS, recipe.getPotion().get(DataComponents.POTION_CONTENTS));
-        this.result = SlotContent.of(result);
-
-    }
+    //TODO reimplement tipped arrow recipes
 
     @Override
     public IEivRecipeViewType getViewType() {
         return CraftingViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override

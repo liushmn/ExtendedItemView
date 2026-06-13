@@ -1,33 +1,50 @@
 package de.crafty.eiv.common.network.payload.embedding;
 
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.UUID;
+public class ServerboundShareRecipePayload implements ICustomEivPayload {
 
-public record ServerboundShareRecipePayload(ResourceLocation recipeId, CompoundTag extraData) implements CustomPacketPayload {
+    private ResourceLocation recipeId;
+    private CompoundTag extraData;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundShareRecipePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            serverboundShareRecipePayload -> serverboundShareRecipePayload.recipeId().toString(),
-            ByteBufCodecs.COMPOUND_TAG,
-            ServerboundShareRecipePayload::extraData,
-            (id, extraData) -> new ServerboundShareRecipePayload(ResourceLocation.tryParse(id), extraData)
-    );
+    public static final ResourceLocation ID = new ResourceLocation(CommonEIV.MODID, "share_recipe_to_server");
 
-    public static final Type<ServerboundShareRecipePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "share_recipe_to_server"));
+
+
+    public ServerboundShareRecipePayload(ResourceLocation recipeId, CompoundTag extraData){
+        this.recipeId = recipeId;
+        this.extraData = extraData;
+    }
+
+    public ServerboundShareRecipePayload(){}
 
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void writeTag(CompoundTag tag) {
+        tag.putString("recipeId", this.recipeId.toString());
+        tag.put("extraData", this.extraData);
+    }
+
+    @Override
+    public void readTag(CompoundTag tag) {
+        this.recipeId = ResourceLocation.tryParse(tag.getString("recipeId"));
+        this.extraData = tag.getCompound("extraData");
+    }
+
+    @Override
+    public ResourceLocation getIdentifier() {
+        return ID;
     }
 
 
+    public ResourceLocation getRecipeId() {
+        return this.recipeId;
+    }
 
+    public CompoundTag getExtraData() {
+        return this.extraData;
+    }
 }

@@ -8,8 +8,8 @@ import de.crafty.eiv.common.builtin.BuiltInEivIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -568,13 +568,13 @@ public class RecipeViewMenu extends AbstractContainerMenu {
             ItemStack playerStack = stackSupply.get(playerSlot);
             ItemStack foundStack = playerStack.copy();
 
-            if (!(checkComponents ? ItemStack.isSameItemSameComponents(playerStack, requiredStack) : ItemStack.isSameItem(playerStack, requiredStack)))
+            if (!(checkComponents ? ItemStack.isSameItemSameTags(playerStack, requiredStack) : ItemStack.isSameItem(playerStack, requiredStack)))
                 continue;
 
             if (firstFound.isEmpty())
                 firstFound = foundStack.copy();
 
-            if (!ItemStack.isSameItemSameComponents(foundStack, firstFound))
+            if (!ItemStack.isSameItemSameTags(foundStack, firstFound))
                 continue;
 
             int prevReq = requiredAmount;
@@ -676,7 +676,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     }
 
     protected void tickContents() {
-        if (Minecraft.getInstance().hasShiftDown())
+        if (AbstractContainerScreen.hasShiftDown())
             return;
 
         for (int i = 0; i < this.currentDisplay.size(); i++) {
@@ -852,7 +852,7 @@ public class RecipeViewMenu extends AbstractContainerMenu {
     public interface OptionalSlotRenderer {
 
         RecipeViewMenu.OptionalSlotRenderer DEFAULT = (guiGraphics, mouseX, mouseY, partialTicks) -> {
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
+            guiGraphics.blit(BuiltInEivIntegration.DEFAULT_SLOT_TEXTURE, 0, 0, 0, 0, 18, 18, 18, 18);
         };
 
         /**

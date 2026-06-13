@@ -1,30 +1,47 @@
 package de.crafty.eiv.common.network.payload.transfer;
 
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
-public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
-                                         HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) implements CustomPacketPayload {
+public class ServerboundTransferPayload implements ICustomEivPayload {
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundTransferPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.COMPOUND_TAG,
-            ServerboundTransferPayload::encodeMap,
-            ServerboundTransferPayload::decodeMap
+    private HashMap<Integer, Integer> transferMap;
+    private HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots;
 
-    );
 
-    public static final Type<ServerboundTransferPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_transfer"));
+    public static final ResourceLocation ID = new ResourceLocation(CommonEIV.MODID, "recipe_transfer");
+
+
+    public ServerboundTransferPayload(HashMap<Integer, Integer> transferMap, HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots) {
+        this.transferMap = transferMap;
+        this.usedPlayerSlots = usedPlayerSlots;
+    }
+
+    public ServerboundTransferPayload(){
+        this(new HashMap<>(), new HashMap<>());
+    }
+
+    @Override
+    public void writeTag(CompoundTag tag) {
+        tag.put("mapData", this.encodeMap());
+    }
+
+    @Override
+    public void readTag(CompoundTag tag) {
+        this.decodeMap(tag.getCompound("mapData"));
+    }
+
+    @Override
+    public ResourceLocation getIdentifier() {
+        return ID;
+    }
 
 
     private CompoundTag encodeMap() {
@@ -51,25 +68,25 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
         return encoded;
     }
 
-    private static ServerboundTransferPayload decodeMap(CompoundTag encoded) {
+    private ServerboundTransferPayload decodeMap(CompoundTag encoded) {
 
         HashMap<Integer, Integer> transferMap = new HashMap<>();
-        CompoundTag encodedTransferMap = encoded.getCompound("transferMap").orElseGet(CompoundTag::new);
+        CompoundTag encodedTransferMap = encoded.getCompound("transferMap");
 
-        encodedTransferMap.keySet().forEach(recipeSlot -> {
-            transferMap.put(Integer.valueOf(recipeSlot), encodedTransferMap.getInt(recipeSlot).orElse(Integer.valueOf(recipeSlot)));
+        encodedTransferMap.getAllKeys().forEach(recipeSlot -> {
+            transferMap.put(Integer.valueOf(recipeSlot), encodedTransferMap.getInt(recipeSlot));
         });
 
         HashMap<Integer, HashMap<Integer, ItemStack>> usedPlayerSlots = new HashMap<>();
-        CompoundTag encodedUsedPlayerSlots = encoded.getCompound("usedPlayerSlots").orElseGet(CompoundTag::new);
+        CompoundTag encodedUsedPlayerSlots = encoded.getCompound("usedPlayerSlots");
 
-        encodedUsedPlayerSlots.keySet().forEach(recipeSlot -> {
+        encodedUsedPlayerSlots.getAllKeys().forEach(recipeSlot -> {
             HashMap<Integer, ItemStack> usedSlots = new HashMap<>();
 
-            CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot).orElseGet(CompoundTag::new);
-            playerSlotsTag.keySet().forEach(playerSlot -> {
+            CompoundTag playerSlotsTag = encodedUsedPlayerSlots.getCompound(recipeSlot);
+            playerSlotsTag.getAllKeys().forEach(playerSlot -> {
 
-                ItemStack stack = EivTagUtil.decodeItemStackOnServer(playerSlotsTag.getCompound(playerSlot).orElseGet(CompoundTag::new));
+                ItemStack stack = EivTagUtil.decodeItemStackOnServer(playerSlotsTag.getCompound(playerSlot));
                 usedSlots.put(Integer.valueOf(playerSlot), stack);
             });
 
@@ -79,8 +96,11 @@ public record ServerboundTransferPayload(HashMap<Integer, Integer> transferMap,
         return new ServerboundTransferPayload(transferMap, usedPlayerSlots);
     }
 
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public HashMap<Integer, Integer> getTransferMap() {
+        return this.transferMap;
+    }
+
+    public HashMap<Integer, HashMap<Integer, ItemStack>> getUsedPlayerSlots() {
+        return this.usedPlayerSlots;
     }
 }

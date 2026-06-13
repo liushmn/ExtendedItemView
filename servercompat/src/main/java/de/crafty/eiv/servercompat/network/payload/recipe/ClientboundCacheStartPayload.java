@@ -11,7 +11,7 @@ public record ClientboundCacheStartPayload(int types) implements IEivCompatPacke
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "cache_start");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "cache_start");
     }
 
 

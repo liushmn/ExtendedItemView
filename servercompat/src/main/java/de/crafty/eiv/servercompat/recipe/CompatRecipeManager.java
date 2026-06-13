@@ -131,7 +131,7 @@ public class CompatRecipeManager {
 
             ResourceLocation typeId = iEivServerModRecipe.getRecipeType().getId();
             List<CompatRecipeEntry> list = PRESENT_RECIPES.getOrDefault(iEivServerModRecipe.getRecipeType(), new ArrayList<>());
-            list.add(new CompatRecipeEntry(ResourceLocation.fromNamespaceAndPath(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
+            list.add(new CompatRecipeEntry(new ResourceLocation(typeId.getNamespace(), typeId.getPath() + "/" + UUID.randomUUID()), iEivServerModRecipe));
             PRESENT_RECIPES.put(iEivServerModRecipe.getRecipeType(), list);
         });
     }

@@ -20,18 +20,20 @@ public abstract class MixinRecipeBookComponent {
 
 
     @Shadow
-    public abstract int getXOrigin();
-
-    @Shadow
-    protected abstract int getYOrigin();
-
-
-    @Shadow
     private boolean visible;
 
     @Shadow
     @Final
     private List<RecipeBookTabButton> tabButtons;
+
+    @Shadow
+    private int width;
+
+    @Shadow
+    private int xOffset;
+
+    @Shadow
+    private int height;
 
     @Inject(method = "init", at = @At("TAIL"))
     private void injectBlocking$0(CallbackInfo ci) {
@@ -52,15 +54,15 @@ public abstract class MixinRecipeBookComponent {
 
         if (!this.visible) {
             OverlayManager.INSTANCE.removeGuiBlocking(ResourceLocation -> ResourceLocation.getPath().startsWith("recipetabbutton_"), false);
-            OverlayManager.INSTANCE.removeGuiBlocking(ResourceLocation.withDefaultNamespace("recipebook"), false);
+            OverlayManager.INSTANCE.removeGuiBlocking(new ResourceLocation("recipebook"), false);
             return;
         }
 
         //Width and height hardcoded
         OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                ResourceLocation.withDefaultNamespace("recipebook"),
-                this.getXOrigin(),
-                this.getYOrigin(),
+                new ResourceLocation("recipebook"),
+                (this.width - 147) / 2 - this.xOffset - 30,
+                (this.height - 166) / 2 + 3,
                 147,
                 166
         ));
@@ -79,7 +81,7 @@ public abstract class MixinRecipeBookComponent {
 
             if (tabButton.visible)
                 OverlayManager.INSTANCE.setGuiBlocking(new BlockingGuiComponent(
-                        ResourceLocation.withDefaultNamespace("recipetabbutton_" + i),
+                        new ResourceLocation("recipetabbutton_" + i),
                         tabButton.getX(),
                         tabButton.getY(),
                         tabButton.getWidth(),

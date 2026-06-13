@@ -12,7 +12,7 @@ public class CompatStonecutterRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatStonecutterRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("stonecutting")
+            new ResourceLocation("stonecutting")
     );
 
     private RecipeChoice input;

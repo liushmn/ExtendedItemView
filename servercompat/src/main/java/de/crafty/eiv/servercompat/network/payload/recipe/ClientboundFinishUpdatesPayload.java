@@ -10,7 +10,7 @@ public record ClientboundFinishUpdatesPayload() implements IEivCompatPacketPaylo
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "finish_updates");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "finish_updates");
     }
 
     @Override

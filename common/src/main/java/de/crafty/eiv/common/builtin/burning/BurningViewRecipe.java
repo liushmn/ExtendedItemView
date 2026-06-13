@@ -11,26 +11,31 @@ import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 
 import java.util.List;
 
 public class BurningViewRecipe implements IEivViewRecipe {
 
+    private final ResourceLocation id;
     private final SlotContent fuel;
     private final int burnTime;
 
     private final AnimationTicker ticker;
 
-    public BurningViewRecipe(BurningServerRecipe recipe) {
-        this.fuel = SlotContent.of(recipe.getFuel());
-        this.burnTime = recipe.getBurnTime();
+    public BurningViewRecipe(Item fuel, int burnTime) {
+        this.id = BuiltInRegistries.ITEM.getKey(fuel);
+        this.fuel = SlotContent.of(fuel);
+        this.burnTime = burnTime;
 
         this.ticker = AnimationTicker.create(new ResourceLocation("burning_tick_" + this.burnTime), this.burnTime);
     }
 
-    private BurningViewRecipe(SlotContent fuel,  int burnTime, AnimationTicker ticker) {
+    private BurningViewRecipe(ResourceLocation id, SlotContent fuel,  int burnTime, AnimationTicker ticker) {
+        this.id = id;
         this.fuel = fuel;
         this.burnTime = burnTime;
         this.ticker = ticker;
@@ -39,6 +44,11 @@ public class BurningViewRecipe implements IEivViewRecipe {
     @Override
     public IEivRecipeViewType getViewType() {
         return BurningViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -107,6 +117,6 @@ public class BurningViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new BurningViewRecipe(this.fuel.copy(), this.burnTime, this.ticker.copy());
+        return new BurningViewRecipe(this.id, this.fuel.copy(), this.burnTime, this.ticker.copy());
     }
 }

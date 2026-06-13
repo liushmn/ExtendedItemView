@@ -24,7 +24,7 @@ public class BookmarkConfig extends AbstractEivConfig {
                JsonObject encodedItem = element.getAsJsonObject();
 
                try {
-                   ItemBookmarkOverlay.INSTANCE.availableItems().add(ItemStack.CODEC.decode(JsonOps.INSTANCE, encodedItem).getOrThrow().getFirst());
+                   ItemBookmarkOverlay.INSTANCE.availableItems().add(ItemStack.CODEC.decode(JsonOps.INSTANCE, encodedItem).getOrThrow(false, CommonEIV.LOGGER::error).getFirst());
                }catch (Exception e) {
                    CommonEIV.LOGGER.error("Failed to load item from json: {}", encodedItem);
                }
@@ -40,7 +40,7 @@ public class BookmarkConfig extends AbstractEivConfig {
         ItemBookmarkOverlay.INSTANCE.availableItems().forEach(itemStack -> {
 
             try {
-                itemList.add(ItemStack.CODEC.encode(itemStack, JsonOps.INSTANCE, new JsonObject()).getOrThrow().getAsJsonObject());
+                itemList.add(ItemStack.CODEC.encode(itemStack, JsonOps.INSTANCE, new JsonObject()).getOrThrow(false, CommonEIV.LOGGER::error));
             }catch (Exception e) {
                 CommonEIV.LOGGER.error("Could not save bookmarked item: {}", itemStack.toString());
             }

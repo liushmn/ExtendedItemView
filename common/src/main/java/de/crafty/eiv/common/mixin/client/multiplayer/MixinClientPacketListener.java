@@ -1,21 +1,16 @@
 package de.crafty.eiv.common.mixin.client.multiplayer;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.ParseResults;
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.network.EivNetworkManager;
-import de.crafty.eiv.common.recipe.ClientRecipeManager;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.Connection;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.TickablePacketListener;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -27,37 +22,46 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPacketListener.class)
-public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl implements ClientGamePacketListener, TickablePacketListener {
+public abstract class MixinClientPacketListener implements TickablePacketListener, ClientGamePacketListener {
 
 
-    @Shadow public CommandDispatcher<SharedSuggestionProvider> commands;
+    @Shadow
+    public CommandDispatcher<SharedSuggestionProvider> commands;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
-    protected MixinClientPacketListener(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
-        super(minecraft, connection, commonListenerCookie);
-    }
+
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
     @Inject(method = "handleLogin", at = @At("RETURN"))
     private void requestRecipes(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
-        ClientRecipeManager.INSTANCE.requestServerEivData();
         ItemView.getClientReloadCallbacks().forEach(ItemView.ReloadCallback::onReload);
     }
 
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void onEivPayloadReceived(CustomPacketPayload payload, CallbackInfo ci) {
-        ResourceLocation payloadId = payload.type().id();
+    private void onEivPayloadReceived(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
+        ResourceLocation payloadId = packet.getIdentifier();
 
-        EivNetworkManager.INSTANCE.getClientbound().forEach((ResourceLocation, typeAndCodec) -> {
+        EivNetworkManager.INSTANCE.getClientPayloadHandlers().forEach((id, payloadHandler) -> {
 
-            if (!payloadId.equals(ResourceLocation))
+            if (!id.equals(payloadId))
                 return;
 
-            if (EivNetworkManager.INSTANCE.clientPayloadHandlers().containsKey(payloadId)) {
-                EivNetworkManager.INSTANCE.clientPayloadHandlers().get(payloadId).handle(new EivNetworkManager.ClientContext(this.minecraft), EivNetworkManager.INSTANCE.castPayload(payload));
+            CompoundTag data = packet.getData().readNbt();
+            if (EivNetworkManager.INSTANCE.getClientPayloadFactories().containsKey(payloadId)) {
+
+                ICustomEivPayload payload = EivNetworkManager.INSTANCE.getClientPayloadFactories().get(payloadId).createEmpty();
+                payload.readTag(data);
+                payloadHandler.handle(new EivNetworkManager.ClientContext(this.minecraft), EivNetworkManager.INSTANCE.castPayload(payload));
+
             } else
-                CommonEIV.LOGGER.error("Cannot resolve payload handler for id: {}", payloadId);
+                LOGGER.error("Cannot resolve payload factory for id: {}", payloadId);
+
 
             ci.cancel();
         });

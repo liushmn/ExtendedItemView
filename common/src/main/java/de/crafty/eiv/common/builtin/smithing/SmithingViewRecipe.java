@@ -4,73 +4,83 @@ import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
-import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.armortrim.*;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.item.equipment.trim.TrimPattern;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //TODO split Smithing recipes in upgrade and trim recipes
 public class SmithingViewRecipe implements IEivViewRecipe {
 
+    private final ResourceLocation id;
     private final SlotContent additionIngredient;
     private final SlotContent base, template;
     private final SlotContent result;
-
     private final boolean isTrimType;
-    private final TransmuteResult upgradeResult;
 
-    public SmithingViewRecipe(boolean isTrimType, Ingredient additionIngredient, Ingredient base, Ingredient template, TrimPattern trimPattern, @Nullable TransmuteResult upgradeResult) {
+    public SmithingViewRecipe(ResourceLocation id, Ingredient additionIngredient, ItemStack base, ItemStack template, ItemStack result, boolean isTrimType) {
+        this.id = id;
+
         this.isTrimType = isTrimType;
 
-        this.template = template != null ? SlotContent.of(template) : SlotContent.of(Items.AIR);
-        this.base = base != null ? SlotContent.of(base) : SlotContent.of(Items.AIR);
-        this.additionIngredient = additionIngredient != null ? SlotContent.of(additionIngredient) : SlotContent.of(Items.AIR);
-        this.upgradeResult = upgradeResult;
+        this.additionIngredient = SlotContent.of(additionIngredient);
+        this.base = SlotContent.of(base);
+        this.template = SlotContent.of(template);
 
-        if (Minecraft.getInstance().player == null) {
-            this.result = SlotContent.of(Items.AIR);
-            return;
-        }
+        if (isTrimType) {
+            Optional<Holder.Reference<TrimPattern>> pattern = TrimPatterns.getFromTemplate(Minecraft.getInstance().level.registryAccess(), template);
 
-        HolderLookup.Provider provider = Minecraft.getInstance().player.level().registryAccess();
-
-        if (this.isTrimType) {
-            List<ItemStack> possibleResults = new ArrayList<>();
-
+            List<ItemStack> results = new ArrayList<>();
             this.additionIngredient.getValidContents().forEach(addition -> {
-                possibleResults.add(SmithingTrimRecipe.applyTrim(provider, this.base.next(), addition, Holder.direct(trimPattern)));
+                Optional<Holder.Reference<TrimMaterial>> material = TrimMaterials.getFromIngredient(Minecraft.getInstance().level.registryAccess(), addition);
+
+                if (material.isEmpty() || pattern.isEmpty())
+                    return;
+
+                ItemStack resultStack = base.copy();
+                ArmorTrim trim = new ArmorTrim(material.get(), pattern.get());
+                ArmorTrim.setTrim(Minecraft.getInstance().level.registryAccess(), resultStack, trim);
+                results.add(resultStack);
             });
 
-            this.result = SlotContent.of(possibleResults);
-
+            this.result = SlotContent.of(results);
             return;
         }
 
-        this.result = SlotContent.of(this.upgradeResult == null ? ItemStack.EMPTY : this.upgradeResult.apply(this.base.next()));
+        ItemStack resultStack = result.copy();
+        if (base.hasTag())
+            resultStack.setTag(base.getOrCreateTag().copy());
+
+        this.result = SlotContent.of(resultStack);
     }
 
-    private SmithingViewRecipe(SlotContent additionIngredient, SlotContent base, SlotContent template, SlotContent result, boolean isTrimType,  TransmuteResult upgradeResult) {
+    private SmithingViewRecipe(ResourceLocation id, SlotContent additionIngredient, SlotContent base, SlotContent template, SlotContent result, boolean isTrimType) {
+        this.id = id;
+
+        this.isTrimType = isTrimType;
+
         this.additionIngredient = additionIngredient;
         this.base = base;
         this.template = template;
         this.result = result;
-        this.isTrimType = isTrimType;
-        this.upgradeResult = upgradeResult;
     }
 
     @Override
     public IEivRecipeViewType getViewType() {
         return SmithingViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -121,6 +131,6 @@ public class SmithingViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new SmithingViewRecipe(this.additionIngredient.copy(), this.base.copy(), this.template.copy(), this.result.copy(), this.isTrimType, this.upgradeResult);
+        return new SmithingViewRecipe(this.id, this.additionIngredient.copy(), this.base.copy(), this.template.copy(), this.result.copy(), this.isTrimType);
     }
 }

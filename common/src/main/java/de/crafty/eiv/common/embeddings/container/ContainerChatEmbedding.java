@@ -2,18 +2,17 @@ package de.crafty.eiv.common.embeddings.container;
 
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.ItemView;
-import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,11 +53,11 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
     }
 
     @Override
-    protected void mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         this.slots.forEach((slot) -> {
 
-            if (slot.isHovered((int) event.x(), (int) event.y()))
-                slot.onClick(event);
+            if (slot.isHovered(mouseX, mouseY))
+                slot.onClick(mouseX, mouseY, mouseButton);
         });
     }
 
@@ -117,14 +116,15 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
             this.boundViewType = boundViewType;
         }
 
-        private void onClick(MouseButtonEvent event) {
+        private void onClick(int mouseX, int mouseY, int mouseButton) {
 
             ItemStack copy = this.stack.copy();
-            if (copy.has(EivDataComponents.EMBEDDING_DATA))
-                copy.remove(EivDataComponents.EMBEDDING_DATA);
+            CompoundTag tag = copy.getTag() == null ? new CompoundTag() : copy.getTag();
+            if (tag.contains("eiv_embedding_data"))
+                tag.remove("eiv_embedding_data");
 
 
-            if (event.button() == 0)
+            if (mouseButton == 0)
                 ItemView.openForStackResult(copy, this.boundViewType);
             else
                 ItemView.openForStackIngredient(copy, this.boundViewType);
@@ -135,26 +135,26 @@ public abstract class ContainerChatEmbedding extends ChatEmbedding {
             float chatScaling = Minecraft.getInstance().options.chatScale().get().floatValue();
 
             if (this.isHovered(mouseX, mouseY)){
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().scale(this.guiScaling, this.guiScaling);
-                guiGraphics.fill(this.x, this.y, this.x + SIZE, this.y + SIZE, ARGB.color(32, 255, 255, 255));
-                guiGraphics.pose().popMatrix();
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().scale(this.guiScaling, this.guiScaling, 1.0F);
+                guiGraphics.fill(this.x, this.y, this.x + SIZE, this.y + SIZE, new Color(32, 255, 255, 255).getRGB());
+                guiGraphics.pose().popPose();
             }
 
 
             EmbeddingData data = new EmbeddingData(this.bound.getLineAlpha());
-            this.stack.set(EivDataComponents.EMBEDDING_DATA, data);
+            this.stack.getOrCreateTag().put("eiv_embedding_data", EmbeddingData.CODEC.encode(data, NbtOps.INSTANCE, new CompoundTag()).result().orElseThrow());
 
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().scale(this.guiScaling, this.guiScaling);
-            guiGraphics.pose().translate(this.x, this.y);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(this.guiScaling, this.guiScaling, 1.0F);
+            guiGraphics.pose().translate(this.x, this.y, 0);
             guiGraphics.renderItem(this.stack, 0, 0);
             guiGraphics.renderItemDecorations(Minecraft.getInstance().font, this.stack, 0, 0);
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().popPose();
 
             if (this.isHovered(mouseX, mouseY) && !this.stack.isEmpty())
-                guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.stack, mouseX + Math.round(ChatEmbedding.getEmbeddingXOffset() * this.guiScaling * chatScaling), mouseY + ChatEmbedding.getYPosition(this.bound));
+                guiGraphics.renderTooltip(Minecraft.getInstance().font, this.stack, mouseX + Math.round(ChatEmbedding.getEmbeddingXOffset() * this.guiScaling * chatScaling), mouseY + ChatEmbedding.getYPosition(this.bound));
         }
 
         private boolean isHovered(int mouseX, int mouseY) {

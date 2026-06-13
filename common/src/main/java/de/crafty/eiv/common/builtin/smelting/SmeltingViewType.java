@@ -15,8 +15,8 @@ public class SmeltingViewType implements IEivRecipeViewType {
 
     public static final SmeltingViewType INSTANCE = new SmeltingViewType();
 
-    private static final ResourceLocation SMELTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smelting.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smelting.png");
+    private static final ResourceLocation SMELTING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/smelting.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/smelting.png");
 
     @Override
     public Component getDisplayName() {
@@ -25,7 +25,7 @@ public class SmeltingViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("furnace_smelting");
+        return new ResourceLocation("furnace_smelting");
     }
 
     @Override

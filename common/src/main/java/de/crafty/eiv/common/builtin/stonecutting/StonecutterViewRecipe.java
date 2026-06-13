@@ -6,27 +6,37 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.StonecutterRecipe;
 
 import java.util.List;
 
 public class StonecutterViewRecipe implements IEivViewRecipe {
 
 
+    private final ResourceLocation id;
     private final SlotContent input, result;
 
-    public StonecutterViewRecipe(StonecutterServerRecipe stonecutterRecipe) {
-        this.input = SlotContent.of(stonecutterRecipe.getInput());
-        this.result = SlotContent.of(stonecutterRecipe.getResult());
+    public StonecutterViewRecipe(StonecutterRecipe stonecutterRecipe) {
+        this.id = stonecutterRecipe.getId();
+        this.input = SlotContent.of(stonecutterRecipe.getIngredients().get(0));
+        this.result = SlotContent.of(stonecutterRecipe.getResultItem(null));
     }
 
-    private StonecutterViewRecipe(SlotContent input, SlotContent result) {
-        this.input =  input;
+    private StonecutterViewRecipe(ResourceLocation id, SlotContent input, SlotContent result) {
+        this.id = id;
+        this.input = input;
         this.result = result;
     }
 
     @Override
     public IEivRecipeViewType getViewType() {
         return StonecutterViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -65,6 +75,6 @@ public class StonecutterViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new StonecutterViewRecipe(this.input.copy(), this.result.copy());
+        return new StonecutterViewRecipe(this.id, this.input.copy(), this.result.copy());
     }
 }

@@ -1,39 +1,30 @@
 package de.crafty.eiv.common.network;
 
 import com.mojang.authlib.GameProfile;
-import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.container.RecipeChatEmbedding;
-import de.crafty.eiv.common.network.payload.compat.ClientboundCompatPayload;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
 import de.crafty.eiv.common.network.payload.embedding.ClientboundShareRecipePayload;
 import de.crafty.eiv.common.network.payload.embedding.ServerboundShareRecipePayload;
 import de.crafty.eiv.common.network.payload.mode.ServerboundPickCheatmodeItemPayload;
-import de.crafty.eiv.common.network.payload.recipe.*;
-import de.crafty.eiv.common.network.payload.reload.ClientboundServerReloadPayload;
-import de.crafty.eiv.common.network.payload.stack.ClientboundFinishStackSensitivesPayload;
-import de.crafty.eiv.common.network.payload.stack.ClientboundStackSensitivePayload;
-import de.crafty.eiv.common.network.payload.stack.ClientboundStartStackSensitivesPayload;
 import de.crafty.eiv.common.network.payload.transfer.ClientboundUpdateTransferCachePayload;
 import de.crafty.eiv.common.network.payload.transfer.ServerboundTransferPayload;
 import de.crafty.eiv.common.recipe.ClientRecipeCache;
-import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
-import de.crafty.eiv.common.recipe.cache.LowEndRecipeCache;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
+import io.netty.buffer.Unpooled;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
@@ -41,7 +32,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * Network Manager for all EIV packets
+ * Network Manager for all EIV packets TODO re-implement all relevant packets
  */
 public class EivNetworkManager {
 
@@ -50,137 +41,63 @@ public class EivNetworkManager {
      */
     public static final EivNetworkManager INSTANCE = new EivNetworkManager().registerPayloads();
 
-    private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> clientbound;
-    private final HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> serverbound;
 
-    /**
-     * Payload handlers are used for packet processing on the client and server side
-     */
-    private final HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers;
-    private final HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers;
+    private final HashMap<ResourceLocation, EivClientPayloadHandler<?>> clientPayloadHandlers = new HashMap<>();
+    private final HashMap<ResourceLocation, EivServerPayloadHandler<?>> serverPayloadHandlers = new HashMap<>();
 
-    private EivNetworkManager() {
-        this.clientbound = new HashMap<>();
-        this.serverbound = new HashMap<>();
+    private final HashMap<ResourceLocation, PayloadFactory<?>> clientPayloadFactories = new HashMap<>();
+    private final HashMap<ResourceLocation, PayloadFactory<?>> serverPayloadFactories = new HashMap<>();
 
-        this.clientPayloadHandlers = new HashMap<>();
-        this.serverPayloadHandlers = new HashMap<>();
+    public <T extends ICustomEivPayload> void sendPayloadToServer(T payload) {
+        if (Minecraft.getInstance().getConnection() == null)
+            return;
+
+        CompoundTag tag = new CompoundTag();
+        payload.writeTag(tag);
+
+        FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(Unpooled.buffer());
+        friendlyByteBuf.writeNbt(tag);
+
+        Minecraft.getInstance().getConnection().send(new ServerboundCustomPayloadPacket(payload.getIdentifier(), friendlyByteBuf));
+
     }
 
-    /**
-     * Registers a new clientbound packet type
-     *
-     * @param type          The packet type
-     * @param codec         The codec for the packet
-     * @param clientHandler The client payload handler
-     */
-    private <B extends FriendlyByteBuf, T extends CustomPacketPayload> void registerClientbound(CustomPacketPayload.Type<T> type, StreamCodec<B, T> codec, PayloadHandler<ClientContext, T> clientHandler) {
-        this.clientbound.put(type.id(), new CustomPacketPayload.TypeAndCodec<>(type, codec));
-        this.clientPayloadHandlers.put(type.id(), clientHandler);
+    public <T extends ICustomEivPayload> void sendPayloadToClient(ServerPlayer player, T payload) {
+
+        CompoundTag tag = new CompoundTag();
+        payload.writeTag(tag);
+        FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(Unpooled.buffer());
+        friendlyByteBuf.writeNbt(tag);
+
+        player.connection.send(new ClientboundCustomPayloadPacket(friendlyByteBuf));
     }
 
-    /**
-     * Registers a new serverbound packet type
-     * @param type The packet type
-     * @param codec The codec for the packet
-     * @param serverHandler The server payload handler
-     */
-    private <B extends FriendlyByteBuf, T extends CustomPacketPayload> void registerServerbound(CustomPacketPayload.Type<T> type, StreamCodec<B, T> codec, PayloadHandler<ServerContext, T> serverHandler) {
-        this.serverbound.put(type.id(), new CustomPacketPayload.TypeAndCodec<>(type, codec));
-        this.serverPayloadHandlers.put(type.id(), serverHandler);
-    }
+    private EivNetworkManager registerPayloads() {
 
+        this.registerServerbound(ServerboundTransferPayload.ID, (context, payload) -> {
+            ServerRecipeManager.INSTANCE.performRecipeTransfer(context.sender(), payload.getTransferMap(), payload.getUsedPlayerSlots());
+        }, ServerboundTransferPayload::new);
 
-    /**
-     * @return ALl clientbound packets
-     */
-    public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getClientbound() {
-        return this.clientbound;
-    }
-
-    /**
-     * @return All serverbound packets
-     */
-    public HashMap<ResourceLocation, CustomPacketPayload.TypeAndCodec<?, ?>> getServerbound() {
-        return this.serverbound;
-    }
-
-    /**
-     * Returns all registered payload handlers for clientbound packets
-     *
-     * @return
-     */
-    public HashMap<ResourceLocation, PayloadHandler<ClientContext, ? extends CustomPacketPayload>> clientPayloadHandlers() {
-        return this.clientPayloadHandlers;
-    }
-
-    /**
-     * Returns all registered payload handlers for serverbound packets
-     *
-     * @return
-     */
-    public HashMap<ResourceLocation, PayloadHandler<ServerContext, ? extends CustomPacketPayload>> serverPayloadHandlers() {
-        return this.serverPayloadHandlers;
-    }
-
-
-    //:D
-    public <T extends CustomPacketPayload> T castPayload(CustomPacketPayload payload) {
-        return (T) payload;
-    }
-
-    /**
-     * Send a payload to the server
-     *
-     * @param payload The payload
-     */
-    public void sendPacketToServer(CustomPacketPayload payload) {
-        if (Minecraft.getInstance().getConnection() != null)
-            Minecraft.getInstance().getConnection().send(new ServerboundCustomPayloadPacket(payload));
-    }
-
-    /**
-     * Send a payload to a player
-     *
-     * @param player  The player
-     * @param payload The payload
-     */
-    public void sendPacket(ServerPlayer player, CustomPacketPayload payload) {
-        player.connection.send(new ClientboundCustomPayloadPacket(payload));
-    }
-
-
-    /**
-     * Registers all EIV payloads
-     *
-     * @return The instance of the NetworkManager
-     */
-    public EivNetworkManager registerPayloads() {
-
-        //Item-Transfer payloads
-        this.registerServerbound(ServerboundTransferPayload.TYPE, ServerboundTransferPayload.STREAM_CODEC, (context, payload) -> {
-            ServerRecipeManager.INSTANCE.performRecipeTransfer(context.sender(), payload.transferMap(), payload.usedPlayerSlots());
-        });
-        this.registerClientbound(ClientboundUpdateTransferCachePayload.TYPE, ClientboundUpdateTransferCachePayload.STREAM_CODEC, (context, payload) -> {
+        //-------------- Item Transfer Cache --------------
+        this.registerClientbound(ClientboundUpdateTransferCachePayload.ID, (context, payload) -> {
             if (context.client.screen instanceof RecipeViewScreen viewScreen)
                 viewScreen.getMenu().updateTransferCache();
-        });
 
+        }, ClientboundUpdateTransferCachePayload::new);
 
-        //Cheatmode
-        this.registerServerbound(ServerboundPickCheatmodeItemPayload.TYPE, ServerboundPickCheatmodeItemPayload.STREAM_CODEC, (context, payload) -> {
-
-            if (context.sender().permissions().hasPermission(Permissions.COMMANDS_ADMIN)) {
+        //-------------- Cheat Mode --------------
+        this.registerServerbound(ServerboundPickCheatmodeItemPayload.ID, (context, payload) -> {
+            if (context.sender().hasPermissions(3)) {
                 context.sender().sendSystemMessage(
                         Component.literal("Cheated x").withStyle(ChatFormatting.GRAY)
                                 .append(
-                                        Component.literal(String.valueOf(payload.amount())).withStyle(ChatFormatting.GOLD)
+                                        Component.literal(String.valueOf(payload.getAmount())).withStyle(ChatFormatting.GOLD)
                                 )
                                 .append(" ")
-                                .append(payload.stack().getDisplayName().copy())
+                                .append(payload.getStack().getDisplayName().copy())
                 );
 
-                context.sender().addItem(payload.stack().copyWithCount(payload.amount()));
+                context.sender().addItem(payload.getStack().copyWithCount(payload.getAmount()));
                 context.sender().level().playSound(
                         null,
                         context.sender().getX(),
@@ -195,66 +112,86 @@ public class EivNetworkManager {
                 context.sender().sendSystemMessage(
                         Component.translatable("cheatmode.eiv.denied").withStyle(ChatFormatting.RED)
                 );
-
-        });
-
-        //this.registerClientbound(ClientboundCompatPayload.TYPE, ClientboundCompatPayload.STREAM_CODEC, EivPayloadConverter::convertFromCompat);
+        }, ServerboundPickCheatmodeItemPayload::new);
 
 
-        //Embeddings
-
-        this.registerServerbound(ServerboundShareRecipePayload.TYPE, ServerboundShareRecipePayload.STREAM_CODEC, (context, payload) -> {
-            context.server().getPlayerList().getPlayers().forEach(player -> {
-                this.sendPacket(player, new ClientboundShareRecipePayload(payload.recipeId(), payload.extraData(), context.sender().getUUID()));
-            });
-        });
-
-        this.registerClientbound(ClientboundShareRecipePayload.TYPE, ClientboundShareRecipePayload.STREAM_CODEC, (context, payload) -> {
+        //-------------- Recipe Sharing --------------
+        this.registerClientbound(ClientboundShareRecipePayload.ID, (context, payload) -> {
 
             if(!Configs.CLIENT_SETTINGS.chatEmbeddings())
                 return;
 
-            Optional<GameProfile> profile = context.client().getConnection().getListedOnlinePlayers().stream().map(PlayerInfo::getProfile).filter(gameProfile -> gameProfile.id().equals(payload.sender())).findFirst();
-            profile.ifPresent(gameProfile -> ChatEmbedding.addToChatQueue(new RecipeChatEmbedding(ClientRecipeCache.INSTANCE.getRecipe(payload.recipeId()), payload.extraData(), gameProfile.name())));
+            Optional<GameProfile> profile = context.client().getConnection().getListedOnlinePlayers().stream().map(PlayerInfo::getProfile).filter(gameProfile -> gameProfile.getId().equals(payload.getSender())).findFirst();
+            profile.ifPresent(gameProfile -> ChatEmbedding.addToChatQueue(new RecipeChatEmbedding(ClientRecipeCache.INSTANCE.getRecipe(payload.getRecipeId()), payload.getExtraData(), gameProfile.getName())));
 
-        });
+        }, ClientboundShareRecipePayload::new);
+
+
+        this.registerServerbound(ServerboundShareRecipePayload.ID, (context, payload) -> {
+            context.server().getPlayerList().getPlayers().forEach(player -> {
+                this.sendPayloadToClient(player, new ClientboundShareRecipePayload(payload.getRecipeId(), payload.getExtraData(), context.sender().getUUID()));
+            });
+        }, ServerboundShareRecipePayload::new);
 
         return this;
     }
 
 
-    /**
-     * The context where the packet is handled in (either client or server)
-     */
-    public interface Context {
+    private <T extends ICustomEivPayload> void registerClientbound(ResourceLocation id, EivClientPayloadHandler<T> handler, PayloadFactory<T> factory) {
+        this.clientPayloadHandlers.put(id, handler);
+        this.clientPayloadFactories.put(id, factory);
     }
 
-    /**
-     * Network context containing relevant information for client packet handling
-     *
-     * @param client The client instance
-     */
-    public record ClientContext(Minecraft client) implements Context {
+    private <T extends ICustomEivPayload> void registerServerbound(ResourceLocation id, EivServerPayloadHandler<T> handler, PayloadFactory<T> factory) {
+        this.serverPayloadHandlers.put(id, handler);
+        this.serverPayloadFactories.put(id, factory);
     }
 
-    /**
-     * Network context containing relevant information for server packet handling
-     *
-     * @param server The server instance
-     * @param sender The player who sent the packet
-     */
-    public record ServerContext(MinecraftServer server, ServerPlayer sender) implements Context {
+
+    public HashMap<ResourceLocation, EivClientPayloadHandler<?>> getClientPayloadHandlers() {
+        return this.clientPayloadHandlers;
     }
 
-    /**
-     * Functional interface containing the packet handling logic
-     *
-     * @param <S> The context (Either ClientContext or ServerContext)
-     * @param <T> The payload type
-     */
-    public interface PayloadHandler<S extends Context, T extends CustomPacketPayload> {
-
-        void handle(S context, T payload);
+    public HashMap<ResourceLocation, EivServerPayloadHandler<?>> getServerPayloadHandlers() {
+        return this.serverPayloadHandlers;
     }
 
+    public HashMap<ResourceLocation, PayloadFactory<?>> getClientPayloadFactories() {
+        return this.clientPayloadFactories;
+    }
+
+    public HashMap<ResourceLocation, PayloadFactory<?>> getServerPayloadFactories() {
+        return this.serverPayloadFactories;
+    }
+
+    public <T extends ICustomEivPayload> T castPayload(ICustomEivPayload payload) {
+        return (T) payload;
+    }
+
+    public record ClientContext(Minecraft client) {
+
+    }
+
+    public record ServerContext(MinecraftServer server, ServerPlayer sender) {
+
+    }
+
+
+    public interface EivClientPayloadHandler<T extends ICustomEivPayload> {
+
+        void handle(ClientContext context, T payload);
+
+    }
+
+    public interface EivServerPayloadHandler<T extends ICustomEivPayload> {
+
+        void handle(ServerContext context, T payload);
+    }
+
+
+    public interface PayloadFactory<T extends ICustomEivPayload> {
+
+        T createEmpty();
+
+    }
 }

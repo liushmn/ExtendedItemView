@@ -2,30 +2,22 @@ package de.crafty.eiv.common.recipe.inventory;
 
 import com.mojang.datafixers.util.Either;
 import de.crafty.eiv.common.CommonEIV;
-import de.crafty.eiv.common.api.recipe.ItemView;
 import de.crafty.eiv.common.extra.FluidStack;
-import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
-import de.crafty.eiv.common.recipe.ClientRecipeCache;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +26,7 @@ public class SlotContent {
     private final List<ItemStack> content;
     private int current;
 
-    private TagKey<Item> itemTag;
+    private List<TagKey<Item>> itemTags;
 
     private ItemStack itemOrigin;
     private SlotContent.Type originType;
@@ -53,6 +45,8 @@ public class SlotContent {
         this.originType = SlotContent.Type.ANY;
 
         this.type = Type.INGREDIENT;
+
+        this.itemTags = new ArrayList<>();
     }
 
     public SlotContent copy() {
@@ -61,7 +55,7 @@ public class SlotContent {
 
         copy.type = this.type;
         copy.itemOrigin = this.itemOrigin.copy();
-        copy.itemTag = this.itemTag;
+        copy.itemTags = this.itemTags;
         copy.originType = this.originType;
         copy.current = this.current;
 
@@ -77,8 +71,10 @@ public class SlotContent {
     }
 
     private SlotContent bindItemTag(TagKey<Item> tag) {
-        this.itemTag = tag;
-        this.setDataComponent();
+        if(!this.itemTags.contains(tag))
+            this.itemTags.add(tag);
+
+        this.updateTags();
         return this;
     }
 
@@ -131,14 +127,18 @@ public class SlotContent {
         return this.content;
     }
 
-    private void setDataComponent() {
-        if (this.itemTag().isEmpty())
+    private void updateTags() {
+        if (this.itemTags().isEmpty())
             return;
 
         this.content.forEach(stack -> {
-            CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-            tag.putString(CommonEIV.MODID + "_recipeTag", this.itemTag().get().location().toString());
-            CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
+            CompoundTag tag = stack.getOrCreateTag();
+            ListTag itemTags = new ListTag();
+            this.itemTags.forEach(tagKey -> {
+                itemTags.add(StringTag.valueOf(tagKey.location().toString()));
+            });
+
+            tag.put(CommonEIV.MODID + "_recipeTag", itemTags);
         });
 
     }
@@ -168,8 +168,8 @@ public class SlotContent {
     }
 
 
-    public Optional<TagKey<Item>> itemTag() {
-        return this.itemTag == null ? Optional.empty() : Optional.of(this.itemTag);
+    public List<TagKey<Item>> itemTags() {
+        return this.itemTags;
     }
 
 
@@ -184,10 +184,10 @@ public class SlotContent {
 
     public void decodeDetails(CompoundTag tag) {
 
-        this.current = tag.getIntOr("current", 0);
-        this.originType = Type.valueOf(tag.getString("originType").orElseThrow());
-        this.type = Type.valueOf(tag.getString("type").orElseThrow());
-        this.itemOrigin = EivTagUtil.decodeItemStackOnClient(tag.getCompoundOrEmpty("itemOrigin"));
+        this.current = tag.getInt("current");
+        this.originType = Type.valueOf(tag.getString("originType"));
+        this.type = Type.valueOf(tag.getString("type"));
+        this.itemOrigin = EivTagUtil.decodeItemStackOnClient(tag.getCompound("itemOrigin"));
 
     }
 
@@ -242,20 +242,27 @@ public class SlotContent {
         if (ingredient == null)
             return SlotContent.of();
 
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = ((IngredientAccessor) (Object) ingredient).getValues().unwrap();
+        List<ItemStack> stacks = new ArrayList<>();
+        List<TagKey<Item>> tags = new ArrayList<>();
 
-        if (ingredientContent.right().isPresent()) {
-            List<ItemStack> stacks = new ArrayList<>();
-            ingredientContent.right().get().forEach(holder -> stacks.add(new ItemStack(holder.value())));
-            return new SlotContent(stacks);
+        for(Ingredient.Value value : ingredient.values){
+            if(value instanceof Ingredient.ItemValue itemValue)
+                stacks.addAll(itemValue.getItems());
+
+            if(value instanceof Ingredient.TagValue tagValue){
+                tags.add(tagValue.tag);
+                stacks.addAll(tagValue.getItems());
+            }
         }
 
-        return ingredientContent.left().isPresent() ? SlotContent.of(ingredientContent.left().get()) : SlotContent.of(Items.AIR);
+        SlotContent slotContent = new SlotContent(stacks);
+        tags.forEach(slotContent::bindItemTag);
 
+        return slotContent;
     }
 
     public static Optional<HolderSet.Named<Item>> getItemsFromTag(TagKey<Item> tag) {
-        return BuiltInRegistries.ITEM.get(tag);
+        return BuiltInRegistries.ITEM.getTag(tag);
     }
 
 

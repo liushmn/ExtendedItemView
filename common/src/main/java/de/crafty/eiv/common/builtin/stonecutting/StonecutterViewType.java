@@ -15,8 +15,8 @@ public class StonecutterViewType implements IEivRecipeViewType {
 
     protected static final StonecutterViewType INSTANCE = new StonecutterViewType();
 
-    private static final ResourceLocation STONECUTTER_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/stonecutter.png");
+    private static final ResourceLocation STONECUTTER_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/stonecutter.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/stonecutter.png");
 
 
     @Override
@@ -26,7 +26,7 @@ public class StonecutterViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("stonecutting");
+        return new ResourceLocation("stonecutting");
     }
 
     @Override

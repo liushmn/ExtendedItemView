@@ -21,7 +21,7 @@ public class NeoForgeBuiltinEivIntegration extends BuiltInEivIntegration {
 
 
     public static final VillagerServerRecipe.VillagerOfferType<BasicItemListing> NEOFORGE_BASIC = VillagerServerRecipe.VillagerOfferType.register(
-            ResourceLocation.fromNamespaceAndPath("neoforge", "basic"),
+            new ResourceLocation("neoforge", "basic"),
             BasicItemListing.class,
             (listing, out) -> {
 

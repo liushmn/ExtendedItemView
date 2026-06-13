@@ -8,27 +8,34 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BlastFurnaceScreen;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.BlastingRecipe;
 
 import java.util.List;
 
 public class BlastingViewRecipe implements IEivViewRecipe {
 
+
+    private final ResourceLocation id;
     private final SlotContent input, result;
     private final AnimationTicker blastingTicker;
 
-    public BlastingViewRecipe(BlastingServerRecipe blastingRecipe) {
+    public BlastingViewRecipe(BlastingRecipe blastingRecipe) {
 
-        this.input = SlotContent.of(blastingRecipe.getInput());
-        this.result = SlotContent.of(blastingRecipe.getResult());
+        this.id = blastingRecipe.getId();
+
+        this.input = SlotContent.of(blastingRecipe.getIngredients().get(0));
+        this.result = SlotContent.of(blastingRecipe.getResultItem(null));
 
         this.blastingTicker = AnimationTicker.create(new ResourceLocation("blasting_ticker"), 100);
     }
 
-    private BlastingViewRecipe(SlotContent input, SlotContent result, AnimationTicker ticker) {
+    private BlastingViewRecipe(ResourceLocation id, SlotContent input, SlotContent result, AnimationTicker ticker) {
+        this.id = id;
         this.input = input;
         this.result = result;
         this.blastingTicker = ticker;
@@ -37,6 +44,11 @@ public class BlastingViewRecipe implements IEivViewRecipe {
     @Override
     public IEivRecipeViewType getViewType() {
         return BlastingViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -102,6 +114,6 @@ public class BlastingViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new BlastingViewRecipe(this.input.copy(), this.result.copy(), this.blastingTicker.copy());
+        return new BlastingViewRecipe(this.id, this.input.copy(), this.result.copy(), this.blastingTicker.copy());
     }
 }

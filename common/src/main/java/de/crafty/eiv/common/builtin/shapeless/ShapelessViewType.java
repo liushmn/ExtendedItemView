@@ -15,7 +15,7 @@ public class ShapelessViewType extends CraftingViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("crafting_shapeless");
+        return new ResourceLocation("crafting_shapeless");
     }
 
 

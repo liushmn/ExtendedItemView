@@ -1,12 +1,10 @@
 package de.crafty.eiv.common.embeddings.util;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.PlainTextContents;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.network.chat.ComponentContents;
 
 import java.util.UUID;
 
-public class EmbeddingComponentContents implements PlainTextContents {
+public class EmbeddingComponentContents implements ComponentContents {
 
 
     private UUID embeddingId;
@@ -17,11 +15,6 @@ public class EmbeddingComponentContents implements PlainTextContents {
 
     public void bindUUID(UUID embeddingId) {
         this.embeddingId = embeddingId;
-    }
-
-    @Override
-    public @NotNull String text() {
-        return "";
     }
 
 

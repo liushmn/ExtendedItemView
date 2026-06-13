@@ -1,29 +1,26 @@
 package de.crafty.eiv.common.network.payload.transfer;
 
 import de.crafty.eiv.common.CommonEIV;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
-public record ClientboundUpdateTransferCachePayload() implements CustomPacketPayload {
+public class ClientboundUpdateTransferCachePayload implements ICustomEivPayload {
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundUpdateTransferCachePayload> STREAM_CODEC = CustomPacketPayload.codec(ClientboundUpdateTransferCachePayload::write, ClientboundUpdateTransferCachePayload::new);
-    public static final Type<ClientboundUpdateTransferCachePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "update_transfer_cache"));
+    public static final ResourceLocation ID = new ResourceLocation(CommonEIV.MODID, "update_transfer_cache");
 
-    public ClientboundUpdateTransferCachePayload(FriendlyByteBuf friendlyByteBuf) {
-        this();
-    }
 
-    private void write(FriendlyByteBuf friendlyByteBuf) {
-
+    @Override
+    public void writeTag(CompoundTag tag) {
     }
 
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void readTag(CompoundTag tag) {
+    }
+
+    @Override
+    public ResourceLocation getIdentifier() {
+        return ID;
     }
 }

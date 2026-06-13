@@ -8,7 +8,7 @@ public interface IExtendedItemViewIntegration {
 
 
     /**
-     * Called once on game launch to register callbacks, recipe providers, recipe wrappers, ...
+     * Called once on game launch to register callbacks, recipe providers, ...
      */
     void onIntegrationInitialize();
 }

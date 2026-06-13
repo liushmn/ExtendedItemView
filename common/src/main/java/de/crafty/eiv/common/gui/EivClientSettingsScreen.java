@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
+//TODO test
 public class EivClientSettingsScreen extends Screen {
 
     private static final Component TITLE = Component.translatable("eiv.client_settings.title");
@@ -31,20 +32,23 @@ public class EivClientSettingsScreen extends Screen {
 
         this.layout.addToHeader(new StringWidget(TITLE, this.font));
 
-        LinearLayout linearLayout = this.layout.addToContents(LinearLayout.vertical());
+        LinearLayout linearLayout = this.layout.addToContents(new LinearLayout(150, 250, LinearLayout.Orientation.VERTICAL));
 
         linearLayout.addChild(
-                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.background.enabled"), Component.translatable("eiv.client_settings.background.disabled"), Configs.CLIENT_SETTINGS.drawBackground())
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.background.enabled"), Component.translatable("eiv.client_settings.background.disabled"))
+                        .withInitialValue(Configs.CLIENT_SETTINGS.drawBackground())
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.background"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setDrawBackground(b))
         );
         linearLayout.addChild(
-                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.resize_mode.wrap"), Component.translatable("eiv.client_settings.resize_mode.cut"), Configs.CLIENT_SETTINGS.isItemWrapMode())
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.resize_mode.wrap"), Component.translatable("eiv.client_settings.resize_mode.cut"))
+                        .withInitialValue(Configs.CLIENT_SETTINGS.isItemWrapMode())
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.resize_mode"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setItemWrapMode(b))
         );
         linearLayout.addChild(
-                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.chat_embeddings.enabled"), Component.translatable("eiv.client_settings.chat_embeddings.disabled"), Configs.CLIENT_SETTINGS.chatEmbeddings())
+                CycleButton.booleanBuilder(Component.translatable("eiv.client_settings.chat_embeddings.enabled"), Component.translatable("eiv.client_settings.chat_embeddings.disabled"))
+                        .withInitialValue(Configs.CLIENT_SETTINGS.chatEmbeddings())
                         .create(0, 0, 150, 20, Component.translatable("eiv.client_settings.chat_embeddings"),
                                 (cycleButton, b) -> Configs.CLIENT_SETTINGS.setChatEmbeddings(b))
         );

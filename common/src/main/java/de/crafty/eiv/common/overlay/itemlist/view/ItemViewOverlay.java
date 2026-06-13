@@ -20,18 +20,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,7 +36,7 @@ import java.util.List;
 public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
     public static final ItemViewOverlay INSTANCE = new ItemViewOverlay();
-    private static final ResourceLocation SETTINGS_WHEEL = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "settings_wheel");
+    private static final ResourceLocation SETTINGS_WHEEL = new ResourceLocation(CommonEIV.MODID, "settings_wheel");
 
     private EditBox searchbar = null;
 
@@ -142,15 +138,15 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    protected boolean keyPressed(KeyEvent event) {
-        super.keyPressed(event);
+    protected boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        super.keyPressed(keyCode, scanCode, modifiers);
 
 
         for (ItemSlot slot : this.itemSlots()) {
             if (!slot.isHovered())
                 continue;
 
-            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(event))
+            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(keyCode, scanCode))
                 ItemBookmarkOverlay.INSTANCE.bookmarkItem(slot.getStack());
         }
 
@@ -158,17 +154,17 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        super.mouseClicked(event, doubleClick);
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseButton, boolean doubleClick) {
+        super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 
-        if (this.searchbar.isHovered() && event.button() == 1) {
+        if (this.searchbar.isHovered() && mouseButton == 1) {
             this.searchbar.setValue("");
             this.searchbar.setFocused(true);
             OverlayManager.INSTANCE.currentInfo().screen().setFocused(this.searchbar);
         }
 
 
-        if (this.searchbar.isHovered() && event.button() == 0) {
+        if (this.searchbar.isHovered() && mouseButton == 0) {
             if (this.lastSearchbarClick != -1 && System.currentTimeMillis() - this.lastSearchbarClick <= 400) {
                 this.itemFilterMode = !this.itemFilterMode;
                 this.lastSearchbarClick = -1;

@@ -10,6 +10,8 @@ import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import de.crafty.eiv.common.recipe.rendering.AnimationTicker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.List;
 
@@ -18,24 +20,28 @@ public class BrewingViewRecipe implements IEivViewRecipe {
     private static final int[] BUBBLELENGTHS = new int[]{29, 24, 20, 16, 11, 6, 0};
 
 
+    private final ResourceLocation id;
     private final SlotContent bottle1, bottle2, bottle3;
     private final SlotContent result, magicIngredient;
 
     private final AnimationTicker brewProgressTicker;
 
-    public BrewingViewRecipe(BrewingServerRecipe brewingServerRecipe) {
+    public BrewingViewRecipe(ResourceLocation id, ItemStack result, Ingredient magicIngredient, ItemStack bottleStack) {
+        this.id = id;
 
-        this.bottle1 = SlotContent.of(brewingServerRecipe.getBottleIngredient().copy());
-        this.bottle2 = SlotContent.of(brewingServerRecipe.getBottleIngredient().copy());
-        this.bottle3 = SlotContent.of(brewingServerRecipe.getBottleIngredient().copy());
+        this.bottle1 = SlotContent.of(bottleStack.copy());
+        this.bottle2 = SlotContent.of(bottleStack.copy());
+        this.bottle3 = SlotContent.of(bottleStack.copy());
 
-        this.result = SlotContent.of(brewingServerRecipe.getResult());
-        this.magicIngredient = SlotContent.of(brewingServerRecipe.getMagicIngredient());
+        this.result = SlotContent.of(result);
+        this.magicIngredient = SlotContent.of(magicIngredient);
 
         this.brewProgressTicker = AnimationTicker.create(new ResourceLocation("brew_progress_tick"), 400);
     }
 
-    private BrewingViewRecipe(SlotContent bottle1, SlotContent bottle2, SlotContent bottle3, SlotContent result, SlotContent magicIngredient, AnimationTicker brewProgressTicker) {
+    private BrewingViewRecipe(ResourceLocation id, SlotContent bottle1, SlotContent bottle2, SlotContent bottle3, SlotContent result, SlotContent magicIngredient, AnimationTicker brewProgressTicker) {
+        this.id = id;
+
         this.bottle1 = bottle1;
         this.bottle2 = bottle2;
         this.bottle3 = bottle3;
@@ -47,6 +53,11 @@ public class BrewingViewRecipe implements IEivViewRecipe {
     @Override
     public IEivRecipeViewType getViewType() {
         return BrewingViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -104,6 +115,6 @@ public class BrewingViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new BrewingViewRecipe(this.bottle1.copy(), this.bottle2.copy(), this.bottle3.copy(), this.result.copy(), this.magicIngredient.copy(), this.brewProgressTicker.copy());
+        return new BrewingViewRecipe(this.id, this.bottle1.copy(), this.bottle2.copy(), this.bottle3.copy(), this.result.copy(), this.magicIngredient.copy(), this.brewProgressTicker.copy());
     }
 }

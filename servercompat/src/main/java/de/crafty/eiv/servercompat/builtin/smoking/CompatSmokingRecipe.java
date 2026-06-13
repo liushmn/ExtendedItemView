@@ -11,7 +11,7 @@ public class CompatSmokingRecipe extends CompatSmeltingRecipe {
 
 
     public static final EivCompatRecipeType<CompatSmokingRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("smoking")
+            new ResourceLocation("smoking")
     );
 
     public CompatSmokingRecipe(RecipeChoice input, ItemStack result) {

@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class ItemSlot {
 
-    private static final ResourceLocation SLOT_HIGHLIGHT_BACK_SPRITE = ResourceLocation.withDefaultNamespace("container/slot_highlight_back");
-    private static final ResourceLocation SLOT_HIGHLIGHT_FRONT_SPRITE = ResourceLocation.withDefaultNamespace("container/slot_highlight_front");
+    private static final ResourceLocation SLOT_HIGHLIGHT_BACK_SPRITE = new ResourceLocation("container/slot_highlight_back");
+    private static final ResourceLocation SLOT_HIGHLIGHT_FRONT_SPRITE = new ResourceLocation("container/slot_highlight_front");
 
     private final ItemStack stack;
     private final int x, y;
@@ -66,7 +66,7 @@ public class ItemSlot {
         List<Component> tooltip = new ArrayList<>(Screen.getTooltipFromItem(mc, this.stack));
 
         if (CommonEIVClient.isCheatmodeActive())
-            tooltip.addLast(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
+            tooltip.add(Component.literal("Taking x").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(this.currentCheatmodeCount)).withStyle(ChatFormatting.GOLD)));
 
         if (this.isHovered())
             guiGraphics.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
@@ -76,7 +76,7 @@ public class ItemSlot {
 
 
         if (this.isHovered())
-            guiGraphics.setComponentTooltipForNextFrame(mc.font, tooltip, mouseX, mouseY);
+            guiGraphics.renderTooltip(mc.font, tooltip, this.stack.getTooltipImage(), mouseX, mouseY);
     }
 
     /**
@@ -95,7 +95,7 @@ public class ItemSlot {
         }
 
         if (mouseButton == 0 && CommonEIVClient.isCheatmodeActive()) {
-            EivNetworkManager.INSTANCE.sendPacketToServer(new ServerboundPickCheatmodeItemPayload(this.stack.copy(), this.currentCheatmodeCount));
+            EivNetworkManager.INSTANCE.sendPayloadToServer(new ServerboundPickCheatmodeItemPayload(this.stack.copy(), this.currentCheatmodeCount));
             return;
         }
 

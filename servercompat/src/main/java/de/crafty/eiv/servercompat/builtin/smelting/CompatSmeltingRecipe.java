@@ -13,7 +13,7 @@ public class CompatSmeltingRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatSmeltingRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("smelting")
+            new ResourceLocation("smelting")
     );
 
     private RecipeChoice input;

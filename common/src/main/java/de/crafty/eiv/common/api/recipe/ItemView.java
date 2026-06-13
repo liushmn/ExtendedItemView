@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+//TODO Check for proper client reload callback handling
+//TODO call serve rreload callback
 /**
  * Main API class used to register EIV compat for other mods
  */
@@ -21,15 +23,12 @@ public class ItemView {
     private static final List<Item> EXCLUDED = new ArrayList<>();
 
     /**
-     * Server-Side map of "item-variants", the client gets informed about on every server reload
+     * Client-side Map of "item-variants", the client gets informed about on every server reload
      */
     private static final HashMap<Item, List<StackSensitive>> STACK_SENSITIVE = new HashMap<>();
 
     /**
      * A list of Callbacks used for mods to hook into a server reload
-     * <br>
-     * <br>
-     * Stack-Sensitives should also be registered here
      */
     private static final List<ReloadCallback> RELOAD_CALLBACKS = new ArrayList<>();
 
@@ -48,22 +47,8 @@ public class ItemView {
      *
      * @param provider The recipe provider
      */
-    public static void addRecipeProvider(ItemViewRecipes.ServerRecipeProvider provider) {
+    public static void addRecipeProvider(ItemViewRecipes.RecipeProvider provider) {
         ItemViewRecipes.INSTANCE.addRecipeProvider(provider);
-    }
-
-    /**
-     * ClientRecipeWrappers convert an incoming server recipe into a displayable viewRecipe later shown in the recipeView
-     * <br>
-     * <br>
-     * They can also split a server recipe up into multiple viewRecipes if desired, since they require a list to be returned
-     *
-     * @param recipeType The server recipe type
-     * @param wrapper    The wrapper
-     * @param <T>        The class of the server recipe
-     */
-    public static <T extends IEivServerRecipe> void registerRecipeWrapper(EivRecipeType<T> recipeType, ItemViewRecipes.ClientRecipeWrapper<T> wrapper) {
-        ItemViewRecipes.INSTANCE.registerRecipeWrapper(recipeType, wrapper);
     }
 
 

@@ -12,7 +12,7 @@ public class CompatBrewingRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatBrewingRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("brewing")
+            new ResourceLocation("brewing")
     );
 
     private ItemStack result, bottleIngredient;

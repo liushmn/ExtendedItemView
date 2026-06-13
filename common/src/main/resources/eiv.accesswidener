@@ -1,14 +1,28 @@
-accessWidener v1 named
+accessWidener v2 named
 
-accessible field net/minecraft/world/item/crafting/ShapedRecipe result Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/world/item/crafting/ShapelessRecipe result Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/world/item/crafting/Ingredient values Lnet/minecraft/core/HolderSet;
-accessible field net/minecraft/world/item/crafting/ShapelessRecipe ingredients Ljava/util/List;
-accessible field net/minecraft/world/item/crafting/SingleItemRecipe result Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/world/item/crafting/SmithingTransformRecipe result Lnet/minecraft/world/item/crafting/TransmuteResult;
+transitive-accessible	class	net/minecraft/world/inventory/MenuType$MenuSupplier
+transitive-accessible	method	net/minecraft/world/inventory/MenuType	<init>	(Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+
 accessible class net/minecraft/world/item/alchemy/PotionBrewing$Mix
 
-#Villager Trades
+#---------------- Potion Brewing ----------------
+accessible field net/minecraft/world/item/alchemy/PotionBrewing POTION_MIXES Ljava/util/List;
+accessible field net/minecraft/world/item/alchemy/PotionBrewing CONTAINER_MIXES Ljava/util/List;
+
+accessible field net/minecraft/world/item/alchemy/PotionBrewing$Mix to Ljava/lang/Object;
+accessible field net/minecraft/world/item/alchemy/PotionBrewing$Mix ingredient Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/alchemy/PotionBrewing$Mix from Ljava/lang/Object;
+
+#---------------- Ingredient ----------------
+accessible field net/minecraft/world/item/crafting/Ingredient values [Lnet/minecraft/world/item/crafting/Ingredient$Value;
+accessible class net/minecraft/world/item/crafting/Ingredient$Value
+accessible class net/minecraft/world/item/crafting/Ingredient$ItemValue
+accessible class net/minecraft/world/item/crafting/Ingredient$TagValue
+accessible field net/minecraft/world/item/crafting/Ingredient$TagValue tag Lnet/minecraft/tags/TagKey;
+
+
+
+#---------------- Villager Trades ----------------
 accessible class net/minecraft/world/entity/npc/VillagerTrades$DyedArmorForEmeralds
 accessible class net/minecraft/world/entity/npc/VillagerTrades$EmeraldForItems
 accessible class net/minecraft/world/entity/npc/VillagerTrades$EmeraldsForVillagerTypeItem
@@ -20,11 +34,5 @@ accessible class net/minecraft/world/entity/npc/VillagerTrades$SuspiciousStewFor
 accessible class net/minecraft/world/entity/npc/VillagerTrades$TippedArrowForItemsAndEmeralds
 accessible class net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds
 
-accessible class net/minecraft/client/resources/model/ModelBakery$ModelBakerImpl
 
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
-accessible field net/minecraft/client/KeyMapping ALL Ljava/util/Map;
-accessible field net/minecraft/client/KeyMapping MAP Ljava/util/Map;
-
-accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
-accessible class net/minecraft/world/inventory/MenuType$MenuSupplier

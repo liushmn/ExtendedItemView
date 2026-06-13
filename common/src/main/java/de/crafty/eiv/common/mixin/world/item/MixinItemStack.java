@@ -1,13 +1,13 @@
-package de.crafty.eiv.common.mixin.world.entity;
+package de.crafty.eiv.common.mixin.world.item;
 
-import de.crafty.eiv.common.access.IEivEntity;
+import de.crafty.eiv.common.access.IEivItemStack;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(Entity.class)
-public abstract class MixinEntity implements IEivEntity {
+@Mixin(ItemStack.class)
+public abstract class MixinItemStack implements IEivItemStack {
 
 
     @Unique

@@ -1,19 +1,16 @@
 package de.crafty.eiv.common.recipe.item;
 
-import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.extra.FluidStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
+import java.util.List;
 
 public class FluidItem extends BlockItem {
 
@@ -30,14 +27,14 @@ public class FluidItem extends BlockItem {
         return this.fluid;
     }
 
-
     @Override
-    public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag tooltipFlag) {
-        super.appendHoverText(itemStack, tooltipContext, tooltipDisplay, consumer, tooltipFlag);
+    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, level, list, tooltipFlag);
 
         FluidStack fluidStack = FluidStack.fromItemStack(itemStack);
-        consumer.accept(Component.literal(String.valueOf(fluidStack.amount())).append(Component.translatable("eiv.fluid.unit")).withStyle(ChatFormatting.GRAY));
+        list.add(Component.literal(String.valueOf(fluidStack.amount())).append(Component.translatable("eiv.fluid.unit")).withStyle(ChatFormatting.GRAY));
     }
+
 
 
 
@@ -49,22 +46,6 @@ public class FluidItem extends BlockItem {
         public FluidItemProperties fluid(Fluid fluid) {
             this.fluid = fluid;
             return this;
-        }
-
-        public FluidItemProperties setItemId(ResourceKey<Item> id) {
-            this.setId(id);
-            return this;
-        }
-
-        @Override
-        protected @NotNull String effectiveDescriptionId() {
-            String s = super.effectiveDescriptionId();
-            return s.replaceFirst("item.", "block.");
-        }
-
-        @Override
-        public @NotNull ResourceLocation effectiveModel() {
-            return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "fluiditem");
         }
 
     }

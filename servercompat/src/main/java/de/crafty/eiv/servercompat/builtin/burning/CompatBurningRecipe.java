@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 public class CompatBurningRecipe implements IEivCompatServerRecipe {
 
     public static final EivCompatRecipeType<CompatBurningRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("burning")
+            new ResourceLocation("burning")
     );
 
     private Item fuel;

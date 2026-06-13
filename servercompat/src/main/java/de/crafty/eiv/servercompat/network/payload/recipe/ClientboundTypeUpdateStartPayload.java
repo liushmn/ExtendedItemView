@@ -14,7 +14,7 @@ public record ClientboundTypeUpdateStartPayload(EivCompatRecipeType<?> recipeTyp
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "type_start");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "type_start");
     }
 
     @Override

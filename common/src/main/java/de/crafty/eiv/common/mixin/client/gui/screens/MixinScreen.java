@@ -5,7 +5,6 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.util.EmbeddingComponentContents;
 import de.crafty.eiv.common.mixin.client.gui.components.IChatComponentAccessor;
-import de.crafty.eiv.common.recipe.ClientRecipeManager;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -14,17 +13,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,23 +41,23 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     @Final
     protected Minecraft minecraft;
 
-    @Inject(method = "render", at = @At("RETURN"))
-    private void renderRecipeProgress(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        String statusMsg = ClientRecipeManager.INSTANCE.status().get();
 
-        if (!ClientRecipeManager.INSTANCE.status().isIdle())
-            guiGraphics.drawString(this.font, statusMsg, guiGraphics.guiWidth() - this.font.width(statusMsg) - 2, 2, -1);
-    }
+    @Redirect(method = "getTooltipFromItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;"))
+    private static List<Component> appendRecipeTag(ItemStack stack, Player player, TooltipFlag flag) {
+        List<Component> tooltip = stack.getTooltipLines(player, flag);
 
-
-    @Redirect(method = "getTooltipFromItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;"))
-    private static List<Component> appendRecipeTag(ItemStack stack, Item.TooltipContext list, @Nullable Player player, TooltipFlag flag) {
-        List<Component> tooltip = stack.getTooltipLines(list, player, flag);
-        CompoundTag tagTag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        CompoundTag tagTag = stack.getTag() == null ? new CompoundTag() : stack.getTag();
         if (tagTag.contains(CommonEIV.MODID + "_recipeTag")) {
+            ListTag tagList = tagTag.getList(CommonEIV.MODID + "_recipeTag", CompoundTag.TAG_STRING);
+            tagList.forEach(tag -> {
+                tooltip.add(
+                        Component.translatable("view.eiv.tags").append(": ").withStyle(ChatFormatting.GOLD)
+                        .append(Component.literal("#" + tag.getAsString()).withStyle(ChatFormatting.GRAY))
+                );
+            });
             tooltip.add(
                     Component.translatable("view.eiv.tags").append(": ").withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal("#" + tagTag.getStringOr(CommonEIV.MODID + "_recipeTag", "Error")).withStyle(ChatFormatting.GRAY))
+                            .append(Component.literal("#" + tagTag.getString(CommonEIV.MODID + "_recipeTag")).withStyle(ChatFormatting.GRAY))
 
             );
         }
@@ -73,7 +68,7 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
         }
 
         //TODO make more performance
-        tooltip.addLast(Component.literal(CommonEIVClient.resolver().getModNameForItem(stack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
+        tooltip.add(Component.literal(CommonEIVClient.resolver().getModNameForItem(stack.getItem())).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
 
         return tooltip;
     }
@@ -91,7 +86,9 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
             }
 
             ChatEmbedding.cache(embedding);
-            embedding.bindMsg(((IChatComponentAccessor) this.minecraft.gui.getChat()).getAllMessages().getFirst());
+
+            if (!((IChatComponentAccessor) this.minecraft.gui.getChat()).getAllMessages().isEmpty())
+                embedding.bindMsg(((IChatComponentAccessor) this.minecraft.gui.getChat()).getAllMessages().get(0));
         }
     }
 }

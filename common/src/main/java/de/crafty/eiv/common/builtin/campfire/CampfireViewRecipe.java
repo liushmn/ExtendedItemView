@@ -12,22 +12,27 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CampfireCookingRecipe;
 
 import java.util.List;
 
 public class CampfireViewRecipe implements IEivViewRecipe {
 
+    private final ResourceLocation id;
     private final SlotContent input, result;
     private final AnimationTicker cookingTicker;
 
-    public CampfireViewRecipe(CampfireServerRecipe campfireCookingRecipe) {
-        this.input = SlotContent.of(campfireCookingRecipe.getInput());
-        this.result = SlotContent.of(campfireCookingRecipe.getResult());
+    public CampfireViewRecipe(CampfireCookingRecipe campfireCookingRecipe) {
+        this.id = campfireCookingRecipe.getId();
+
+        this.input = SlotContent.of(campfireCookingRecipe.getIngredients().get(0));
+        this.result = SlotContent.of(campfireCookingRecipe.getResultItem(null));
 
         this.cookingTicker = AnimationTicker.create(new ResourceLocation("campfire_cooking_ticker"), 300);
     }
 
-    private CampfireViewRecipe(SlotContent input, SlotContent result, AnimationTicker cookingTicker) {
+    private CampfireViewRecipe(ResourceLocation id, SlotContent input, SlotContent result, AnimationTicker cookingTicker) {
+        this.id = id;
         this.input = input;
         this.result = result;
         this.cookingTicker = cookingTicker;
@@ -36,6 +41,11 @@ public class CampfireViewRecipe implements IEivViewRecipe {
     @Override
     public IEivRecipeViewType getViewType() {
         return CampfireViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -78,6 +88,6 @@ public class CampfireViewRecipe implements IEivViewRecipe {
 
     @Override
     public IEivViewRecipe asChatCopy() {
-        return new CampfireViewRecipe(this.input.copy(), this.result.copy(), this.cookingTicker.copy());
+        return new CampfireViewRecipe(this.id, this.input.copy(), this.result.copy(), this.cookingTicker.copy());
     }
 }

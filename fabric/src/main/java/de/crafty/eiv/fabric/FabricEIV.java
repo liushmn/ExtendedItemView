@@ -2,7 +2,6 @@ package de.crafty.eiv.fabric;
 
 import de.crafty.eiv.common.api.IExtendedItemViewIntegration;
 import de.crafty.eiv.common.command.EivCommand;
-import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.item.FluidItem;
 import net.fabricmc.api.ModInitializer;
@@ -28,8 +27,6 @@ public class FabricEIV implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Hello Minecraft!");
 
-        EivDataComponents.logTypes();
-
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> EivCommand.register(commandDispatcher));
 
         FabricLoader.getInstance().invokeEntrypoints("eiv", IExtendedItemViewIntegration.class, IExtendedItemViewIntegration::onIntegrationInitialize);
@@ -47,7 +44,7 @@ public class FabricEIV implements ModInitializer {
                 return;
 
             if(BuiltInRegistries.ITEM.containsKey(BuiltInRegistries.FLUID.getKey(fluid))){
-                fluidItemMap.put(fluid, BuiltInRegistries.ITEM.getValue(BuiltInRegistries.FLUID.getKey(fluid)));
+                fluidItemMap.put(fluid, BuiltInRegistries.ITEM.get(BuiltInRegistries.FLUID.getKey(fluid)));
                 return;
             }
 
@@ -61,7 +58,6 @@ public class FabricEIV implements ModInitializer {
                     new FluidItem(fluid.defaultFluidState().createLegacyBlock().getBlock(),
                             new FluidItem.FluidItemProperties()
                                     .fluid(fluid)
-                                    .setItemId(ResourceKey.create(Registries.ITEM, itemLocation))
                     ));
 
             fluidItemMap.put(fluid, item);

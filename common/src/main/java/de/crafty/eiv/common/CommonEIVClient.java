@@ -1,9 +1,6 @@
 package de.crafty.eiv.common;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
-import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.itemlist.bookmark.ItemBookmarkOverlay;
 import de.crafty.eiv.common.overlay.OverlayManager;
@@ -14,14 +11,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.permissions.PermissionSet;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.MenuType;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static de.crafty.eiv.common.CommonEIV.LOGGER;
@@ -29,26 +21,23 @@ import static de.crafty.eiv.common.CommonEIV.MODID;
 
 public class CommonEIVClient {
 
-    public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MODID, "fluiditem"), "inventory");
+    public static final ModelLayerLocation FLUID_ITEM_MODEL_LAYER = new ModelLayerLocation(new ResourceLocation(MODID, "fluiditem"), "inventory");
 
     public static final MenuType<RecipeViewMenu> RECIPE_VIEW_MENU = new MenuType<>(RecipeViewMenu::new, FeatureFlagSet.of());
 
-
-    public static final KeyMapping.Category EIV_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MODID, "eiv"));
-    public static final KeyMapping.Category EIV_ADMIN_CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MODID, "eiv_admin"));
     
-    public static final KeyMapping USAGE_KEYBIND = new KeyMapping("key.eiv.usage", 85, EIV_CATEGORY);
+    public static final KeyMapping USAGE_KEYBIND = new KeyMapping("key.eiv.usage", 85, "key.category.eiv.eiv");
 
-    public static final KeyMapping RECIPE_KEYBIND = new KeyMapping("key.eiv.recipe", 82, EIV_CATEGORY);
+    public static final KeyMapping RECIPE_KEYBIND = new KeyMapping("key.eiv.recipe", 82, "key.category.eiv.eiv");
 
-    public static final KeyMapping TOGGLE_OVERLAY_KEYBIND = new KeyMapping("key.eiv.toggle_overlay", 79, EIV_CATEGORY);
+    public static final KeyMapping TOGGLE_OVERLAY_KEYBIND = new KeyMapping("key.eiv.toggle_overlay", 79, "key.category.eiv.eiv");
 
-    public static final KeyMapping ADD_BOOKMARK_KEYBIND = new KeyMapping("key.eiv.bookmark", 65, EIV_CATEGORY);
+    public static final KeyMapping ADD_BOOKMARK_KEYBIND = new KeyMapping("key.eiv.bookmark", 65, "key.category.eiv.eiv");
 
-    public static final KeyMapping GO_BACK_RECIPE = new KeyMapping("key.eiv.go_back", InputConstants.Type.MOUSE, 3, EIV_CATEGORY);
-    public static final KeyMapping GO_FORWARD_RECIPE = new KeyMapping("key.eiv.go_forward", InputConstants.Type.MOUSE, 4, EIV_CATEGORY);
+    public static final KeyMapping GO_BACK_RECIPE = new KeyMapping("key.eiv.go_back", InputConstants.Type.MOUSE, 3, "key.category.eiv.eiv");
+    public static final KeyMapping GO_FORWARD_RECIPE = new KeyMapping("key.eiv.go_forward", InputConstants.Type.MOUSE, 4, "key.category.eiv.eiv");
 
-    public static final KeyMapping USE_CHEATMODE = new KeyMapping("key.eiv.cheatmode", 342, EIV_ADMIN_CATEGORY);
+    public static final KeyMapping USE_CHEATMODE = new KeyMapping("key.eiv.cheatmode", 342, "key.category.eiv.eiv_admin");
 
     public static final List<KeyMapping> EIV_KEY_MAPPINGS = List.of(USAGE_KEYBIND, RECIPE_KEYBIND, TOGGLE_OVERLAY_KEYBIND, ADD_BOOKMARK_KEYBIND, GO_BACK_RECIPE, GO_FORWARD_RECIPE, USE_CHEATMODE);
 
@@ -84,7 +73,7 @@ public class CommonEIVClient {
     }
 
     public static boolean isCheatmodeActive() {
-        return Minecraft.getInstance().player != null && Minecraft.getInstance().player.permissions().hasPermission(Permissions.COMMANDS_ADMIN) && InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue());
+        return Minecraft.getInstance().player != null && Minecraft.getInstance().player.hasPermissions(3) && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), CommonEIVClient.USE_CHEATMODE.key.getValue());
     }
 
 }

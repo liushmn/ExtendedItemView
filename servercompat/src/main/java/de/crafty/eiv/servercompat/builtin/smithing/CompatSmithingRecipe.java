@@ -15,7 +15,7 @@ public class CompatSmithingRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatSmithingRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("smithing")
+            new ResourceLocation("smithing")
     );
 
     private boolean isTrim;

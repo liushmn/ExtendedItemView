@@ -2,7 +2,6 @@ package de.crafty.eiv.fabric;
 
 import de.crafty.eiv.common.CommonEIV;
 import de.crafty.eiv.common.CommonEIVClient;
-import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.extra.FluidItemModel;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.fabric.resolver.FabricEivResolver;
@@ -28,7 +27,7 @@ public class FabricEIVClient implements ClientModInitializer {
         CommonEIVClient.EIV_KEY_MAPPINGS.forEach(KeyBindingHelper::registerKeyBinding);
         CommonEIVClient.setResolver(new FabricEivResolver());
 
-        Registry.register(BuiltInRegistries.MENU, ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         MenuScreens.register(CommonEIVClient.RECIPE_VIEW_MENU, RecipeViewScreen::new);
 
         EntityModelLayerRegistry.registerModelLayer(CommonEIVClient.FLUID_ITEM_MODEL_LAYER, FluidItemModel::createFluidLayer);

@@ -1,7 +1,8 @@
 package de.crafty.eiv.common.recipe.util;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import com.mojang.datafixers.util.Either;
-import de.crafty.eiv.common.mixin.world.item.crafting.IngredientAccessor;
 import de.crafty.eiv.common.recipe.ServerRecipeManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.DefaultedRegistry;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Helper class for network encoding based on CompoundTags
@@ -35,7 +35,23 @@ public class EivTagUtil {
     }
 
     private static <T> List<T> reconstructRegistryList(CompoundTag srcTag, String key, DefaultedRegistry<T> registry) {
-        return srcTag.getListOrEmpty(key).stream().map(Tag::asString).map(s -> stringToRegistry(s.orElseThrow(), registry)).filter(Objects::nonNull).toList();
+        return srcTag.getList(key, Tag.TAG_STRING).stream().map(Tag::getAsString).map(s -> stringToRegistry(s, registry)).filter(Objects::nonNull).toList();
+    }
+
+    public static CompoundTag encodeItemStack(ItemStack stack) {
+        return stack.save(new CompoundTag());
+    }
+
+    public static ItemStack decodeItemStack(CompoundTag tag) {
+        return ItemStack.of(tag);
+    }
+
+    public static CompoundTag encodeClientSideItemStack(ItemStack stack){
+        return stack.save(new CompoundTag());
+    }
+
+    public static ItemStack decodeServerSideItemStack(CompoundTag tag) {
+        return ItemStack.of(tag);
     }
 
 
@@ -45,7 +61,7 @@ public class EivTagUtil {
      * @return The decoded stack
      */
     public static ItemStack decodeItemStackOnClient(CompoundTag tag) {
-        return ItemStack.CODEC.parse(Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
+        return ItemStack.of(tag);
     }
 
     /**
@@ -54,7 +70,7 @@ public class EivTagUtil {
      * @return The encoded stack as CompoundTag
      */
     public static CompoundTag encodeItemStackOnClient(ItemStack stack) {
-        return ItemStack.CODEC.encode(stack, Minecraft.getInstance().player.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).mapOrElse(tag -> tag.asCompound().orElseGet(CompoundTag::new), tagError -> new CompoundTag());
+        return stack.save(new CompoundTag());
     }
 
     /**
@@ -63,7 +79,7 @@ public class EivTagUtil {
      * @return The encoded stack as CompoundTag
      */
     public static CompoundTag encodeItemStackOnServer(ItemStack stack) {
-        return ItemStack.CODEC.encode(stack, ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), new CompoundTag()).mapOrElse(tag -> tag.asCompound().orElseGet(CompoundTag::new), tagError -> new CompoundTag());
+        return stack.save(new CompoundTag());
     }
 
     /**
@@ -72,7 +88,7 @@ public class EivTagUtil {
      * @return The decoded stack
      */
     public static ItemStack decodeItemStackOnServer(CompoundTag tag) {
-        return ItemStack.CODEC.parse(ServerRecipeManager.INSTANCE.getServer().registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).result().orElse(ItemStack.EMPTY);
+        return ItemStack.of(tag);
     }
 
     /**
@@ -84,21 +100,8 @@ public class EivTagUtil {
         if (ingredient == null)
             return new CompoundTag();
 
-        HolderSet<Item> set = ((IngredientAccessor) (Object) ingredient).getValues();
-
-        Either<TagKey<Item>, List<Holder<Item>>> ingredientContent = set.unwrap();
         CompoundTag tag = new CompoundTag();
-
-
-        if (ingredientContent.left().isPresent()) {
-            tag.putString("tag", ingredientContent.left().get().location().toString());
-            return tag;
-        }
-
-        if(ingredientContent.right().isEmpty())
-            return new CompoundTag();
-
-        tag.put("items", EivTagUtil.createItemList(ingredientContent.right().get().stream().filter(Holder::isBound).map(Holder::value).toList()));
+        tag.putString("ingredient", new GsonBuilder().create().toJson(ingredient.toJson()));
         return tag;
     }
 
@@ -112,16 +115,7 @@ public class EivTagUtil {
             return null;
 
 
-        if (tag.contains("tag")) {
-            TagKey<Item> tagKey = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getStringOr("tag", "")));
-            if (BuiltInRegistries.ITEM.get(tagKey).isEmpty())
-                return null;
-
-            return Ingredient.of(Objects.requireNonNull(BuiltInRegistries.ITEM.get(tagKey).get()));
-        }
-
-        List<Holder<Item>> itemList = EivTagUtil.reconstructItemList(tag, "items").stream().map(Holder::direct).toList();
-        return !itemList.isEmpty() ? Ingredient.of(HolderSet.direct(itemList)) : null;
+        return Ingredient.fromJson(new GsonBuilder().create().toJsonTree(tag.getString("ingredient")));
     }
 
 
@@ -212,7 +206,7 @@ public class EivTagUtil {
      * @param <T> The type of the list
      */
     public static <T> List<T> readList(CompoundTag srcTag, String key, CompoundReconstructor<T> builder) {
-        return srcTag.getListOrEmpty(key).stream().map(Tag::asCompound).map(compoundTag -> builder.reconstructSingle(compoundTag.orElseGet(CompoundTag::new))).toList();
+        return srcTag.getList(key, Tag.TAG_COMPOUND).stream().map(tag -> (CompoundTag) tag).map(builder::reconstructSingle).toList();
     }
 
 

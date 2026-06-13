@@ -6,12 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.ChatVisiblity;
 
@@ -131,14 +127,14 @@ public abstract class ChatEmbedding {
 
     protected abstract void renderEmbedding(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
-    protected void mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
     }
 
-    protected void mouseScrolled(int mouseX, int mouseY, double horizontalAmount, double verticalAmount) {
+    protected void mouseScrolled(int mouseX, int mouseY, double verticalAmount) {
 
     }
 
-    protected void keyPressed(KeyEvent event) {
+    protected void keyPressed(int keyCode, int scanCode, int modifiers) {
 
     }
 
@@ -158,11 +154,11 @@ public abstract class ChatEmbedding {
 
         Color old = new Color(color);
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().scale(scaling, scaling);
-        guiGraphics.pose().translate(x / scaling, y / scaling);
-        guiGraphics.drawString(font, text, 0, 0, ARGB.color(Math.round(old.getAlpha() * this.getLineAlpha()), old.getRed(), old.getGreen(), old.getBlue()), withShadow);
-        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().scale(scaling, scaling, 1.0F);
+        guiGraphics.pose().translate(x / scaling, y / scaling, 0);
+        guiGraphics.drawString(font, text, 0, 0, new Color(Math.round(old.getAlpha() * this.getLineAlpha()), old.getRed(), old.getGreen(), old.getBlue()).getRGB(), withShadow);
+        guiGraphics.pose().popPose();
 
     }
 
@@ -191,11 +187,11 @@ public abstract class ChatEmbedding {
             float yStart = Math.max(startLine * occupiedLineSpace + (y - startLine * occupiedLineSpace), i * occupiedLineSpace);
 
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().scale(scaling, scaling);
-            guiGraphics.pose().translate(x / scaling, yStart / scaling);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, u, v + (height - remainingTextureHeight), width, allowedSpace, textureWidth, textureHeight, ARGB.color(Math.round(255 * this.getLineAlpha()), 255, 255, 255));
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(scaling, scaling, 1.0F);
+            guiGraphics.pose().translate(x / scaling, yStart / scaling, 0);
+            guiGraphics.blit(texture, 0, 0, u, v + (height - remainingTextureHeight), width, allowedSpace, textureWidth, textureHeight, new Color(Math.round(255 * this.getLineAlpha()), 255, 255, 255).getRGB());
+            guiGraphics.pose().popPose();
 
             remainingTextureHeight -= allowedSpace;
         }
@@ -266,21 +262,20 @@ public abstract class ChatEmbedding {
 
     //---------------- Input Events ----------------
 
-    public static void onMouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public static void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
         CACHED.forEach(embedding -> {
-            MouseButtonEvent withCorrectCoords = new MouseButtonEvent(event.x() - ChatEmbedding.getXPosition(), event.y() - ChatEmbedding.getYPosition(embedding), event.buttonInfo());
-            embedding.mouseClicked(withCorrectCoords, doubleClick);
+            embedding.mouseClicked(mouseX - ChatEmbedding.getXPosition(), mouseY - ChatEmbedding.getYPosition(embedding), mouseButton);
         });
     }
 
-    public static void onMouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public static void onMouseScrolled(double mouseX, double mouseY, double verticalAmount) {
         CACHED.forEach(embedding -> {
-            embedding.mouseScrolled((int) Math.round(mouseX - ChatEmbedding.getXPosition()), (int) Math.round(mouseY - ChatEmbedding.getYPosition(embedding)), horizontalAmount, verticalAmount);
+            embedding.mouseScrolled((int) Math.round(mouseX - ChatEmbedding.getXPosition()), (int) Math.round(mouseY - ChatEmbedding.getYPosition(embedding)), verticalAmount);
         });
     }
 
-    public static void onKeyPressed(KeyEvent event) {
-        CACHED.forEach(embedding -> embedding.keyPressed(event));
+    public static void onKeyPressed(int keyCode, int scanCode, int modifiers) {
+        CACHED.forEach(embedding -> embedding.keyPressed(keyCode, scanCode, modifiers));
     }
 
 
@@ -335,7 +330,7 @@ public abstract class ChatEmbedding {
         int scissorTop = Mth.floor(yStartPos) - occupiedSpace * (displayableMessages + 1) + totalHiddenLines * occupiedSpace;
         int scissorBot = Mth.floor(yStartPos);
 
-        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().pushPose();
         guiGraphics.enableScissor(0, scissorTop, ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get()), scissorBot);
 
         for (int i = 0; i < renderables.size(); i++) {
@@ -344,18 +339,18 @@ public abstract class ChatEmbedding {
             int relMouseX = mouseX - ChatEmbedding.getXPosition();
             int relMouseY = mouseY - ChatEmbedding.getYPosition(embedding);
 
-            embedding.hovered = embedding.isHovered(relMouseX, relMouseY) && guiGraphics.containsPointInScissor(mouseX, mouseY);
+            embedding.hovered = embedding.isHovered(relMouseX, relMouseY) && mouseY >= 0 && mouseY <= ChatEmbedding.getChatStartY();
 
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(0, ChatEmbedding.getEmbeddingYOffset(embedding));
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(0, ChatEmbedding.getEmbeddingYOffset(embedding), 0);
             embedding.setCurrentTime(currentTime);
             embedding.setChatOpen(chatOpen);
-            embedding.render(guiGraphics, relMouseX, relMouseY, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks());
-            guiGraphics.pose().popMatrix();
+            embedding.render(guiGraphics, relMouseX, relMouseY, Minecraft.getInstance().getDeltaFrameTime());
+            guiGraphics.pose().popPose();
         }
 
         guiGraphics.disableScissor();
-        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().popPose();
 
 
     }
@@ -377,11 +372,13 @@ public abstract class ChatEmbedding {
         return (int) (lineSize * (chatLineSpacing + 1.0));
     }
 
-    protected static float getEmbeddingYOffset(ChatEmbedding embedding) {
+    protected static float getChatStartY(){
         float chatScale = Minecraft.getInstance().options.chatScale().get().floatValue();
-        final float yStartPos = (Minecraft.getInstance().getWindow().getGuiScaledHeight() - 40) / chatScale;
+        return (Minecraft.getInstance().getWindow().getGuiScaledHeight() - 40) / chatScale;
+    }
 
-        return yStartPos - (embedding.getChatPos() - SYNCED_CHAT_SCROLLBAR_POS) * ChatEmbedding.getOccupiedSpacePerLine() - embedding.height - embedding.lineOffset;
+    protected static float getEmbeddingYOffset(ChatEmbedding embedding) {
+        return ChatEmbedding.getChatStartY() - (embedding.getChatPos() - SYNCED_CHAT_SCROLLBAR_POS) * ChatEmbedding.getOccupiedSpacePerLine() - embedding.height - embedding.lineOffset;
     }
 
     protected static float getEmbeddingXOffset() {

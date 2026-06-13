@@ -10,7 +10,7 @@ public record ClientboundStartStackSensitivesPayload(int amount) implements IEiv
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "start_stack_sensitive");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "start_stack_sensitive");
     }
 
     @Override

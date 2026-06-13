@@ -91,14 +91,14 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        super.keyPressed(event);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        super.keyPressed(keyCode, scanCode, modifiers);
 
         for (ItemSlot slot : this.itemSlots()) {
             if (!slot.isHovered())
                 continue;
 
-            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(event)) {
+            if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(keyCode, scanCode)) {
                 this.availableItems.remove(slot.getStack());
                 this.updateSlots();
                 if (this.itemSlots().isEmpty() && !this.availableItems.isEmpty()) {

@@ -4,8 +4,6 @@ import de.crafty.eiv.common.overlay.OverlayManager;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,26 +20,26 @@ public abstract class MixinCreativeModeInventoryScreen extends AbstractContainer
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    private void injectSearchBar$0(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(characterEvent))
+    private void injectSearchBar$0(char c, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        if (OverlayManager.INSTANCE.isTextWidgetFocused() && this.getFocused() instanceof EditBox box && box.charTyped(c, modifiers))
             cir.setReturnValue(true);
 
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void injectSearchBar$1(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+    private void injectSearchBar$1(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (this.getFocused() != null && this.getFocused().isFocused() && this.getFocused() instanceof EditBox box) {
 
             //We don't want to affect other mods compat
             if(OverlayManager.INSTANCE.isTextWidgetFocused()) {
-                box.keyPressed(keyEvent);
+                box.keyPressed(keyCode, scanCode, modifiers);
 
-                if ((keyEvent.key() != 256 && keyEvent.key() != 258))
+                if ((keyCode != 256 && keyCode != 258))
                     cir.setReturnValue(true);
             }
 
         }
-        else if (OverlayManager.INSTANCE.keyPressed(keyEvent))
+        else if (OverlayManager.INSTANCE.keyPressed(keyCode, scanCode, modifiers))
             cir.setReturnValue(true);
     }
 }

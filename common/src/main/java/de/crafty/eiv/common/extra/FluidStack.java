@@ -2,12 +2,10 @@ package de.crafty.eiv.common.extra;
 
 import de.crafty.eiv.common.recipe.ItemViewRecipes;
 import de.crafty.eiv.common.recipe.item.FluidItem;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
@@ -48,10 +46,10 @@ public record FluidStack(Fluid fluid, int amount) {
         if (!(stack.getItem() instanceof FluidItem fluidItem))
             return FluidStack.EMPTY;
 
-        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        CompoundTag tag = stack.getOrCreateTag();
         int amount = FluidStack.AMOUNT_FULL;
         if (tag.contains("fluidAmount"))
-            amount = tag.getInt("fluidAmount").orElseGet(() -> FluidStack.AMOUNT_FULL);
+            amount = tag.getInt("fluidAmount");
 
         return new FluidStack(fluidItem.getFluid(), amount);
     }
@@ -65,9 +63,8 @@ public record FluidStack(Fluid fluid, int amount) {
             return ItemStack.EMPTY;
 
         ItemStack stack = new ItemStack(item);
-        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        CompoundTag tag = stack.getOrCreateTag();
         tag.putInt("fluidAmount", this.amount);
-        CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
         return stack;
     }
 }

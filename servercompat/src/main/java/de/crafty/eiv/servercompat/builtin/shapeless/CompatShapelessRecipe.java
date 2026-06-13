@@ -14,7 +14,7 @@ public class CompatShapelessRecipe implements IEivCompatServerRecipe {
 
 
     public static final EivCompatRecipeType<CompatShapelessRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("shapeless_crafting")
+            new ResourceLocation("shapeless_crafting")
     );
 
     private List<RecipeChoice> choices;

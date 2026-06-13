@@ -12,7 +12,7 @@ public record ClientboundStackSensitivePayload(CompatItemView.StackSensitive sta
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "stack_sensitive");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "stack_sensitive");
     }
 
     @Override

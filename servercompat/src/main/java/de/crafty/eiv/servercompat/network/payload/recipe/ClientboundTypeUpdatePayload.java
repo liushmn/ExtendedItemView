@@ -11,7 +11,7 @@ public record ClientboundTypeUpdatePayload(CompatRecipeManager.CompatRecipeEntry
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "recipe_update");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "recipe_update");
     }
 
     @Override

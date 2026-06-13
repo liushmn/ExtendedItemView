@@ -25,7 +25,7 @@ public class NeoForgeEIVClient {
     @SubscribeEvent
     public static void onMenuRegistry(RegisterEvent event) {
         event.register(Registries.MENU, menuTypeRegisterHelper -> {
-            menuTypeRegisterHelper.register(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
+            menuTypeRegisterHelper.register(new ResourceLocation(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         });
 
     }

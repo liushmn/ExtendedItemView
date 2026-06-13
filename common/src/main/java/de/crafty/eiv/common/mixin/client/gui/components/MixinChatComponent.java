@@ -2,11 +2,12 @@ package de.crafty.eiv.common.mixin.client.gui.components;
 
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import net.minecraft.client.GuiMessage;
+import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,11 +30,12 @@ public abstract class MixinChatComponent {
     private List<GuiMessage.Line> trimmedMessages;
 
 
-    @Shadow
-    public abstract void addMessage(Component p_93786_);
 
     @Shadow
-    protected abstract void addMessageToDisplayQueue(GuiMessage p_338816_);
+    protected abstract void addMessage(Component p_240562_, MessageSignature p_241566_, int p_240583_, GuiMessageTag p_240624_, boolean p_240558_);
+
+    @Shadow
+    protected abstract boolean isChatHidden();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void syncMessages(Minecraft minecraft, CallbackInfo ci) {
@@ -48,17 +50,17 @@ public abstract class MixinChatComponent {
         ChatEmbedding.stored().clear();
     }
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V", at = @At("TAIL"))
-    private void injectEmbeddings(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int mouseX, int mouseY, boolean chatOpen, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("TAIL"))
+    private void injectEmbeddings(GuiGraphics guiGraphics, int i, int j, int k, CallbackInfo ci) {
 
         ChatEmbedding.setSyncedChatScrollbarPos(this.chatScrollbarPos);
         ChatEmbedding.setSyncedMessageCount(this.trimmedMessages.size());
 
     }
 
-    @Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;pose()Lorg/joml/Matrix3x2fStack;", ordinal = 1))
-    private void renderEmbeddings(GuiGraphics guiGraphics, Font font, int currentTime, int mouseX, int mouseY, boolean chatOpen, boolean bl2, CallbackInfo ci) {
-        ChatEmbedding.renderEmbeddings(guiGraphics, mouseX, mouseY, currentTime, chatOpen);
+    @Inject(method = "render", at = @At("RETURN"))
+    private void renderEmbeddings(GuiGraphics guiGraphics, int mouseX, int mouseY, int currentTime, CallbackInfo ci) {
+        ChatEmbedding.renderEmbeddings(guiGraphics, mouseX, mouseY, currentTime, !this.isChatHidden());
     }
 
 
@@ -68,34 +70,35 @@ public abstract class MixinChatComponent {
     }
 
 
-    @Inject(method = "addMessageToDisplayQueue", at = @At(value = "INVOKE", target = "Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift = At.Shift.AFTER))
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;ILnet/minecraft/client/GuiMessageTag;Z)V", at = @At(value = "INVOKE", target = "Ljava/util/List;add(ILjava/lang/Object;)V", ordinal = 0, shift = At.Shift.AFTER))
     private void updateEmbeddingPositions(CallbackInfo ci) {
         ChatEmbedding.updateChatPositions();
     }
 
 
-    @Redirect(method = "addMessageToQueue", at = @At(value = "INVOKE", target = "Ljava/util/List;removeLast()Ljava/lang/Object;"))
-    private <E> E removeEmbedding(List<E> instance) {
+    @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;ILnet/minecraft/client/GuiMessageTag;Z)V", at = @At(value = "INVOKE", target = "Ljava/util/List;remove(I)Ljava/lang/Object;", ordinal = 1))
+    private <E> E removeEmbedding(List<E> instance, int i) {
 
-        GuiMessage removed = (GuiMessage) instance.removeLast();
+        GuiMessage removed = (GuiMessage) instance.remove(i);
         ChatEmbedding.stored().remove(removed);
 
         return (E) removed;
     }
 
-    @Inject(method = "refreshTrimmedMessages", at = @At("HEAD"))
+    @Inject(method = "refreshTrimmedMessage", at = @At("HEAD"))
     private void refreshEmbeddings$0(CallbackInfo ci) {
         ChatEmbedding.clearCache();
     }
 
-    @Redirect(method = "refreshTrimmedMessages", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;addMessageToDisplayQueue(Lnet/minecraft/client/GuiMessage;)V"))
-    private void refreshEmbeddings$1(ChatComponent instance, GuiMessage guiMessage) {
-        this.addMessageToDisplayQueue(guiMessage);
+    @Redirect(method = "refreshTrimmedMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;get(I)Ljava/lang/Object;"))
+    private <E> E refreshEmbeddings$1(List<E> instance, int i) {
+        GuiMessage guiMessage = (GuiMessage) instance.get(i);
 
         ChatEmbedding embedding = ChatEmbedding.stored().getOrDefault(guiMessage, null);
         if (embedding != null)
             ChatEmbedding.cache(embedding);
 
 
+        return (E) guiMessage;
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
@@ -21,6 +22,10 @@ public interface IEivViewRecipe {
     List<IEivViewRecipe> PLACEHOLDER = List.of(
             new IEivViewRecipe() {
 
+                @Override
+                public ResourceLocation getId() {
+                    return null;
+                }
 
                 @Override
                 public IEivRecipeViewType getViewType() {
@@ -49,10 +54,12 @@ public interface IEivViewRecipe {
      */
     IEivRecipeViewType getViewType();
 
+    ResourceLocation getId();
+
     /**
      * Bind the SlotContents of the recipe to the according slots
      *
-     * @param slotFillContext The context the {@link SlotContent}s is bound to
+     * @param slotFillContext The context the {@link SlotContent} is bound to
      */
     void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext);
 

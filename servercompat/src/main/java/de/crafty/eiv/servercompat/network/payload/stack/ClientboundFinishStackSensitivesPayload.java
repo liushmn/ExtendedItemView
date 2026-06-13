@@ -9,7 +9,7 @@ public record ClientboundFinishStackSensitivesPayload() implements IEivCompatPac
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(EivPlugin.PLUGIN_ID, "finish_stack_sensitive");
+        return new ResourceLocation(EivPlugin.PLUGIN_ID, "finish_stack_sensitive");
     }
 
     @Override

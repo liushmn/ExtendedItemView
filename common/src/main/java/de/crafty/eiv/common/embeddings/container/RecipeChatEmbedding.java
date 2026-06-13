@@ -1,8 +1,6 @@
 package de.crafty.eiv.common.embeddings.container;
 
-import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
-import de.crafty.eiv.common.component.EivDataComponents;
 import de.crafty.eiv.common.embeddings.ChatEmbedding;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
@@ -13,13 +11,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -97,7 +95,7 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
     }
 
     private void tickContents() {
-        if (this.minecraft.hasShiftDown() && this.isChatOpen())
+        if (AbstractContainerScreen.hasShiftDown() && this.isChatOpen())
             return;
 
         this.recipe.tickContents();
@@ -201,7 +199,7 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
             int yStart = Mth.floor(y0 + yOff);
             int yEnd = Mth.floor(y1 + yOff);
 
-            EivGuiRenderHelper.renderEntityOnScreen(guiGraphics, livingEntity, xStart, yStart, xEnd, yEnd, scale, translation.mul(this.getGuiScaling()).add(((x0 + xOff) - xStart) / scale, ((y0 + yOff) - yStart) / scale, 0.0F), rotation, cameraAngleOverride);
+            //EivGuiRenderHelper.renderEntityOnScreen(guiGraphics, livingEntity, xStart, yStart, xEnd, yEnd, scale, translation.mul(this.getGuiScaling()).add(((x0 + xOff) - xStart) / scale, ((y0 + yOff) - yStart) / scale, 0.0F), rotation, cameraAngleOverride);
         }
 
         public void drawString(Font font, GuiGraphics guiGraphics, Component text, float x, float y, int color, boolean withShadow) {
@@ -227,15 +225,17 @@ public class RecipeChatEmbedding extends ContainerChatEmbedding {
 
         public void renderItem(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
 
-            stack.set(EivDataComponents.EMBEDDING_DATA, new EmbeddingData(this.getCurrentAlpha()));
+            //TODO make constant for embedding data
+            EmbeddingData data = new EmbeddingData(this.getCurrentAlpha());
+            stack.getOrCreateTag().put("eiv_embedding_data", EmbeddingData.CODEC.encode(data, NbtOps.INSTANCE, new CompoundTag()).result().orElseThrow());
 
 
             // + 3 for margin
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(x * this.getGuiScaling(), y * this.getGuiScaling() + 1);
-            guiGraphics.pose().scale(this.embedding.guiScaling, this.embedding.guiScaling);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(x * this.getGuiScaling(), y * this.getGuiScaling() + 1, 0);
+            guiGraphics.pose().scale(this.embedding.guiScaling, this.embedding.guiScaling, 1.0F);
             guiGraphics.renderItem(stack, 0, 0);
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().popPose();
         }
 
     }

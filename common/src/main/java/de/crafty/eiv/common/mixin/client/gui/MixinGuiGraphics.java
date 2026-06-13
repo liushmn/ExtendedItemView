@@ -1,25 +1,16 @@
 package de.crafty.eiv.common.mixin.client.gui;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import de.crafty.eiv.common.access.IEivItemStackRenderState;
-import de.crafty.eiv.common.component.EivDataComponents;
+import com.mojang.blaze3d.vertex.PoseStack;
+import de.crafty.eiv.common.access.IEivItemStack;
 import de.crafty.eiv.common.embeddings.EmbeddingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ItemOwner;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,108 +20,86 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
-import java.util.Random;
 
 @Mixin(GuiGraphics.class)
 public abstract class MixinGuiGraphics {
 
 
     @Shadow
-    public abstract void drawString(Font p_283019_, @Nullable String p_415853_, int p_283379_, int p_283346_, int p_282119_, boolean p_416601_);
-
-    @Shadow
-    public abstract void fill(RenderPipeline p_416410_, int p_281437_, int p_283660_, int p_282606_, int p_283413_, int p_283428_);
-
-    @Shadow
     @Final
     private Minecraft minecraft;
 
-    @Redirect(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;updateForTopItem(Lnet/minecraft/client/renderer/item/ItemStackRenderState;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/ItemOwner;I)V"))
-    private void injectStackData(ItemModelResolver instance, ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext p_388835_, Level p_388064_, ItemOwner p_434877_, int p_388137_) {
-        instance.updateForTopItem(renderState, stack, p_388835_, p_388064_, p_434877_, p_388137_);
 
-        if (stack.has(EivDataComponents.EMBEDDING_DATA)) {
-            renderState.setAnimated();
-            ((IEivItemStackRenderState) renderState).eiv$setEmbeddingData(stack.get(EivDataComponents.EMBEDDING_DATA));
-        }
+    @Shadow
+    @Final
+    private PoseStack pose;
 
+    @Shadow
+    public abstract int drawString(Font p_283343_, @Nullable String p_281896_, int p_283569_, int p_283418_, int p_281560_, boolean p_282130_);
+
+    @Shadow
+    public abstract void fill(RenderType p_286602_, int p_286738_, int p_286614_, int p_286741_, int p_286610_, int p_286560_);
+
+    @Redirect(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
+    private int injectEmbeddingData$0(GuiGraphics instance, Font font, String string, int x, int y, int color, boolean b) {
+        return 0;
+    }
+
+    @Redirect(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(Lnet/minecraft/client/renderer/RenderType;IIIII)V"))
+    private void injectEmbeddingData$1(GuiGraphics instance, RenderType renderType, int xStart, int yStart, int xEnd, int yEnd, int color) {
     }
 
 
-    @Inject(method = "renderItemCooldown", at = @At("HEAD"), cancellable = true)
-    private void renderChatDependantCouldown(ItemStack itemStack, int i, int j, CallbackInfo ci) {
+    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
+    private void injectEmbeddingData$2(Font font, ItemStack itemStack, int x, int y, String string, CallbackInfo ci) {
+        IEivItemStack eivStack = (IEivItemStack) (Object) itemStack;
+        EmbeddingData embeddingData = eivStack.eiv$getEmbeddingData();
 
-        if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
-            return;
+        if(itemStack.getCount() != 1 || string != null){
+            String s = string == null ? String.valueOf(itemStack.getCount()) : string;
+            this.pose.translate(0.0F, 0.0F, 200.0F);
+            Color c = new Color(16777215);
+            this.drawString(font, s, x + 19 - 2 - font.width(s), y + 6 + 3, new Color(c.getRed(), c.getGreen(), c.getBlue(), embeddingData == null ? c.getAlpha() : c.getAlpha() * embeddingData.alpha()).getRGB(), true);
+        }
+    }
 
 
-        EmbeddingData data = itemStack.get(EivDataComponents.EMBEDDING_DATA);
-        if (data == null)
-            return;
+    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(Lnet/minecraft/client/renderer/RenderType;IIIII)V", ordinal = 0))
+    private void injectEmbeddingData$3(Font font, ItemStack itemStack, int x, int y, String string, CallbackInfo ci) {
+        IEivItemStack eivStack = (IEivItemStack) (Object) itemStack;
+        EmbeddingData embeddingData = eivStack.eiv$getEmbeddingData();
 
-        Color c = new Color(Integer.MAX_VALUE);
+        if(itemStack.isBarVisible()){
+            int width = itemStack.getBarWidth();
+            int color = itemStack.getBarColor();
+            int j = x + 2;
+            int k = y + 13;
+
+            Color c1 = new Color(-16777216);
+            Color c2 = new Color(color | -16777216);
+            this.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, new Color(c1.getRed(), c1.getGreen(), c1.getBlue(), embeddingData == null ? c1.getAlpha() : c1.getAlpha() * embeddingData.alpha()).getRGB());
+            this.fill(RenderType.guiOverlay(), j, k, j + width, k + 1, new Color(c2.getRed(), c2.getGreen(), c2.getBlue(), embeddingData == null ? c2.getAlpha() : c2.getAlpha() * embeddingData.alpha()).getRGB());
+        }
+    }
+
+    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(Lnet/minecraft/client/renderer/RenderType;IIIII)V", ordinal = 2))
+    private void injectEmbeddingData$4(Font font, ItemStack itemStack, int x, int y, String string, CallbackInfo ci) {
+        IEivItemStack eivStack = (IEivItemStack) (Object) itemStack;
+        EmbeddingData embeddingData = eivStack.eiv$getEmbeddingData();
 
         LocalPlayer localPlayer = this.minecraft.player;
-        float f = localPlayer == null
-                ? 0.0F
-                : localPlayer.getCooldowns().getCooldownPercent(itemStack, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-        if (f > 0.0F) {
-            int k = j + Mth.floor(16.0F * (1.0F - f));
-            int l = k + Mth.ceil(16.0F * f);
-            this.fill(RenderPipelines.GUI, i, k, i + 16, l, ARGB.color(Math.round(c.getAlpha() * data.alpha()), c.getRed(), c.getGreen(), c.getBlue()));
+        float f = localPlayer == null ? 0.0F : localPlayer.getCooldowns().getCooldownPercent(itemStack.getItem(), this.minecraft.getFrameTime());
+
+        if(f > 0.0F){
+            int m = y + Mth.floor(16.0F * (1.0F - f));
+            int n = m + Mth.ceil(16.0F * f);
+            Color c = new Color(Integer.MAX_VALUE);
+            this.fill(RenderType.guiOverlay(), x, m, x + 16, n, new Color(c.getRed(), c.getGreen(), c.getBlue(), embeddingData == null ? c.getAlpha() : c.getAlpha() * embeddingData.alpha()).getRGB());
         }
 
-
-        ci.cancel();
-
     }
 
 
-    @Inject(method = "renderItemBar", at = @At("HEAD"), cancellable = true)
-    private void renderChatDependantItemBar(ItemStack itemStack, int i, int j, CallbackInfo ci) {
 
-        if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
-            return;
-
-        EmbeddingData data = itemStack.get(EivDataComponents.EMBEDDING_DATA);
-
-        if (data == null)
-            return;
-
-        Color oldBar = new Color(itemStack.getBarColor());
-        Color oldBg = new Color(-16777216);
-
-        if (itemStack.isBarVisible()) {
-            int k = i + 2;
-            int l = j + 13;
-            this.fill(RenderPipelines.GUI, k, l, k + 13, l + 2, ARGB.color(Math.round(oldBg.getAlpha() * data.alpha()), oldBg.getRed(), oldBg.getGreen(), oldBg.getBlue()));
-            this.fill(RenderPipelines.GUI, k, l, k + itemStack.getBarWidth(), l + 1, ARGB.color(Math.round(oldBar.getAlpha() * data.alpha()), oldBar.getRed(), oldBar.getGreen(), oldBar.getBlue()));
-        }
-
-        ci.cancel();
-    }
-
-    @Inject(method = "renderItemCount", at = @At("HEAD"), cancellable = true)
-    private void renderChatDependantCount(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
-
-        if (!itemStack.has(EivDataComponents.EMBEDDING_DATA))
-            return;
-
-        if (itemStack.getCount() == 1 && string == null)
-            return;
-
-
-        EmbeddingData data = itemStack.get(EivDataComponents.EMBEDDING_DATA);
-
-        if (data == null)
-            return;
-
-        String string2 = string == null ? String.valueOf(itemStack.getCount()) : string;
-        this.drawString(font, string2, i + 19 - 2 - font.width(string2), j + 6 + 3, ARGB.color(Math.round(255 * data.alpha()), 255, 255, 255), true);
-
-
-        ci.cancel();
-
-    }
 
 }

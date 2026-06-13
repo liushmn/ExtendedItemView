@@ -10,7 +10,7 @@ import org.bukkit.inventory.RecipeChoice;
 public class CompatBlastingRecipe extends CompatSmeltingRecipe {
 
     public static final EivCompatRecipeType<CompatBlastingRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("blasting")
+            new ResourceLocation("blasting")
     );
 
 

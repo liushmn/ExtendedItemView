@@ -27,7 +27,7 @@ public class ForgeEIVClient {
     @SubscribeEvent
     public static void onRegistry(RegisterEvent event) {
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> {
-            helper.register(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
+            helper.register(new ResourceLocation(CommonEIV.MODID, "recipe_view"), CommonEIVClient.RECIPE_VIEW_MENU);
         });
 
     }

@@ -10,7 +10,7 @@ import org.bukkit.inventory.RecipeChoice;
 public class CompatCampfireRecipe extends CompatSmeltingRecipe {
 
     public static final EivCompatRecipeType<CompatCampfireRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("campfire_cooking")
+            new ResourceLocation("campfire_cooking")
     );
 
 

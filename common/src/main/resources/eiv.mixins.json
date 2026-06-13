@@ -1,13 +1,11 @@
 {
   "required": true,
   "package": "de.crafty.eiv.common.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "refmap": "eiv.refmap.json",
   "mixins": [
     "advancements.critereon.MixinInventoryChangeTrigger",
-    "network.protocol.common.custom.MixinCustomPacketPayload",
-    "network.protocol.common.custom.MixinPacketProcessor",
     "server.MixinMinecraftServer",
     "server.network.MixinServerGamePacketListenerImpl",
     "world.entity.MixinEntity",
@@ -21,42 +19,29 @@
     "world.entity.npc.SuspiciousStewForEmeraldAccessor",
     "world.entity.npc.TippedArrowForItemsAndEmeraldsAccessor",
     "world.entity.npc.TreasureMapForEmeraldsAccessor",
-    "world.item.alchemy.PotionBrewingAccessor",
-    "world.item.crafting.IngredientAccessor",
+    "world.item.MixinItemStack",
     "world.item.crafting.MixinRecipeManager",
-    "world.item.crafting.TransmuteRecipeAccessor",
-    "world.level.storage.loot.LootPoolAccessor",
-    "world.level.storage.loot.LootTableAccessor",
-    "world.level.storage.loot.entries.CompositeEntryBaseAccessor",
-    "world.level.storage.loot.entries.LootItemAccessor",
-    "world.level.storage.loot.entries.LootPoolSingletonContainerAccessor",
-    "world.level.storage.loot.functions.SetPotionFunctionAccessor"
+    "world.item.crafting.SmithingTransformRecipeAccessor",
+    "world.item.crafting.SmithingTrimRecipeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
     "client.MixinMinecraft",
-    "client.gui.MixinGui",
+    "client.MixinMouseHandler",
     "client.gui.MixinGuiGraphics",
     "client.gui.components.IChatComponentAccessor",
     "client.gui.components.MixinChatComponent",
     "client.gui.components.MixinEditBox",
-    "client.gui.render.MixinGuiRenderer",
-    "client.gui.render.pip.MixinPictureInPictureRenderer",
     "client.gui.screens.MixinChatScreen",
     "client.gui.screens.MixinScreen",
     "client.gui.screens.inventory.MixinAbstractContainerScreen",
-    "client.gui.screens.inventory.MixinAbstractRecipeBookScreen",
     "client.gui.screens.inventory.MixinCreativeModeInventoryScreen",
     "client.gui.screens.inventory.MixinEffectsInInventory",
     "client.gui.screens.recipebook.MixinRecipeBookComponent",
-    "client.multiplayer.MixinClientCommonPacketListenerImpl",
     "client.multiplayer.MixinClientPacketListener",
-    "client.renderer.entity.state.MixinEntityRenderState",
-    "client.renderer.item.MixinItemStackRenderState",
-    "client.renderer.item.MixinSpecialModelWrapper",
-    "client.renderer.special.MixinSpecialModelRenderers",
-    "network.protocol.common.custom.MixinDiscardedPayload"
+    "client.renderer.MixinBlockEntityWithoutLevelRenderer",
+    "client.renderer.entity.MixinItemRenderer"
   ]
 }

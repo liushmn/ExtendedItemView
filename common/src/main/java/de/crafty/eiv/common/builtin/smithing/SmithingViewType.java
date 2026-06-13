@@ -15,8 +15,8 @@ public class SmithingViewType implements IEivRecipeViewType {
 
     protected static final SmithingViewType INSTANCE = new SmithingViewType();
 
-    private static final ResourceLocation SMITHING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smithing.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smithing.png");
+    private static final ResourceLocation SMITHING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/smithing.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/smithing.png");
 
     @Override
     public Component getDisplayName() {
@@ -25,7 +25,7 @@ public class SmithingViewType implements IEivRecipeViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.withDefaultNamespace("smithing");
+        return new ResourceLocation("smithing");
     }
 
     @Override

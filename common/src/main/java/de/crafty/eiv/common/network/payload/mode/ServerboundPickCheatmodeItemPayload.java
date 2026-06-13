@@ -1,31 +1,50 @@
 package de.crafty.eiv.common.network.payload.mode;
 
 import de.crafty.eiv.common.CommonEIV;
+import de.crafty.eiv.common.network.payload.ICustomEivPayload;
 import de.crafty.eiv.common.recipe.util.EivTagUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-public record ServerboundPickCheatmodeItemPayload(ItemStack stack, int amount) implements CustomPacketPayload {
+public class ServerboundPickCheatmodeItemPayload implements ICustomEivPayload {
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundPickCheatmodeItemPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.COMPOUND_TAG,
-            serverboundPickCheatmodeItemPayload -> EivTagUtil.encodeItemStackOnClient(serverboundPickCheatmodeItemPayload.stack()),
-            ByteBufCodecs.INT,
-            ServerboundPickCheatmodeItemPayload::amount,
-            (compoundTag, amount) -> new ServerboundPickCheatmodeItemPayload(EivTagUtil.decodeItemStackOnServer(compoundTag), amount)
-    );
+    private ItemStack stack;
+    private int amount;
 
-    public static final Type<ServerboundPickCheatmodeItemPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "pick_cheatmode_item"));
+    public static final ResourceLocation ID = new ResourceLocation(CommonEIV.MODID, "pick_cheatmode_item");
 
+
+    public ServerboundPickCheatmodeItemPayload(ItemStack stack, int amount){
+        this.stack = stack;
+        this.amount = amount;
+    }
+
+    public ServerboundPickCheatmodeItemPayload(){}
 
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void writeTag(CompoundTag tag) {
+        tag.put("stack", EivTagUtil.encodeItemStackOnClient(this.stack));
+        tag.putInt("amount", this.amount);
+    }
+
+    @Override
+    public void readTag(CompoundTag tag) {
+        this.stack = EivTagUtil.decodeItemStackOnServer(tag.getCompound("stack"));
+        this.amount = tag.getInt("amount");
+    }
+
+    @Override
+    public ResourceLocation getIdentifier() {
+        return ID;
+    }
+
+    public ItemStack getStack() {
+        return this.stack;
+    }
+
+    public int getAmount() {
+        return this.amount;
     }
 }

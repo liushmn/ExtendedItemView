@@ -6,7 +6,6 @@ import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -44,7 +43,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     }
 
     @Override
-    protected boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
+    protected boolean scrollMouse(double mouseX, double mouseY, double scrolledY) {
 
         if (CommonEIVClient.isCheatmodeActive()) {
             for (ItemSlot slot : this.itemSlots()) {
@@ -75,10 +74,10 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     }
 
     @Override
-    protected boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    protected boolean mouseClicked(int mouseX, int mouseY, int mouseButton, boolean doubleClick) {
         for (ItemSlot itemSlot : this.itemSlots()) {
             if (itemSlot.isHovered()) {
-                itemSlot.onClicked((int) event.x(), (int) event.y(), event.button());
+                itemSlot.onClicked( mouseX, mouseY, mouseButton);
                 return true;
             }
         }
@@ -134,11 +133,11 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
 
         float scaleFactor = Math.min(1.0F, 1.0F / (font.width(comp) / ((Configs.CLIENT_SETTINGS.isItemWrapMode() ? this.width : this.effectiveWidth) - 4.0F)));
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y);
-        guiGraphics.pose().scale(scaleFactor, scaleFactor);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x, y, 0);
+        guiGraphics.pose().scale(scaleFactor, scaleFactor, 1.0F);
         guiGraphics.drawCenteredString(font, comp, 0, 0, color);
-        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().popPose();
 
     }
 

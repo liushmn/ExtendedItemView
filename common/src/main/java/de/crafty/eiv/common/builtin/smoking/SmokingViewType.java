@@ -13,8 +13,8 @@ public class SmokingViewType extends SmeltingViewType {
 
     public static final SmokingViewType INSTANCE = new SmokingViewType();
 
-    private static final ResourceLocation BLASTING_LOCATION = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/type/smoking.png");
-    private static final ResourceLocation CHAT_BACKGROUND = ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "textures/gui/embeddings/container/smoking.png");
+    private static final ResourceLocation BLASTING_LOCATION = new ResourceLocation(CommonEIV.MODID, "textures/gui/type/smoking.png");
+    private static final ResourceLocation CHAT_BACKGROUND = new ResourceLocation(CommonEIV.MODID, "textures/gui/embeddings/container/smoking.png");
 
     @Override
     public Component getDisplayName() {
@@ -33,7 +33,7 @@ public class SmokingViewType extends SmeltingViewType {
 
     @Override
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(CommonEIV.MODID, "furnace_smoking");
+        return new ResourceLocation(CommonEIV.MODID, "furnace_smoking");
     }
 
     @Override

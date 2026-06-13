@@ -2,47 +2,50 @@ package de.crafty.eiv.common.builtin.shapeless;
 
 import de.crafty.eiv.common.api.recipe.IEivViewRecipe;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
-import de.crafty.eiv.common.builtin.transmute.TransmuteServerRecipe;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShapelessViewRecipe implements IEivViewRecipe {
 
+    private final ResourceLocation id;
     private final SlotContent result;
     private final List<SlotContent> ingredients;
 
-    public ShapelessViewRecipe(ShapelessServerRecipe shapelessRecipe) {
+    public ShapelessViewRecipe(ShapelessRecipe shapelessRecipe) {
+        this.id = shapelessRecipe.getId();
         this.ingredients = new ArrayList<>();
 
         shapelessRecipe.getIngredients().forEach(ingredient -> {
             this.ingredients.add(SlotContent.of(ingredient));
         });
 
-        this.result = SlotContent.of(shapelessRecipe.getResult());
+        this.result = SlotContent.of(shapelessRecipe.getResultItem(null));
     }
 
-    private ShapelessViewRecipe(SlotContent result, List<SlotContent> ingredients) {
+    private ShapelessViewRecipe(ResourceLocation id, SlotContent result, List<SlotContent> ingredients) {
+        this.id = id;
         this.result = result;
         this.ingredients = ingredients;
     }
 
-    public ShapelessViewRecipe(TransmuteServerRecipe transmuteRecipe) {
-        this.ingredients = new ArrayList<>();
-        this.ingredients.add(SlotContent.of(transmuteRecipe.getInput()));
-        this.ingredients.add(SlotContent.of(transmuteRecipe.getMaterial()));
-
-        this.result = SlotContent.of(transmuteRecipe.getResults());
-    }
+    //TODO reimplement Transmute Recipes
 
     @Override
     public IEivRecipeViewType getViewType() {
         return ShapelessViewType.INSTANCE;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -108,6 +111,6 @@ public class ShapelessViewRecipe implements IEivViewRecipe {
     @Override
     public IEivViewRecipe asChatCopy() {
         List<SlotContent> ingredients = this.ingredients.stream().map(SlotContent::copy).toList();
-        return new  ShapelessViewRecipe(this.result.copy(), ingredients);
+        return new  ShapelessViewRecipe(this.id, this.result.copy(), ingredients);
     }
 }

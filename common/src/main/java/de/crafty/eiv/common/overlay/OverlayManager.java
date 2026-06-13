@@ -6,8 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
@@ -25,8 +23,10 @@ public class OverlayManager {
     private final List<GuiEventListener> oldWidgets = new ArrayList<>();
     private final HashMap<AbstractEivOverlay, AbstractEivOverlay.ScreenContext> screenContextMap = new HashMap<>();
     private boolean queuedWidgetUpdate = false;
+    private long lastMouseClick = -1;
 
     private final List<BlockingGuiComponent> guiBlockings = new ArrayList<>();
+
 
 
     public boolean hasQueuedWidgetUpdate() {
@@ -112,10 +112,10 @@ public class OverlayManager {
         return this.oldWidgets;
     }
 
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         boolean b = false;
 
-        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(event)) {
+        if (CommonEIVClient.TOGGLE_OVERLAY_KEYBIND.matches(keyCode, scanCode)) {
             PRESENT_OVERLAYS.forEach(abstractEivOverlay -> abstractEivOverlay.setEnabled(!abstractEivOverlay.isEnabled()));
             return true;
         }
@@ -124,7 +124,7 @@ public class OverlayManager {
             if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
-            if (overlay.keyPressed(event))
+            if (overlay.keyPressed(keyCode, scanCode, modifiers))
                 b = true;
         }
 
@@ -145,15 +145,18 @@ public class OverlayManager {
         return b;
     }
 
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    //TODO implement double click
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
         boolean b = false;
 
+        boolean doubleClick = System.currentTimeMillis() - this.lastMouseClick < 250;
+        this.lastMouseClick = System.currentTimeMillis();
 
         this.screenContextMap.forEach((abstractEivOverlay, screenContext) -> {
             screenContext.renderables().forEach(guiEventListener -> {
-                if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(event.x(), event.y()))
+                if (guiEventListener.isFocused() && !guiEventListener.isMouseOver(mouseX, mouseY))
                     guiEventListener.setFocused(false);
-                if (guiEventListener.isMouseOver(event.x(), event.y()) && event.button() == 0)
+                if (guiEventListener.isMouseOver(mouseX, mouseY) && mouseButton == 0)
                     guiEventListener.setFocused(true);
             });
         });
@@ -163,17 +166,17 @@ public class OverlayManager {
             if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
                 continue;
 
-            if (!(event.x() >= overlay.getX() && event.x() <= overlay.getX() + overlay.getWidth() && event.y() >= overlay.getY() && event.y() <= overlay.getY() + overlay.getHeight()))
+            if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
                 continue;
 
-            if (overlay.mouseClicked(event, doubleClick))
+            if (overlay.mouseClicked(mouseX, mouseY, mouseButton, doubleClick))
                 b = true;
         }
 
         return b;
     }
 
-    public boolean scrollMouse(double mouseX, double mouseY, double scrolledX, double scrolledY) {
+    public boolean scrollMouse(double mouseX, double mouseY, double scrolledY) {
         boolean b = false;
         for (AbstractEivOverlay overlay : PRESENT_OVERLAYS) {
             if (!overlay.isEnabled() || !overlay.isEnoughSpaceToRender())
@@ -182,7 +185,7 @@ public class OverlayManager {
             if (!(mouseX >= overlay.getX() && mouseX <= overlay.getX() + overlay.getWidth() && mouseY >= overlay.getY() && mouseY <= overlay.getY() + overlay.getHeight()))
                 continue;
 
-            if (overlay.scrollMouse(mouseX, mouseY, scrolledX, scrolledY))
+            if (overlay.scrollMouse(mouseX, mouseY, scrolledY))
                 b = true;
         }
 
@@ -198,7 +201,7 @@ public class OverlayManager {
     public void renderAll(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         PRESENT_OVERLAYS.stream().filter(AbstractEivOverlay::isEnabled).filter(AbstractEivOverlay::isEnoughSpaceToRender).forEach(overlay -> overlay.render(guiGraphics, mouseX, mouseY, partialTicks));
 
-        if (Minecraft.getInstance().gui.getDebugOverlay().showDebugScreen())
+        if (Minecraft.getInstance().options.renderDebug)
             this.renderDebug(guiGraphics, mouseX, mouseY, partialTicks);
     }
 

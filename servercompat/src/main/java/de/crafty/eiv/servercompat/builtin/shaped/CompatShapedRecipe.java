@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class CompatShapedRecipe implements IEivCompatServerRecipe {
 
     public static final EivCompatRecipeType<CompatShapedRecipe> TYPE = EivCompatRecipeType.register(
-            ResourceLocation.withDefaultNamespace("shaped_crafting")
+            new ResourceLocation("shaped_crafting")
     );
 
 
