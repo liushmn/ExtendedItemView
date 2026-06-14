@@ -141,7 +141,7 @@ public class ItemViewOverlay extends AbstractEivItemListOverlay {
 
         this.availableItems().removeIf(stack -> ItemView.getExcluded().contains(stack.getItem()));
 
-        this.updateSlots();
+        this.updateSlots(SlotUpdateType.DEFAULT);
     }
 
 

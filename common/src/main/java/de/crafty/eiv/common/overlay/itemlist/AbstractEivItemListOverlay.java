@@ -4,6 +4,7 @@ import de.crafty.eiv.common.CommonEIVClient;
 import de.crafty.eiv.common.config.Configs;
 import de.crafty.eiv.common.overlay.AbstractEivOverlay;
 import de.crafty.eiv.common.overlay.ItemSlot;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -68,7 +69,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
             this.startIndex = Math.max(0, this.startIndex - fittingPerPage);
 
         if (scrolledY != 0)
-            this.updateSlots();
+            this.updateSlots(SlotUpdateType.DEFAULT);
 
 
         return true;
@@ -90,7 +91,7 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
     /**
      * Responsible for adding the item entries to the overlay
      */
-    public void updateSlots() {
+    public void updateSlots(SlotUpdateType updateType) {
         this.itemSlots().clear();
 
         int currentStackPos = this.startIndex;
@@ -121,7 +122,8 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
         }
 
         this.fittingPerPage = currentStackPos - this.startIndex;
-
+        if(updateType == SlotUpdateType.ADDED && ItemStack.isSameItemSameComponents(this.availableItems.getLast(), this.itemSlots().getLast().getStack()))
+            this.itemSlots().getLast().setTimeAdded(Minecraft.getInstance().level.getGameTime());
     }
 
 
@@ -164,5 +166,11 @@ public abstract class AbstractEivItemListOverlay extends AbstractEivOverlay {
         return this.availableItems;
     }
 
+
+    public enum SlotUpdateType {
+        ADDED,
+        REMOVED,
+        DEFAULT
+    }
 
 }

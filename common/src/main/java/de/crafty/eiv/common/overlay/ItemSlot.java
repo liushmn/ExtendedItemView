@@ -31,6 +31,8 @@ public class ItemSlot {
     private boolean hovered;
 
     private int currentCheatmodeCount = 1;
+    private long timeAdded = -1;
+    private long timeRemoved = -1;
 
     public ItemSlot(ItemStack stack, int x, int y) {
         this.stack = stack;
@@ -39,6 +41,9 @@ public class ItemSlot {
         this.y = y;
     }
 
+    public void setTimeAdded(long time) {
+        this.timeAdded = time;
+    }
 
     public void changeCheatmodeCount(int change) {
         this.currentCheatmodeCount += change;
@@ -72,7 +77,15 @@ public class ItemSlot {
             guiGraphicsExtractor.fill(this.x, this.y, this.x + 20, this.y + 20, new Color(255, 255, 255, 32).getRGB());
 
 
-        guiGraphicsExtractor.item(this.stack, this.x + 2, this.y + 2);
+        long currentGameTime = Minecraft.getInstance().level.getGameTime();
+
+        guiGraphicsExtractor.pose().pushMatrix();
+        guiGraphicsExtractor.pose().translate(this.x + 2, this.y + 2);
+        if(this.timeAdded >= 0)
+            guiGraphicsExtractor.pose().scale(1.5F - 0.5F * (Math.min((currentGameTime + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks() - this.timeAdded) / 1.75F, 1.0F)));
+
+        guiGraphicsExtractor.item(this.stack, 0, 0);
+        guiGraphicsExtractor.pose().popMatrix();
 
 
         if (this.isHovered())

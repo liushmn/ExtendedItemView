@@ -29,9 +29,9 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
 
     public void bookmarkItem(ItemStack stack) {
-        if (!this.availableItems().contains(stack)) {
+        if (this.availableItems().stream().noneMatch(stack1 -> ItemStack.isSameItemSameComponents(stack1, stack))) {
             this.availableItems().add(stack);
-            this.updateSlots();
+            this.updateSlots(SlotUpdateType.ADDED);
         }
     }
 
@@ -39,7 +39,7 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
     public void onScreenChanged(InventoryPositionInfo info) {
         this.initForScreen(info.screen(), info);
         super.onScreenChanged(info);
-        this.updateSlots();
+        this.updateSlots(SlotUpdateType.DEFAULT);
     }
 
 
@@ -101,10 +101,10 @@ public class ItemBookmarkOverlay extends AbstractEivItemListOverlay {
 
             if (CommonEIVClient.ADD_BOOKMARK_KEYBIND.matches(event)) {
                 this.availableItems.remove(slot.getStack());
-                this.updateSlots();
+                this.updateSlots(SlotUpdateType.REMOVED);
                 if (this.itemSlots().isEmpty() && !this.availableItems.isEmpty()) {
                     this.startIndex = Math.max(0, this.startIndex - this.fittingPerPage());
-                    this.updateSlots();
+                    this.updateSlots(SlotUpdateType.DEFAULT);
                 }
                 return true;
             }
